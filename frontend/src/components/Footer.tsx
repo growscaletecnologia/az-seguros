@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Shield, Facebook, Instagram, Twitter, Mail, Phone, MapPin } from 'lucide-react';
+import Image from 'next/image';
 
 export default function Footer() {
   return (
@@ -72,6 +73,13 @@ export default function Footer() {
 
         <div className="border-t border-gray-800 mt-8 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className='flex flex-row gap-2'>
+              <p>Desenvolvido com ❤️ por </p>
+              
+              <a href="https://growscale.com.br/" target='_blank' >
+                <Image alt="logo-grow" width={100} height={60} src={"/logo-grow&scale.svg"}></Image>
+              </a>
+            </div>
             <p className="text-gray-400 text-sm">
               © 2024 SeguroViagem. Todos os direitos reservados.
             </p>

@@ -14,7 +14,7 @@ export default function Header() {
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
             <Shield className="h-8 w-8 text-blue-600" />
-            <span className="text-xl font-bold text-gray-900">Az Seguros</span>
+            <span className="text-xl font-bold text-gray-900">Seguro Viagem</span>
           </Link>
 
           {/* Desktop Navigation */}

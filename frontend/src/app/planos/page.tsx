@@ -287,7 +287,7 @@ export default function PlanosPage() {
                 )}
               </div>
               
-              <select className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <select className="px-3 py-2 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <option>Ordenar por: Melhor preço</option>
                 <option>Ordenar por: Maior cobertura</option>
                 <option>Ordenar por: Melhor avaliação</option>
@@ -456,7 +456,7 @@ export default function PlanosPage() {
                     <div className="space-y-3 text-black text-sm">
                       <div className="flex justify-between">
                         <span>Cobertura Médica:</span>
-                        <span className="font-medium">USD {plan.coberturaMedica.toLocaleString()}</span>
+                        <p className="font-medium !text-black ">USD {plan.coberturaMedica.toLocaleString()}</p>
                       </div>
                       <div className="flex justify-between">
                         <span>Bagagem:</span>
