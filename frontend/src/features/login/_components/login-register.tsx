@@ -18,11 +18,11 @@ export function LoginRegister({ className, goToBackStep, ...props }: LoginRegist
 					<Input className="w-full" />
 					<Input className="w-full" />
 				</div>
-				<Button asChild effect={"hoverUnderline"} variant={"link"}>
+				{/* <Button asChild effect={"hoverUnderline"} variant={"link"}>
 					<Link href={"/"} className="w-fit">
 						Esqueci minha senha
 					</Link>
-				</Button>
+				</Button> */}
 			</div>
 			<div className="flex gap-4 w-full items-center flex-col">
 				<Button className="w-full">Entrar</Button>

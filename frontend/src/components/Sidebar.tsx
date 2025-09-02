@@ -1,4 +1,5 @@
-'use client';
+"use client";
+
 import {
   ClipboardCheck,
   Home,
@@ -10,23 +11,31 @@ import {
   ShoppingCart,
   TagIcon,
   Users2,
-} from 'lucide-react';
-import LinkWithTooltip from '../linkWithTooltip';
+} from "lucide-react";
 
-import LogoWhite from '@/assets/logo-special-branca.webp';
-import LogoBlack from '@/assets/logo-special-preta.webp';
+import LogoWhite from "@/assets/logo-special-branca.webp";
+import LogoBlack from "@/assets/logo-special-preta.webp";
 
-import Image from 'next/image';
-import Link from 'next/link';
+import Image from "next/image";
+import Link from "next/link";
 
-import { Separator } from '@/components/ui/separator';
-import { cn } from '@/lib/utils';
-import { DropdownMenu } from '@radix-ui/react-dropdown-menu';
-import { useTheme } from 'next-themes';
-import { DropdownMenuContent, DropdownMenuTrigger } from '../ui/dropdown-menu';
+import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";	
+import { useTheme } from "next-themes";
 
 interface SidebarLinkElProps {
-  icon: any;
+  icon: React.ReactNode;
   link: string;
   text: string;
 }
@@ -36,8 +45,8 @@ const SideBarLinkEl = ({ icon, link, text }: SidebarLinkElProps) => {
     <Link href={link}>
       <li
         className={cn(
-          'relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 ',
-          'flex items-center gap-2',
+          "relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 ",
+          "flex items-center gap-2"
         )}
       >
         {icon}
@@ -47,33 +56,61 @@ const SideBarLinkEl = ({ icon, link, text }: SidebarLinkElProps) => {
   );
 };
 
+const SidebarLink = ({
+  href,
+  icon,
+  text,
+}: {
+  href: string;
+  icon: React.ReactNode;
+  text: string;
+}) => {
+  return (
+    <TooltipProvider delayDuration={300}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Link
+            href={href}
+            className="flex items-center gap-2 px-2 py-1.5 rounded-sm text-sm hover:bg-accent hover:text-accent-foreground"
+          >
+            {icon}
+            <span>{text}</span>
+          </Link>
+        </TooltipTrigger>
+        <TooltipContent side="right">
+          <p>{text}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
+
 const SidebarLinks = () => {
   const { theme } = useTheme();
 
   return (
     <div>
-      {/* <Pipette /> */}
-      <Link href={'/admin/'}>
+      <Link href={"/admin/"}>
         <Image
           alt="Logo Special Paraná"
-          src={theme === 'dark' ? LogoWhite : LogoBlack}
+          src={theme === "dark" ? LogoWhite : LogoBlack}
           className="cursor-pointer p-3 w-full"
         />
         <Separator />
       </Link>
       <nav className="flex flex-col gap-4 px-2 sm:py-5">
-        <LinkWithTooltip
-          href={'/admin/'}
+        <SidebarLink
+          href={"/admin/"}
           icon={<Home className="h-5 w-5" />}
           text="Dashboard"
         />
-        <LinkWithTooltip
-          href={'/admin/users'}
+        <SidebarLink
+          href={"/admin/users"}
           icon={<Users2 className="h-5 w-5" />}
           text="Usuários"
         />
-        <LinkWithTooltip
-          href={'/admin/profiles'}
+        <SidebarLink
+          href={"/admin/profiles"}
           icon={<ClipboardCheck className="h-5 w-5" />}
           text="Perfis"
         />
@@ -81,7 +118,7 @@ const SidebarLinks = () => {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <div>
-              <LinkWithTooltip
+              <SidebarLink
                 href="#"
                 icon={<Pin className="h-5 w-5" />}
                 text="Publicações"
@@ -112,17 +149,17 @@ const SidebarLinks = () => {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <LinkWithTooltip
+        <SidebarLink
           href="#"
           icon={<ShoppingCart className="h-5 w-5" />}
           text="Reservas"
         />
-        <LinkWithTooltip
+        <SidebarLink
           href="#"
           icon={<Package2 className="h-5 w-5" />}
           text="Clientes"
         />
-        <LinkWithTooltip
+        <SidebarLink
           href="/admin/settings"
           icon={<Settings className="h-5 w-5" />}
           text="Configurações"
