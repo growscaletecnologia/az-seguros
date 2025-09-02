@@ -107,6 +107,18 @@ export default function ClientePage() {
     setShowCancelModal(false);
   };
 
+  const enviarPorEmail = (policyId: number) => {
+    // Simular envio por email
+    const policy = policies.find(p => p.id === policyId);
+    if (policy) {
+      alert(`Enviando detalhes da apólice ${policy.numero} para ${userData.email}...`);
+      // Em uma implementação real, aqui seria feita a chamada para a API de envio de email
+      setTimeout(() => {
+        alert(`E-mail enviado com sucesso para ${userData.email}!`);
+      }, 1000);
+    }
+  };
+
   return (
     <div className="bg-gray-50 min-h-screen">
       {/* Header */}
@@ -309,6 +321,14 @@ export default function ClientePage() {
                             >
                               <Download className="h-4 w-4" />
                               <span>Voucher</span>
+                            </button>
+                            
+                            <button
+                              onClick={() => enviarPorEmail(policy.id)}
+                              className="flex items-center space-x-2 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+                            >
+                              <Mail className="h-4 w-4" />
+                              <span>Enviar por E-mail</span>
                             </button>
                             
                             <button

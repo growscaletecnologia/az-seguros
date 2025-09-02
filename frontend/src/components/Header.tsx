@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Menu, X, Shield, Phone, User } from 'lucide-react';
+import { Menu, X, Shield, Phone, User, Settings2, Settings } from 'lucide-react';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -22,9 +22,6 @@ export default function Header() {
             <Link href="/planos" className="text-gray-700 hover:text-blue-600 font-medium">
               Seguro Viagem
             </Link>
-            <Link href="/seguradoras" className="text-gray-700 hover:text-blue-600 font-medium">
-              Seguradoras
-            </Link>
             <Link href="/ajuda" className="text-gray-700 hover:text-blue-600 font-medium">
               Ajuda
             </Link>
@@ -39,6 +36,14 @@ export default function Header() {
               >
                 <User className="h-4 w-4" />
                 <span>Entrar</span>
+              </Link>
+
+               <Link 
+                href="/entrar" 
+                className="flex items-center space-x-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <Settings className="h-4 w-4" />
+                <span>Admin</span>
               </Link>
             </div>
           </nav>
