@@ -63,6 +63,25 @@ export default function CheckoutPage() {
 			total: subtotal - discount - pixDiscount,
 		};
 	};
+	// ... dentro do componente CheckoutPage
+
+const [segurados, setSegurados] = useState([
+  { nome: "", nascimento: "", cpf: "" },
+]);
+
+		const addSegurado = () => {
+		setSegurados([...segurados, { nome: "", nascimento: "", cpf: "" }]);
+		};
+
+		const updateSegurado = (index: number, field: string, value: string) => {
+		const novos = [...segurados];
+		(novos[index] as any)[field] = value;
+		setSegurados(novos);
+		};
+
+		const removeSegurado = (index: number) => {
+		setSegurados(segurados.filter((_, i) => i !== index));
+		};
 
 	const totals = calculateTotal();
 
@@ -87,8 +106,78 @@ export default function CheckoutPage() {
 
 			<div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 				<div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+					{/* Identificação dos Segurados */}
+
+
 					{/* Formulário de Pagamento */}
 					<div className="lg:col-span-2 space-y-6">
+						<div className="bg-white rounded-lg shadow-sm p-6">
+  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+    Identificação dos Segurados
+  </h3>
+
+  {segurados.map((seg, index) => (
+    <div
+      key={index}
+      className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 items-end"
+    >
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Nome Completo
+        </label>
+        <input
+          type="text"
+          value={seg.nome}
+          onChange={(e) => updateSegurado(index, "nome", e.target.value)}
+          placeholder="Digite o nome completo"
+          className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Data de Nascimento
+        </label>
+        <input
+          type="date"
+          value={seg.nascimento}
+          onChange={(e) => updateSegurado(index, "nascimento", e.target.value)}
+          className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+      <div className="flex items-center gap-2">
+        <div className="flex-1">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            CPF
+          </label>
+          <input
+            type="text"
+            value={seg.cpf}
+            onChange={(e) => updateSegurado(index, "cpf", e.target.value)}
+            placeholder="000.000.000-00"
+            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        {segurados.length > 1 && (
+          <button
+            type="button"
+            onClick={() => removeSegurado(index)}
+            className="px-3 py-2 text-sm text-red-600 hover:underline"
+          >
+            Remover
+          </button>
+        )}
+      </div>
+    </div>
+  ))}
+
+  <button
+    type="button"
+    onClick={addSegurado}
+    className="w-full mt-2 border-2 border-dashed border-green-400 text-green-600 py-3 rounded-lg font-medium flex items-center justify-center hover:bg-green-50"
+  >
+    + Adicionar Segurado
+  </button>
+</div>
 						{/* Dados da Cotação */}
 						<div className="bg-white rounded-lg shadow-sm p-6">
 							<h3 className="text-lg font-semibold text-gray-900 mb-4">
@@ -369,18 +458,18 @@ export default function CheckoutPage() {
 								</h4>
 								<div className="space-y-1 text-sm text-gray-600">
 									<p>
-										• Cobertura Médica: USD{" "}
+										 Cobertura Médica: USD{" "}
 										{selectedPlan.coberturaMedica.toLocaleString()}
 									</p>
 									<p>
-										• Bagagem: USD{" "}
+										 Bagagem: USD{" "}
 										{selectedPlan.coberturaBagagem.toLocaleString()}
 									</p>
 									<p>
-										• Cancelamento: USD{" "}
+										 Cancelamento: USD{" "}
 										{selectedPlan.coberturaCancelamento.toLocaleString()}
 									</p>
-									<p>• COVID-19: Incluído</p>
+									<p> COVID-19: Incluído</p>
 								</div>
 							</div>
 

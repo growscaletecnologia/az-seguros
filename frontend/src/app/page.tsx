@@ -112,6 +112,124 @@ export default function HomePage() {
 				</div>
 			</section>
 
+			{/* Seção Seguros Temáticos */}
+				<section className="py-16 bg-gray-50">
+				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+					<div className="text-center mb-12">
+					<h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+						Confira seguros de viagem para suas necessidades
+					</h2>
+					</div>
+
+					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+					{/* Card 1 */}
+					<div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+						<Image
+						src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e" // oceano
+						alt="Seguro Viagem Marítimo"
+						width={400}
+						height={250}
+						className="w-full h-48 object-cover"
+						/>
+						<div className="p-4">
+						<h3 className="text-lg font-semibold text-gray-900 mb-2">
+							Seguro Viagem Marítimo
+						</h3>
+						<p className="text-gray-600 mb-4">
+							Proteção contra imprevistos em alto mar, incluindo assistência a
+							bordo e emergências durante cruzeiros.
+						</p>
+						<Link
+							href="/planos"
+							className="text-green-600 font-semibold hover:underline flex items-center gap-1"
+						>
+							Saiba Mais <ArrowRight className="w-4 h-4" />
+						</Link>
+						</div>
+					</div>
+
+					{/* Card 2 */}
+					<div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+						<Image
+						src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b" // estudantes
+						alt="Seguro Viagem Intercâmbio"
+						width={400}
+						height={250}
+						className="w-full h-48 object-cover"
+						/>
+						<div className="p-4">
+						<h3 className="text-lg font-semibold text-gray-900 mb-2">
+							Seguro Viagem Intercâmbio
+						</h3>
+						<p className="text-gray-600 mb-4">
+							Estude em outro país com tranquilidade. Cobertura para saúde,
+							acidentes e suporte durante todo o programa de intercâmbio.
+						</p>
+						<Link
+							href="/planos"
+							className="text-green-600 font-semibold hover:underline flex items-center gap-1"
+						>
+							Saiba Mais <ArrowRight className="w-4 h-4" />
+						</Link>
+						</div>
+					</div>
+
+					{/* Card 3 */}
+					<div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+						<Image
+						src="https://images.unsplash.com/photo-1536213712468-eaae5b7a6d51?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fG11bGhlciUyMGdyJUMzJTgzJUMyJUExdmlkYXxlbnwwfHwwfHx8MA%3D%3D"
+						alt="Gestante em ambiente natural, com vestido azul claro"
+						width={400}
+						height={250}
+						className="w-full h-48 object-cover"
+						/>
+						<div className="p-4">
+						<h3 className="text-lg font-semibold text-gray-900 mb-2">
+							Seguro Viagem para Gestantes
+						</h3>
+						<p className="text-gray-600 mb-4">
+							Viaje com segurança durante a gestação. Coberturas especiais para
+							emergências e acompanhamento médico.
+						</p>
+						<Link
+							href="/planos"
+							className="text-green-600 font-semibold hover:underline flex items-center gap-1"
+						>
+							Saiba Mais <ArrowRight className="w-4 h-4" />
+						</Link>
+						</div>
+					</div>
+
+					{/* Card 4 */}
+					<div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+						<Image
+						src="https://images.unsplash.com/photo-1501785888041-af3ef285b470" // montanhas
+						alt="Seguro Viagem Mochilão"
+						width={400}
+						height={250}
+						className="w-full h-48 object-cover"
+						/>
+						<div className="p-4">
+						<h3 className="text-lg font-semibold text-gray-900 mb-2">
+							Seguro Viagem Mochilão
+						</h3>
+						<p className="text-gray-600 mb-4">
+							Explore o mundo com tranquilidade. Assistência para múltiplos países
+							e coberturas pensadas para mochileiros.
+						</p>
+						<Link
+							href="/planos"
+							className="text-green-600 font-semibold hover:underline flex items-center gap-1"
+						>
+							Saiba Mais <ArrowRight className="w-4 h-4" />
+						</Link>
+						</div>
+					</div>
+					</div>
+				</div>
+				</section>
+
+
 			{/* Diferenciais */}
 			<section className="py-16 bg-gray-50">
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

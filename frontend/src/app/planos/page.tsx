@@ -161,10 +161,10 @@ const benefitsByPlan: Record<number, BenefitItem[]> = {
 		{ titulo: "Franquia de DMH", valor: "NÃO" },
 		{
 			titulo: "Despesa Médica Hospitalar Total",
-			valor: "USD 60.000",
+			valor: "USD 60,000",
 			extra: "Valor total de despesas médicas hospitalares.",
 		},
-		{ titulo: "Despesa Médica Hospitalar", valor: "USD 60.000" },
+		{ titulo: "Despesa Médica Hospitalar", valor: "USD 60,000" },
 		{ titulo: "Cobertura Médica para Prática de Esportes", valor: "USD 10.000" },
 		{ titulo: "Cobertura Médica para Gestante", valor: "USD 30.000" },
 		{ titulo: "Telemedicina", valor: "SIM" },
@@ -198,7 +198,7 @@ const benefitsByPlan: Record<number, BenefitItem[]> = {
 	5: [
 		{ titulo: "Permite emissão em viagem?", valor: "NÃO" },
 		{ titulo: "Validade Geográfica", valor: "EUROPA" },
-		{ titulo: "Despesa Médica Hospitalar Total", valor: "USD 60.000" },
+		{ titulo: "Despesa Médica Hospitalar Total", valor: "USD 60,000" },
 		{ titulo: "Prática de Esportes", valor: "DENTRO DMH" },
 	],
 };
@@ -459,7 +459,7 @@ export default function PlanosPage() {
 										<option value="">Qualquer valor</option>
 										<option value="30000">USD 30.000</option>
 										<option value="40000">USD 40.000</option>
-										<option value="60000">USD 60.000</option>
+										<option value="60000">USD 60,000</option>
 										<option value="75000">USD 75.000</option>
 									</select>
 								</div>
@@ -819,7 +819,7 @@ export default function PlanosPage() {
 												<button
 													className="mt-4 inline-flex items-center gap-2 border rounded-lg px-4 py-2 text-sm text-emerald-700 hover:bg-emerald-50"
 													onClick={() =>
-														alert("Mock: enviar comparação por e-mail")
+														alert("enviar comparação por e-mail")
 													}
 												>
 													<svg
@@ -868,7 +868,7 @@ export default function PlanosPage() {
 														<button
 															className="mt-3 w-full bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-semibold py-2 rounded-lg"
 															onClick={() =>
-																alert(`Mock: comprar ${plan.plano}`)
+																alert(`comprar ${plan.plano}`)
 															}
 														>
 															Comprar

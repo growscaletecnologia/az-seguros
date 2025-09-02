@@ -107,12 +107,12 @@ export const mockProducts: Product[] = [
 			{
 				id: "despesa_medica_total",
 				label: "Despesa Médica Hospitalar Total",
-				value: "USD 60.000",
+				value: "USD 60,000",
 			},
 			{
 				id: "despesa_medica_hospitalar",
 				label: "Despesa Médica Hospitalar",
-				value: "USD 60.000",
+				value: "USD 60,000",
 			},
 			{
 				id: "cobertura_esportes",
