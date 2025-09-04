@@ -70,7 +70,7 @@ const AdminSidebar = () => {
 		},
 		{
 			id: "conteudos",
-			label: "Gestão de Conteúdos",
+			label: "Gestão de Páginas",
 			href: "/admin/conteudos",
 			icon: <Settings className="h-5 w-5" />,
 		},

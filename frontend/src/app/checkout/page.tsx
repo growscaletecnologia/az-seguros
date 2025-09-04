@@ -63,25 +63,23 @@ export default function CheckoutPage() {
 			total: subtotal - discount - pixDiscount,
 		};
 	};
-	// ... dentro do componente CheckoutPage
 
-const [segurados, setSegurados] = useState([
-  { nome: "", nascimento: "", cpf: "" },
-]);
+	const [segurados, setSegurados] = useState([{ nome: "", nascimento: "", cpf: "" }]);
 
-		const addSegurado = () => {
+	const addSegurado = () => {
 		setSegurados([...segurados, { nome: "", nascimento: "", cpf: "" }]);
-		};
+	};
 
-		const updateSegurado = (index: number, field: string, value: string) => {
+	const updateSegurado = (index: number, field: string, value: string) => {
 		const novos = [...segurados];
+
 		(novos[index] as any)[field] = value;
 		setSegurados(novos);
-		};
+	};
 
-		const removeSegurado = (index: number) => {
+	const removeSegurado = (index: number) => {
 		setSegurados(segurados.filter((_, i) => i !== index));
-		};
+	};
 
 	const totals = calculateTotal();
 
@@ -108,76 +106,81 @@ const [segurados, setSegurados] = useState([
 				<div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 					{/* Identificação dos Segurados */}
 
-
 					{/* Formulário de Pagamento */}
 					<div className="lg:col-span-2 space-y-6">
 						<div className="bg-white rounded-lg shadow-sm p-6">
-  <h3 className="text-lg font-semibold text-gray-900 mb-4">
-    Identificação dos Segurados
-  </h3>
+							<h3 className="text-lg font-semibold text-gray-900 mb-4">
+								Identificação dos Segurados
+							</h3>
 
-  {segurados.map((seg, index) => (
-    <div
-      key={index}
-      className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 items-end"
-    >
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Nome Completo
-        </label>
-        <input
-          type="text"
-          value={seg.nome}
-          onChange={(e) => updateSegurado(index, "nome", e.target.value)}
-          placeholder="Digite o nome completo"
-          className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Data de Nascimento
-        </label>
-        <input
-          type="date"
-          value={seg.nascimento}
-          onChange={(e) => updateSegurado(index, "nascimento", e.target.value)}
-          className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
-      <div className="flex items-center gap-2">
-        <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            CPF
-          </label>
-          <input
-            type="text"
-            value={seg.cpf}
-            onChange={(e) => updateSegurado(index, "cpf", e.target.value)}
-            placeholder="000.000.000-00"
-            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-        {segurados.length > 1 && (
-          <button
-            type="button"
-            onClick={() => removeSegurado(index)}
-            className="px-3 py-2 text-sm text-red-600 hover:underline"
-          >
-            Remover
-          </button>
-        )}
-      </div>
-    </div>
-  ))}
+							{segurados.map((seg, index) => (
+								<div
+									key={index}
+									className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 items-end"
+								>
+									<div>
+										<label className="block text-sm font-medium text-gray-700 mb-1">
+											Nome Completo
+										</label>
+										<input
+											type="text"
+											value={seg.nome}
+											onChange={(e) =>
+												updateSegurado(index, "nome", e.target.value)
+											}
+											placeholder="Digite o nome completo"
+											className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+										/>
+									</div>
+									<div>
+										<label className="block text-sm font-medium text-gray-700 mb-1">
+											Data de Nascimento
+										</label>
+										<input
+											type="date"
+											value={seg.nascimento}
+											onChange={(e) =>
+												updateSegurado(index, "nascimento", e.target.value)
+											}
+											className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+										/>
+									</div>
+									<div className="flex items-center gap-2">
+										<div className="flex-1">
+											<label className="block text-sm font-medium text-gray-700 mb-1">
+												CPF
+											</label>
+											<input
+												type="text"
+												value={seg.cpf}
+												onChange={(e) =>
+													updateSegurado(index, "cpf", e.target.value)
+												}
+												placeholder="000.000.000-00"
+												className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+											/>
+										</div>
+										{segurados.length > 1 && (
+											<button
+												type="button"
+												onClick={() => removeSegurado(index)}
+												className="px-3 py-2 text-sm text-red-600 hover:underline"
+											>
+												Remover
+											</button>
+										)}
+									</div>
+								</div>
+							))}
 
-  <button
-    type="button"
-    onClick={addSegurado}
-    className="w-full mt-2 border-2 border-dashed border-green-400 text-green-600 py-3 rounded-lg font-medium flex items-center justify-center hover:bg-green-50"
-  >
-    + Adicionar Segurado
-  </button>
-</div>
+							<button
+								type="button"
+								onClick={addSegurado}
+								className="w-full mt-2 border-2 border-dashed border-green-400 text-green-600 py-3 rounded-lg font-medium flex items-center justify-center hover:bg-green-50"
+							>
+								+ Adicionar Segurado
+							</button>
+						</div>
 						{/* Dados da Cotação */}
 						<div className="bg-white rounded-lg shadow-sm p-6">
 							<h3 className="text-lg font-semibold text-gray-900 mb-4">
@@ -421,6 +424,125 @@ const [segurados, setSegurados] = useState([
 								</div>
 							)}
 						</div>
+						<div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+							<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+								<div>
+									<input
+										type="text"
+										placeholder="Contato"
+										className="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+									/>
+								</div>
+								<div>
+									<input
+										type="email"
+										placeholder="email"
+										className="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+									/>
+								</div>
+								<div>
+									<input
+										type="text"
+										placeholder="telefone"
+										className="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+									/>
+								</div>
+							</div>
+							<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+								{/* CEP */}
+								<div>
+									<input
+										type="text"
+										placeholder="CEP"
+										className="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+									/>
+								</div>
+
+								{/* Endereço */}
+								<div className="md:col-span-2">
+									<input
+										type="text"
+										placeholder="Endereço"
+										className="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+									/>
+								</div>
+
+								{/* Número */}
+								<div>
+									<input
+										type="text"
+										placeholder="Número"
+										className="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+									/>
+								</div>
+
+								{/* Complemento */}
+								<div>
+									<input
+										type="text"
+										placeholder="Complemento"
+										className="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+									/>
+								</div>
+
+								{/* Bairro */}
+								<div>
+									<input
+										type="text"
+										placeholder="Bairro"
+										className="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+									/>
+								</div>
+
+								{/* Cidade */}
+								<div>
+									<input
+										type="text"
+										placeholder="Cidade"
+										className="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+									/>
+								</div>
+
+								{/* Estado */}
+								<div>
+									<select
+										className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+										defaultValue=""
+									>
+										<option value="" disabled>
+											Estado
+										</option>
+										<option value="AC">Acre (AC)</option>
+										<option value="AL">Alagoas (AL)</option>
+										<option value="AP">Amapá (AP)</option>
+										<option value="AM">Amazonas (AM)</option>
+										<option value="BA">Bahia (BA)</option>
+										<option value="CE">Ceará (CE)</option>
+										<option value="DF">Distrito Federal (DF)</option>
+										<option value="ES">Espírito Santo (ES)</option>
+										<option value="GO">Goiás (GO)</option>
+										<option value="MA">Maranhão (MA)</option>
+										<option value="MT">Mato Grosso (MT)</option>
+										<option value="MS">Mato Grosso do Sul (MS)</option>
+										<option value="MG">Minas Gerais (MG)</option>
+										<option value="PA">Pará (PA)</option>
+										<option value="PB">Paraíba (PB)</option>
+										<option value="PR">Paraná (PR)</option>
+										<option value="PE">Pernambuco (PE)</option>
+										<option value="PI">Piauí (PI)</option>
+										<option value="RJ">Rio de Janeiro (RJ)</option>
+										<option value="RN">Rio Grande do Norte (RN)</option>
+										<option value="RS">Rio Grande do Sul (RS)</option>
+										<option value="RO">Rondônia (RO)</option>
+										<option value="RR">Roraima (RR)</option>
+										<option value="SC">Santa Catarina (SC)</option>
+										<option value="SP">São Paulo (SP)</option>
+										<option value="SE">Sergipe (SE)</option>
+										<option value="TO">Tocantins (TO)</option>
+									</select>
+								</div>
+							</div>
+						</div>
 					</div>
 
 					{/* Resumo do Pedido */}
@@ -458,15 +580,15 @@ const [segurados, setSegurados] = useState([
 								</h4>
 								<div className="space-y-1 text-sm text-gray-600">
 									<p>
-										 Cobertura Médica: USD{" "}
+										Cobertura Médica: USD{" "}
 										{selectedPlan.coberturaMedica.toLocaleString()}
 									</p>
 									<p>
-										 Bagagem: USD{" "}
+										Bagagem: USD{" "}
 										{selectedPlan.coberturaBagagem.toLocaleString()}
 									</p>
 									<p>
-										 Cancelamento: USD{" "}
+										Cancelamento: USD{" "}
 										{selectedPlan.coberturaCancelamento.toLocaleString()}
 									</p>
 									<p> COVID-19: Incluído</p>

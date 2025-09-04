@@ -27,6 +27,17 @@ const userData = {
 	telefone: "(11) 99999-9999",
 	cpf: "123.456.789-00",
 	dataNascimento: "15/05/1985",
+	endereco: "Rua das Flores, 123, São Paulo, SP",
+	cidade: "São Paulo",
+	estado: "SP",
+	cep: "01234-567",
+	pais: "Brasil",
+	idioma: "Português",
+	moeda: "BRL",
+	bairro: "Centro",
+	rua: "Rua das Flores",
+	numero: "123",
+	complemento: "Apto 45",
 };
 
 // Dados mock das apólices
@@ -82,6 +93,7 @@ export default function ClientePage() {
 	const [activeTab, setActiveTab] = useState("dashboard");
 	const [selectedPolicy, setSelectedPolicy] = useState<(typeof policies)[0] | null>(null);
 	const [showCancelModal, setShowCancelModal] = useState(false);
+	const [openModal, setOpenModal] = useState(false);
 
 	const getStatusColor = (status: string) => {
 		switch (status) {
@@ -424,7 +436,7 @@ export default function ClientePage() {
 						)}
 
 						{/* Meu Perfil */}
-						{activeTab === "profile" && (
+						{/* {activeTab === "profile" && (
 							<div className="bg-white rounded-lg shadow-sm p-6">
 								<h3 className="text-lg font-semibold text-gray-900 mb-6">
 									Meus Dados
@@ -489,6 +501,209 @@ export default function ClientePage() {
 										</div>
 									</div>
 								</div>
+							</div>
+						)} */}
+
+						{/* Meu Perfil */}
+						{activeTab === "profile" && (
+							<div className="bg-white rounded-lg shadow-sm p-6">
+								<h3 className="text-lg font-semibold text-gray-900 mb-6">
+									Meus Dados
+								</h3>
+
+								<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+									{/* Nome */}
+									<div>
+										<label className="block text-sm font-medium text-gray-700 mb-2">
+											Nome Completo
+										</label>
+										<input
+											type="text"
+											value={userData.nome}
+											className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+											readOnly
+										/>
+									</div>
+
+									{/* Email */}
+									<div>
+										<label className="block text-sm font-medium text-gray-700 mb-2">
+											E-mail
+										</label>
+										<input
+											type="email"
+											value={userData.email}
+											className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+											readOnly
+										/>
+									</div>
+
+									{/* Telefone */}
+									<div>
+										<label className="block text-sm font-medium text-gray-700 mb-2">
+											Telefone
+										</label>
+										<input
+											type="tel"
+											value={userData.telefone}
+											className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+											readOnly
+										/>
+									</div>
+
+									{/* CPF */}
+									<div>
+										<label className="block text-sm font-medium text-gray-700 mb-2">
+											CPF
+										</label>
+										<input
+											type="text"
+											value={userData.cpf}
+											className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+											readOnly
+										/>
+									</div>
+
+									{/* Estado */}
+									<div>
+										<label className="block text-sm font-medium text-gray-700 mb-2">
+											Estado
+										</label>
+										<input
+											type="text"
+											value={userData.estado}
+											className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+											readOnly
+										/>
+									</div>
+
+									{/* Cidade */}
+									<div>
+										<label className="block text-sm font-medium text-gray-700 mb-2">
+											Cidade
+										</label>
+										<input
+											type="text"
+											value={userData.cidade}
+											className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+											readOnly
+										/>
+									</div>
+
+									{/* CEP */}
+									<div>
+										<label className="block text-sm font-medium text-gray-700 mb-2">
+											CEP
+										</label>
+										<input
+											type="text"
+											value={userData.cep}
+											className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+											readOnly
+										/>
+									</div>
+
+									{/* Bairro */}
+									<div>
+										<label className="block text-sm font-medium text-gray-700 mb-2">
+											Bairro
+										</label>
+										<input
+											type="text"
+											value={userData.bairro}
+											className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+											readOnly
+										/>
+									</div>
+
+									{/* Rua */}
+									<div className="md:col-span-2">
+										<label className="block text-sm font-medium text-gray-700 mb-2">
+											Rua
+										</label>
+										<input
+											type="text"
+											value={userData.rua}
+											className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+											readOnly
+										/>
+									</div>
+
+									{/* Número */}
+									<div>
+										<label className="block text-sm font-medium text-gray-700 mb-2">
+											Número
+										</label>
+										<input
+											type="text"
+											value={userData.numero}
+											className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+											readOnly
+										/>
+									</div>
+
+									{/* Complemento */}
+									<div>
+										<label className="block text-sm font-medium text-gray-700 mb-2">
+											Complemento
+										</label>
+										<input
+											type="text"
+											value={userData.complemento}
+											className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+											readOnly
+										/>
+									</div>
+								</div>
+
+								{/* Botão para alterar senha */}
+								<div className="mt-8">
+									<button
+										onClick={() => setOpenModal(true)}
+										className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 transition-colors"
+									>
+										Alterar Senha
+									</button>
+								</div>
+
+								{/* Modal */}
+								{openModal && (
+									<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+										<div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+											<h2 className="text-lg font-semibold mb-4">
+												Alterar Senha
+											</h2>
+											<div className="space-y-4">
+												<input
+													type="password"
+													placeholder="Senha atual"
+													className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+												/>
+												<input
+													type="password"
+													placeholder="Nova senha"
+													className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+												/>
+												<input
+													type="password"
+													placeholder="Confirmar nova senha"
+													className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+												/>
+											</div>
+											<div className="mt-6 flex justify-end gap-3">
+												<button
+													onClick={() => setOpenModal(false)}
+													className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300"
+												>
+													Cancelar
+												</button>
+												<button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+													Salvar
+												</button>
+											</div>
+										</div>
+									</div>
+								)}
 							</div>
 						)}
 					</div>
