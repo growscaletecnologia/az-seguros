@@ -1,6 +1,7 @@
 "use client";
 
 import { DateRangePicker } from "@/components/CustomCalendar";
+import EmblaCarousel  from "@/components/EmblaCarousel";
 import { Calendar } from "@/components/ui/calendar";
 import {
 	Select,
@@ -64,7 +65,7 @@ export default function HomePage() {
 					id="top"
 					className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32"
 				>
-					<div className="grid grid-cols-1 lg:grid-cols-1 gap-12 items-center">
+					<div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
 						<div className="space-y-8">
 							<div className="space-y-4">
 								<h1 className="text-2xl lg:text-4xl font-bold leading-tight">
@@ -87,13 +88,13 @@ export default function HomePage() {
 									<span>Iniciar Cotação</span>
 									<ArrowRight className="h-5 w-5" />
 								</Link> */}
-								<Link
+								{/* <Link
 									href="/planos"
 									className="border-2 border-white text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-white hover:text-blue-900 transition-all duration-300 flex items-center justify-center space-x-2"
 								>
 									<span>Ver Planos</span>
 									<Shield className="h-5 w-5" />
-								</Link>
+								</Link> */}
 							</div>
 
 							<div className="flex items-center space-x-8 text-sm">
@@ -125,7 +126,7 @@ export default function HomePage() {
 															className="!placeholder:text-white !text-white"
 														/>
 													</SelectTrigger>
-													<SelectContent className="w-[var(--radix-select-trigger-width)]">
+													<SelectContent className=" w-[var(--radix-select-trigger-width)]">
 														<SelectGroup>
 															<SelectLabel>
 																Estados do Brasil
@@ -244,14 +245,20 @@ export default function HomePage() {
 										</div>
 									</div>
 
-									<button className="w-full bg-yellow-400 text-blue-900 py-3 rounded-lg font-bold hover:bg-yellow-300 transition-colors">
-										Encontrar Seguro viagem
-									</button>
+									<Link href="/planos" onClick={() => smoothScrollTo(0, 600)} className="block">
+										<button className="w-full bg-yellow-400 text-blue-900 py-3 rounded-lg font-bold hover:bg-yellow-300 transition-colors">
+											Encontrar Seguro viagem
+										</button>
+									</Link>
 								</div>
 							</div>
 						</div>
 					</div>
 				</div>
+				<div className="flex flex-auto justify-center items-center w-full h-20  from-blue-700 via-blue-400 to-blue-600">
+						<EmblaCarousel />
+				</div>
+
 			</section>
 
 			{/* Seção Seguros Temáticos */}
@@ -588,7 +595,7 @@ export default function HomePage() {
 			</section>
 
 			{/* CTA Final */}
-			<section className="py-16 bg-gradient-to-r from-blue-600 to-blue-800 text-white">
+			<section className="py-16 bg-gradient-to-r from-blue-700 via-blue-400 to-blue-600 text-white">
 				<div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
 					<h2 className="text-3xl lg:text-4xl font-bold mb-4">
 						Pronto para viajar com segurança?

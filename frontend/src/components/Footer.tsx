@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function Footer() {
 	return (
-		<footer className="bg-slate-900 dark:bg-gray-900 text-white">
+		<footer className="bg-slate-800  f dark:bg-gray-900 text-white">
 			<div className="max-w-7xl   mx-auto px-4 sm:px-6 lg:px-8 py-12">
 				<div className="grid  grid-cols-1 md:grid-cols-2 gap-8">
 					{/* Logo e Descrição */}
@@ -28,48 +28,27 @@ export default function Footer() {
 
 					<div className="flex flex-col items-center">
 						<h3 className="text-lg font-semibold mb-6">Formas de Pagamento</h3>
-
-						<ul className="grid grid-cols-2 md:grid-cols-4 gap-1 w-full max-w-4xl">
-							<li className="flex flex-col items-center gap-1 text-center">
-								<span className="text-sm">Cartão de Crédito</span>
+							<div className="flex flex-row gap-2 justify-center items-center">
 								<Image
-									alt="Cartão de Crédito"
-									width={150}
-									height={40}
-									src={"/cards-footer-icon.svg"}
-								/>
-							</li>
-
-							<li className="flex flex-col items-center gap-1 text-center">
-								<span className="text-sm">Boleto</span>
+										alt="Cartão de Crédito"
+										width={400}
+										height={40}
+										src={"/cards-footer-icon.svg"}
+									/>
 								<Image
-									alt="Boleto"
-									width={40}
-									height={40}
-									src={"/boleto-footer-icon.svg"}
-								/>
-							</li>
-
-							<li className="flex flex-col items-center gap-1 text-center">
-								<span className="text-sm">Pagamento com Pix</span>
+										alt="Cartão de Crédito"
+										width={100}
+										height={40}
+										src={"/pix-footer-icon.svg"}
+									/>
 								<Image
-									alt="Pix"
-									width={50}
-									height={40}
-									src={"/pix-footer-icon.svg"}
-								/>
-							</li>
-
-							<li className="flex flex-col items-center gap-1 text-center">
-								<span className="text-sm">Transferência bancária</span>
-								<Image
-									alt="Transferência Bancária"
-									width={120}
-									height={40}
-									src={"/bank-footer-icon.svg"}
-								/>
-							</li>
-						</ul>
+										alt="Cartão de Crédito"
+										width={50}
+										height={40}
+										src={"/boleto-footer-icon.svg"}
+									/>
+							</div>
+					
 					</div>
 
 					{/* Contato */}

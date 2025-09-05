@@ -2,7 +2,7 @@
 
 import { differenceInCalendarDays, format, isBefore } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, Info } from "lucide-react";
 import * as React from "react";
 import { DateRange } from "react-day-picker";
 
@@ -49,14 +49,18 @@ export function DateRangePicker({ value, onChange, minDate = new Date(), months 
 								format(range.from, "dd/MM/yyyy", { locale: ptBR })
 							)
 						) : (
-							<span>
-								Selecione as datas de ida e volta (Embarque e Desembarque no Brasil)
+							<span className="text-white/70">
+								Datas de ida e volta.
 							</span>
 						)}
 					</div>
 				</PopoverTrigger>
 
 				<PopoverContent className="w-auto p-0">
+					<div className="p-4 flex flex-auto gap-3 mt-2 items-center justify-center">
+						<Info className="h-6 w-6 animate-bounce text-blue-400 " />
+						<span className="text-blue-400">Embarque e Desembarque no Brasil</span>
+					</div>
 					<Calendar
 						locale={ptBR}
 						mode="range"
@@ -82,7 +86,7 @@ export function DateRangePicker({ value, onChange, minDate = new Date(), months 
 							day_range_middle: "bg-blue-100 text-blue-900 hover:bg-blue-200",
 						}}
 					/>
-
+					
 					<div className="flex items-center justify-between border-t p-3 text-sm">
 						<button className="underline" onClick={() => setRange(undefined)}>
 							Limpar
