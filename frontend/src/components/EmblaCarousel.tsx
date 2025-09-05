@@ -1,92 +1,45 @@
-  import React, { useCallback, useEffect, useState } from 'react'
-  import { EmblaOptionsType } from 'embla-carousel'
-  import useEmblaCarousel from 'embla-carousel-react'
-  import Autoplay from 'embla-carousel-autoplay'
-  import {
-    usePrevNextButtons
-  } from './EmblaCarouselArrowButtons'
-  import Image from 'next/image'
+"use client";
 
-  type PropType = {
-    
-    options?: EmblaOptionsType
-  }
+import React from "react";
+import { EmblaOptionsType } from "embla-carousel";
+import useEmblaCarousel from "embla-carousel-react";
+import Autoplay from "embla-carousel-autoplay";
+import Image from "next/image";
 
-  const EmblaCarousel: React.FC<PropType> = (props) => {
-    const {  options } = props
-    const [emblaRef, emblaApi] = useEmblaCarousel(options, [
-      Autoplay({
-        
-        playOnInit: true,
-        stopOnInteraction: false,
-        stopOnMouseEnter: false,
-        delay: 2000
+type PropType = {
+  options?: EmblaOptionsType;
+};
+
+const EmblaCarousel: React.FC<PropType> = ({ options }) => {
+  const [emblaRef] = useEmblaCarousel(options, [
+    Autoplay({
+      playOnInit: true,
+      stopOnInteraction: false,
+      stopOnMouseEnter: false,
+      delay: 2000,
     }),
-    ])
-    const [isPlaying, setIsPlaying] = useState(false)
+  ]);
 
-    const {
-      prevBtnDisabled,
-      nextBtnDisabled,
-      onPrevButtonClick,
-      onNextButtonClick
-    } = usePrevNextButtons(emblaApi)
+  const images = [
+    { alt: "Image 1", src: "/affinity.svg" },
+    { alt: "Image 2", src: "assistcard.svg" },
+    { alt: "Image 3", src: "coris.svg" },
+    { alt: "Image 4", src: "gta.svg" },
+    { alt: "Image 5", src: "intermac.svg" },
+    { alt: "Image 1", src: "/affinity.svg" },
+    { alt: "Image 2", src: "assistcard.svg" },
+    { alt: "Image 3", src: "coris.svg" },
+    { alt: "Image 4", src: "gta.svg" },
+    { alt: "Image 5", src: "intermac.svg" },
+    { alt: "Image 1", src: "/affinity.svg" },
+    { alt: "Image 2", src: "assistcard.svg" },
+    { alt: "Image 3", src: "coris.svg" },
+    { alt: "Image 4", src: "gta.svg" },
+    { alt: "Image 5", src: "intermac.svg" },
+  ];
 
-    const onButtonAutoplayClick = useCallback(
-      (callback: () => void) => {
-        const autoScroll = emblaApi?.plugins()?.autoScroll
-        if (!autoScroll) return
-
-        const resetOrStop =
-          autoScroll.options.stopOnInteraction === false
-            ? autoScroll.reset
-            : autoScroll.stop
-
-        resetOrStop()
-        callback()
-      },
-      [emblaApi]
-    )
-
-    const toggleAutoplay = useCallback(() => {
-      const autoScroll = emblaApi?.plugins()?.autoScroll
-      if (!autoScroll) return
-
-      const playOrStop = autoScroll.isPlaying()
-        ? autoScroll.stop
-        : autoScroll.play
-      playOrStop()
-    }, [emblaApi])
-
-    useEffect(() => {
-      const autoScroll = emblaApi?.plugins()?.autoScroll
-      if (!autoScroll) return
-
-      setIsPlaying(autoScroll.isPlaying())
-      emblaApi
-        .on('autoScroll:play', () => setIsPlaying(true))
-        .on('autoScroll:stop', () => setIsPlaying(false))
-        .on('reInit', () => setIsPlaying(autoScroll.isPlaying()))
-    }, [emblaApi])
-    const images = [
-      {alt: 'Image 1', src: '/affinity.svg'},
-      {alt: 'Image 2', src: 'assistcard.svg'},
-      {alt: 'Image 3', src: 'coris.svg'},
-      {alt: 'Image 4', src: 'gta.svg'},
-      {alt: 'Image 5', src: 'intermac.svg'},
-        {alt: 'Image 1', src: '/affinity.svg'},
-      {alt: 'Image 2', src: 'assistcard.svg'},
-      {alt: 'Image 3', src: 'coris.svg'},
-      {alt: 'Image 4', src: 'gta.svg'},
-      {alt: 'Image 5', src: 'intermac.svg'},
-        {alt: 'Image 1', src: '/affinity.svg'},
-      {alt: 'Image 2', src: 'assistcard.svg'},
-      {alt: 'Image 3', src: 'coris.svg'},
-      {alt: 'Image 4', src: 'gta.svg'},
-      {alt: 'Image 5', src: 'intermac.svg'}
-    ]
-    return (
-      <div className="w-[80%] p-1">
+  return (
+    <div className="w-[80%] p-1">
       <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex items-center">
           {images.map((image, index) => (
@@ -106,7 +59,7 @@
         </div>
       </div>
     </div>
-    )
-  }
+  );
+};
 
-  export default EmblaCarousel
+export default EmblaCarousel;
