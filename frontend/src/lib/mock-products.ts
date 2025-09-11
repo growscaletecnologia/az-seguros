@@ -45,8 +45,16 @@ export const mockProducts: Product[] = [
 			"Prática de esportes",
 		],
 		detalhes: [
-			{ id: "emissao_viagem", label: "Permite emissão em viagem?", value: "NÃO" },
-			{ id: "validade_geografica", label: "Validade Geográfica", value: "EUROPA" },
+			{
+				id: "emissao_viagem",
+				label: "Permite emissão em viagem?",
+				value: "NÃO",
+			},
+			{
+				id: "validade_geografica",
+				label: "Validade Geográfica",
+				value: "EUROPA",
+			},
 			{ id: "franquia_dmh", label: "Franquia de DMH", value: "NÃO" },
 			{
 				id: "despesa_medica_total",
@@ -69,7 +77,11 @@ export const mockProducts: Product[] = [
 				value: "USD 30.000",
 			},
 			{ id: "telemedicina", label: "Telemedicina", value: "SIM" },
-			{ id: "cobertura_odontologica", label: "Cobertura Odontológica", value: "USD 1.000" },
+			{
+				id: "cobertura_odontologica",
+				label: "Cobertura Odontológica",
+				value: "USD 1.000",
+			},
 		],
 	},
 	{
@@ -125,7 +137,11 @@ export const mockProducts: Product[] = [
 				value: "DENTRO DMH - ATÉ 28 SEMANAS",
 			},
 			{ id: "telemedicina", label: "Telemedicina", value: "-" },
-			{ id: "cobertura_odontologica", label: "Cobertura Odontológica", value: "USD 500" },
+			{
+				id: "cobertura_odontologica",
+				label: "Cobertura Odontológica",
+				value: "USD 500",
+			},
 		],
 	},
 ];

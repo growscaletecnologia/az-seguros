@@ -1,8 +1,11 @@
 "use client";
 
-import { DateRangePicker } from "@/components/CustomCalendar";
-import EmblaCarousel  from "@/components/EmblaCarousel";
+import { DateRangePicker } from "@/components/Inputs/CustomCalendar";
+import EmailField from "@/components/Inputs/EmailInput";
+import EmblaCarousel from "@/components/EmblaCarousel";
+import PhoneField from "@/components/Inputs/PhoneInput";
 import { Calendar } from "@/components/ui/calendar";
+import { Input } from "@/components/ui/input";
 import {
 	Select,
 	SelectContent,
@@ -12,6 +15,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { PreRegisterForm } from "@/types/types";
 import {
 	ArrowRight,
 	CheckCircle,
@@ -21,20 +25,40 @@ import {
 	Heart,
 	Mail,
 	MapPin,
+	
 	Phone,
 	Plane,
 	Shield,
 	Star,
+	
 	User,
 	Users,
+	
+	UserSquare2,
 } from "lucide-react";
+
+
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { DateRange } from "react-day-picker";
+import DestinationSelect from "@/components/Inputs/DestinationSelect";
+import PassengersSelect from "@/components/Inputs/PassengersSelect,";
 
 export default function HomePage() {
+	const [formData, setFormData] = useState<PreRegisterForm>({
+		name: "",
+		email: "",
+		phone: "",
+		range: undefined,
+		passengers: "1",
+		destination: "BA",
+		step: 1,
+		coupon: "",
+	});
+	console.log(formData)
 	const [datas, setDatas] = useState<DateRange | undefined>();
+	const [coupomChecked, setCoupomChecked] = useState(false);
 	function smoothScrollTo(targetY: number, duration = 600) {
 		const startY = window.scrollY || document.documentElement.scrollTop;
 		const distance = targetY - startY;
@@ -56,45 +80,30 @@ export default function HomePage() {
 
 		requestAnimationFrame(step);
 	}
+	function handleSubmit(event: React.FormEvent) {
+		event.preventDefault();
+		console.log("Form submitted:", formData);
+	}
 	return (
 		<div className="bg-white">
 			{/* Hero Section */}
-			<section className="relative bg-gradient-to-br from-blue-700 via-blue-400 to-blue-600 text-white overflow-hidden">
+			<section className="relative  min-h-[695px] flex flex-auto bg-gradient-to-br from-blue-700 via-blue-400 to-blue-600 text-white  bg-[url('/banners/hero_promo.png')] bg-cover bg-no-repeat">
 				<div className="absolute inset-0 bg-black/20"></div>
 				<div
 					id="top"
-					className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32"
+					className="flex flex-1 justify-end relative  mx-auto px-4 w-full sm:px-6 lg:px-8  lg:py-3"
 				>
-					<div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-						<div className="space-y-8">
+					<div className="flex py-20 flex-col max-w-1/2 items-center gap-8">
+						<div className="space-y-2">
 							<div className="space-y-4">
-								<h1 className="text-2xl lg:text-4xl font-bold leading-tight">
+								<h1 className="text-xl lg:text-4xl font-bold leading-tight">
 									Viaje com
-									<span className="text-yellow-400"> Segurança</span>
-									<br />
-									Total
+									<span className="text-yellow-400"> Segurança Total</span>
 								</h1>
-								<p className="text-xl lg:text-2xl text-blue-100">
-									Compare preços, encontre o melhor seguro de viagem e contrate em
-									minutos. Proteção completa para suas aventuras pelo mundo.
+								<p className="text-xl lg:text-2xl text-blue-50">
+									Compare preços, encontre o melhor seguro de viagem e contrate
+									em minutos. Proteção completa para suas aventuras pelo mundo.
 								</p>
-							</div>
-
-							<div className="flex flex-col sm:flex-row gap-4">
-								{/* <Link
-									href="/cotacao"
-									className="bg-yellow-400 text-blue-900 px-8 py-4 rounded-lg font-bold text-lg hover:bg-yellow-300 transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2"
-								>
-									<span>Iniciar Cotação</span>
-									<ArrowRight className="h-5 w-5" />
-								</Link> */}
-								{/* <Link
-									href="/planos"
-									className="border-2 border-white text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-white hover:text-blue-900 transition-all duration-300 flex items-center justify-center space-x-2"
-								>
-									<span>Ver Planos</span>
-									<Shield className="h-5 w-5" />
-								</Link> */}
 							</div>
 
 							<div className="flex items-center space-x-8 text-sm">
@@ -108,158 +117,127 @@ export default function HomePage() {
 								</div>
 							</div>
 						</div>
+						<div className="relative left-0  w-full h-15 flex items-start justify-center">
+							{coupomChecked ?
+							
+							(<>
+								<div className="rounded-lg border-2 flex flex-row p-4 animate-wiggle gap-4">
+									<input
+										type="checkbox"
+										id="cupom"
+										className="w-4 h-4 rounded-2xl mt-1"
+										checked={coupomChecked}
+										onChange={() => {
+											setCoupomChecked(!coupomChecked)
+											setFormData((prev) => ({ ...prev, coupon: "" }))
+										}}
+									/>
+									<span className=" text-lg font-bold">Cupom aplicado com sucesso!</span>
+								</div>
+							</>
+								
+							):(
+							<div className="rounded-lg border-2 relative flex flex-row p-4 gap-4">
+							
+								<input
+									type="checkbox"
+									id="cupom"
+									className="w-4 h-4 rounded-2xl mt-1"
+									checked={coupomChecked}
+									onChange={() => {
+										setCoupomChecked(!coupomChecked)
+										setFormData((prev) => ({ ...prev, coupon: "SEGURO25" }))
+									}}
+								/>
+								<span className=" text-lg">Aplicar cupom</span>
+								<span className="text-yellow-300 mt-0.5 font-bold"> "SEGURO25"</span>
 
-						<div className="relative">
-							<div className="relative z-10 bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-								<h3 className="text-2xl font-bold mb-6">
-									Realize uma cotação de Seguro de Viagem para seu destino
-								</h3>
-								<div className="space-y-4">
-									<div className="grid gridcols-1 md:grid-cols-2 gap-6">
-										<div>
-											<div className="flex max-h-[48px] items-center w-full px-3 py-3 rounded-lg bg-white/20 border border-white/30 text-white focus-within:ring-2 focus-within:ring-yellow-400">
-												<MapPin className="h-5 w-5 mr-2 opacity-80" />
-												<Select>
-													<SelectTrigger className="w-full bg-transparent border-0 text-white placeholder:text-white  focus:ring-0 focus:outline-none">
-														<SelectValue
-															placeholder="Destinos"
-															className="!placeholder:text-white !text-white"
-														/>
-													</SelectTrigger>
-													<SelectContent className=" w-[var(--radix-select-trigger-width)]">
-														<SelectGroup>
-															<SelectLabel>
-																Estados do Brasil
-															</SelectLabel>
-															<SelectItem value="AC">
-																Acre (AC)
-															</SelectItem>
-															<SelectItem value="AL">
-																Alagoas (AL)
-															</SelectItem>
-															<SelectItem value="AP">
-																Amapá (AP)
-															</SelectItem>
-															<SelectItem value="AM">
-																Amazonas (AM)
-															</SelectItem>
-															<SelectItem value="BA">
-																Bahia (BA)
-															</SelectItem>
-															<SelectItem value="CE">
-																Ceará (CE)
-															</SelectItem>
-															<SelectItem value="DF">
-																Distrito Federal (DF)
-															</SelectItem>
-															<SelectItem value="ES">
-																Espírito Santo (ES)
-															</SelectItem>
-															<SelectItem value="GO">
-																Goiás (GO)
-															</SelectItem>
-															<SelectItem value="MA">
-																Maranhão (MA)
-															</SelectItem>
-															<SelectItem value="MT">
-																Mato Grosso (MT)
-															</SelectItem>
-															<SelectItem value="MS">
-																Mato Grosso do Sul (MS)
-															</SelectItem>
-															<SelectItem value="MG">
-																Minas Gerais (MG)
-															</SelectItem>
-															<SelectItem value="PA">
-																Pará (PA)
-															</SelectItem>
-															<SelectItem value="PB">
-																Paraíba (PB)
-															</SelectItem>
-															<SelectItem value="PR">
-																Paraná (PR)
-															</SelectItem>
-															<SelectItem value="PE">
-																Pernambuco (PE)
-															</SelectItem>
-															<SelectItem value="PI">
-																Piauí (PI)
-															</SelectItem>
-															<SelectItem value="RJ">
-																Rio de Janeiro (RJ)
-															</SelectItem>
-															<SelectItem value="RN">
-																Rio Grande do Norte (RN)
-															</SelectItem>
-															<SelectItem value="RS">
-																Rio Grande do Sul (RS)
-															</SelectItem>
-															<SelectItem value="RO">
-																Rondônia (RO)
-															</SelectItem>
-															<SelectItem value="RR">
-																Roraima (RR)
-															</SelectItem>
-															<SelectItem value="SC">
-																Santa Catarina (SC)
-															</SelectItem>
-															<SelectItem value="SP">
-																São Paulo (SP)
-															</SelectItem>
-															<SelectItem value="SE">
-																Sergipe (SE)
-															</SelectItem>
-															<SelectItem value="TO">
-																Tocantins (TO)
-															</SelectItem>
-														</SelectGroup>
-													</SelectContent>
-												</Select>
-											</div>
-										</div>
+								<span className="text-lg">para ganhar</span>
+								<span className="text-yellow-300 mt-0.5  font-bold"> 25% OFF</span>
+							</div>
+							)}
+						
+							
+						</div>
 
-										<div>
+						<form onSubmit={handleSubmit}>
+							<div className="relative ">
+								<div className="relative z-10 bg-gradient-to-br from-transparent via-transparent to-blue-100/50  backdrop-blur-md rounded-2xl p-8 border border-white/20">
+									<h3 className="text-2xl font-bold mb-6">
+										Realize uma cotação de Seguro de Viagem para seu destino
+									</h3>
+									<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+										<DestinationSelect
+											data={formData.destination}
+											setData={(value) =>
+												setFormData((prev) => ({ ...prev, destination: value }))
+											}
+										/>
+										<div className="col-span-1 md:col-span-2 lg:col-span-2">
 											<DateRangePicker
-												onChange={setDatas}
+												onChange={(value)=>{
+													setFormData((prev) => ({ ...prev, range: value }))
+												}}
 												minDate={new Date()}
 												months={2}
-												value={datas}
-											></DateRangePicker>
+												range={formData.range}
+							
+											/>
 										</div>
-
-										<div className="flex items-center  max-h-[48px] w-full px-3 py-3 rounded-lg bg-white/20 border border-white/30 text-white focus-within:ring-2 focus-within:ring-yellow-400">
+										<div className="flex items-center h-[52px] w-full px-3 rounded-lg bg-white/20 border border-white/30 text-white focus-within:ring-2 focus-within:ring-yellow-400">
 											<User className="h-5 w-5 mr-2 opacity-80" />
 											<input
 												type="text"
 												placeholder="Nome completo"
 												className="w-full bg-transparent border-0 placeholder-white/70 text-white focus:ring-0 focus:outline-none"
+												value={formData.name}
+												onChange={(e) =>
+													setFormData((prev) => ({ ...prev, name: e.target.value }))
+												}
 											/>
 										</div>
-										<div className="flex items-center  max-h-[48px] w-full p-1 rounded-lg bg-white/20 border border-white/30 text-white focus-within:ring-2 focus-within:ring-yellow-400">
-											<Mail className="h-5 w-5 ml-2 mr-2 opacity-80" />
-											<input
-												type="email"
-												placeholder="E-mail"
-												className="w-full bg-transparent border-0 placeholder-white/70 text-white focus:ring-0 focus:outline-none"
-											/>
+										<EmailField
+												email={formData.email}
+												setEmail={(value) =>
+													setFormData((prev) => ({ ...prev, email: value }))
+												}
+										/>
+										<PhoneField
+											phone={formData.phone}
+											setPhone={(value) =>
+												setFormData((prev) => ({ ...prev, phone: value }))
+											}
+										/>
+									</div>
+							
+									<div className="flex flex-row justify-between items-center gap-4 mt-4">
+										<PassengersSelect
+											data={formData.passengers}
+											setData={(value) =>
+												setFormData((prev) => ({ ...prev, passengers: value }))
+											}
+										/>
+							
+							
+							
+										{/* Botão */}
+										<div className="w-full">
+												<button type="submit" className="w-full bg-yellow-400 h-[52px] text-blue-900 py-3 rounded-lg font-bold hover:bg-yellow-300 transition-colors">
+													Encontrar Seguro viagem
+												</button>
 										</div>
 									</div>
-
-									<Link href="/planos" onClick={() => smoothScrollTo(0, 600)} className="block">
-										<button className="w-full bg-yellow-400 text-blue-900 py-3 rounded-lg font-bold hover:bg-yellow-300 transition-colors">
-											Encontrar Seguro viagem
-										</button>
-									</Link>
 								</div>
 							</div>
-						</div>
+						</form>
+
+						
 					</div>
 				</div>
-				<div className="flex flex-auto justify-center items-center w-full h-20  from-blue-700 via-blue-400 to-blue-600">
-						<EmblaCarousel />
-				</div>
-
 			</section>
+			<div className="flex flex-auto justify-center items-center w-full h-20 bg-blue-600">
+				<EmblaCarousel />
+			</div>
 
 			{/* Seção Seguros Temáticos */}
 			<section className="py-16 bg-gray-50">
@@ -285,8 +263,8 @@ export default function HomePage() {
 									Seguro Viagem Marítimo
 								</h3>
 								<p className="text-gray-600 mb-4">
-									Proteção contra imprevistos em alto mar, incluindo assistência a
-									bordo e emergências durante cruzeiros.
+									Proteção contra imprevistos em alto mar, incluindo assistência
+									a bordo e emergências durante cruzeiros.
 								</p>
 								<Link
 									href="/planos"
@@ -386,8 +364,8 @@ export default function HomePage() {
 							Por que escolher a SeguroViagem?
 						</h2>
 						<p className="text-xl text-gray-600 max-w-3xl mx-auto">
-							Somos a plataforma líder em seguros de viagem no Brasil, com mais de 1
-							milhão de clientes satisfeitos.
+							Somos a plataforma líder em seguros de viagem no Brasil, com mais
+							de 1 milhão de clientes satisfeitos.
 						</p>
 					</div>
 
@@ -396,7 +374,9 @@ export default function HomePage() {
 							<div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-200 transition-colors">
 								<DollarSign className="h-8 w-8 text-blue-600" />
 							</div>
-							<h3 className="text-xl font-bold text-gray-900 mb-2">Melhor Preço</h3>
+							<h3 className="text-xl font-bold text-gray-900 mb-2">
+								Melhor Preço
+							</h3>
 							<p className="text-gray-600">
 								Garantimos o melhor preço do mercado ou devolvemos a diferença.
 							</p>
@@ -406,7 +386,9 @@ export default function HomePage() {
 							<div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-green-200 transition-colors">
 								<Clock className="h-8 w-8 text-green-600" />
 							</div>
-							<h3 className="text-xl font-bold text-gray-900 mb-2">Suporte 24h</h3>
+							<h3 className="text-xl font-bold text-gray-900 mb-2">
+								Suporte 24h
+							</h3>
 							<p className="text-gray-600">
 								Atendimento especializado 24 horas por dia, 7 dias por semana.
 							</p>
@@ -416,7 +398,9 @@ export default function HomePage() {
 							<div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-200 transition-colors">
 								<Shield className="h-8 w-8 text-blue-600" />
 							</div>
-							<h3 className="text-xl font-bold text-gray-900 mb-2">Compra Segura</h3>
+							<h3 className="text-xl font-bold text-gray-900 mb-2">
+								Compra Segura
+							</h3>
 							<p className="text-gray-600">
 								Transações 100% seguras com certificado SSL e criptografia.
 							</p>
@@ -426,7 +410,9 @@ export default function HomePage() {
 							<div className="bg-orange-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-orange-200 transition-colors">
 								<Users className="h-8 w-8 text-orange-600" />
 							</div>
-							<h3 className="text-xl font-bold text-gray-900 mb-2">+1M Clientes</h3>
+							<h3 className="text-xl font-bold text-gray-900 mb-2">
+								+1M Clientes
+							</h3>
 							<p className="text-gray-600">
 								Mais de 1 milhão de viajantes já confiaram em nossos serviços.
 							</p>
@@ -461,7 +447,9 @@ export default function HomePage() {
 							</p>
 							<div className="bg-gray-100 rounded-lg p-4">
 								<MapPin className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-								<p className="text-sm text-gray-600">Destino, datas e viajantes</p>
+								<p className="text-sm text-gray-600">
+									Destino, datas e viajantes
+								</p>
 							</div>
 							{/* Seta para desktop */}
 							<div className="hidden md:block absolute top-6 -right-4 text-blue-300">
@@ -473,10 +461,12 @@ export default function HomePage() {
 							<div className="bg-blue-600 text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-6 text-xl font-bold">
 								2
 							</div>
-							<h3 className="text-xl font-bold text-gray-900 mb-4">Compare planos</h3>
+							<h3 className="text-xl font-bold text-gray-900 mb-4">
+								Compare planos
+							</h3>
 							<p className="text-gray-600 mb-6">
-								Veja as melhores opções de seguradoras, compare coberturas e preços
-								lado a lado.
+								Veja as melhores opções de seguradoras, compare coberturas e
+								preços lado a lado.
 							</p>
 							<div className="bg-gray-100 rounded-lg p-4">
 								<Globe className="h-8 w-8 text-green-600 mx-auto mb-2" />
@@ -496,8 +486,8 @@ export default function HomePage() {
 								Finalize em minutos
 							</h3>
 							<p className="text-gray-600 mb-6">
-								Escolha seu plano, efetue o pagamento e receba sua apólice por email
-								instantaneamente.
+								Escolha seu plano, efetue o pagamento e receba sua apólice por
+								email instantaneamente.
 							</p>
 							<div className="bg-gray-100 rounded-lg p-4">
 								<Heart className="h-8 w-8 text-red-600 mx-auto mb-2" />
@@ -528,8 +518,9 @@ export default function HomePage() {
 								))}
 							</div>
 							<p className="text-gray-600 mb-4">
-								&quot;Excelente atendimento! Tive um problema médico na Europa e fui
-								atendido rapidamente. Recomendo para todos os viajantes.&quot;
+								&quot;Excelente atendimento! Tive um problema médico na Europa e
+								fui atendido rapidamente. Recomendo para todos os
+								viajantes.&quot;
 							</p>
 							<div className="flex items-center">
 								<div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
@@ -577,8 +568,9 @@ export default function HomePage() {
 								))}
 							</div>
 							<p className="text-gray-600 mb-4">
-								&quot;Suporte 24h realmente funciona! Precisei de ajuda durante a
-								madrugada e fui atendida imediatamente. Empresa confiável!&quot;
+								&quot;Suporte 24h realmente funciona! Precisei de ajuda durante
+								a madrugada e fui atendida imediatamente. Empresa
+								confiável!&quot;
 							</p>
 							<div className="flex items-center">
 								<div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
@@ -601,7 +593,8 @@ export default function HomePage() {
 						Pronto para viajar com segurança?
 					</h2>
 					<p className="text-xl mb-8 text-blue-100">
-						Faça sua cotação agora e encontre o seguro de viagem perfeito para você.
+						Faça sua cotação agora e encontre o seguro de viagem perfeito para
+						você.
 					</p>
 					<div className="flex flex-col sm:flex-row gap-4 justify-center">
 						<Link

@@ -3,6 +3,7 @@
 import {
 	ArrowRight,
 	Banknote,
+	Building,
 	Calendar,
 	CheckCircle,
 	CreditCard,
@@ -64,7 +65,9 @@ export default function CheckoutPage() {
 		};
 	};
 
-	const [segurados, setSegurados] = useState([{ nome: "", nascimento: "", cpf: "" }]);
+	const [segurados, setSegurados] = useState([
+		{ nome: "", nascimento: "", cpf: "" },
+	]);
 
 	const addSegurado = () => {
 		setSegurados([...segurados, { nome: "", nascimento: "", cpf: "" }]);
@@ -88,7 +91,9 @@ export default function CheckoutPage() {
 		// Simular processamento do pagamento
 		setTimeout(() => {
 			setIsProcessing(false);
-			alert("Pagamento processado com sucesso! Você receberá sua apólice por email.");
+			alert(
+				"Pagamento processado com sucesso! Você receberá sua apólice por email.",
+			);
 		}, 3000);
 	};
 
@@ -98,7 +103,9 @@ export default function CheckoutPage() {
 			<div className="bg-white shadow-sm border-b">
 				<div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
 					<h1 className="text-3xl font-bold text-gray-900">Finalizar Compra</h1>
-					<p className="text-gray-600 mt-2">Revise seus dados e efetue o pagamento</p>
+					<p className="text-gray-600 mt-2">
+						Revise seus dados e efetue o pagamento
+					</p>
 				</div>
 			</div>
 
@@ -328,7 +335,7 @@ export default function CheckoutPage() {
 								</label>
 
 								{/* Boleto */}
-								<label className="flex items-center p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+								{/* <label className="flex items-center p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
 									<input
 										type="radio"
 										name="payment"
@@ -350,7 +357,7 @@ export default function CheckoutPage() {
 											</div>
 										</div>
 									</div>
-								</label>
+								</label> */}
 							</div>
 
 							{/* Campos do Cartão */}
@@ -424,122 +431,122 @@ export default function CheckoutPage() {
 								</div>
 							)}
 						</div>
-						<div className="grid grid-cols-1 md:grid-cols-1 gap-4">
-							<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-								<div>
-									<input
-										type="text"
-										placeholder="Contato"
-										className="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-									/>
+						<div className="bg-white rounded-lg shadow-sm p-6">
+							<div className="grid grid-cols-1 md:grid-cols-1 gap-4 mt-4">
+								<h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+									<Building className="h-5 w-5 mr-2 text-blue-600" />
+									Endereço do Asegurado
+								</h3>
+								<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+									<div>
+										<input
+											type="text"
+											placeholder="Contato"
+											className="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+										/>
+									</div>
+									<div>
+										<input
+											type="email"
+											placeholder="email"
+											className="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+										/>
+									</div>
+									<div>
+										<input
+											type="text"
+											placeholder="telefone"
+											className="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+										/>
+									</div>
 								</div>
-								<div>
-									<input
-										type="email"
-										placeholder="email"
-										className="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-									/>
-								</div>
-								<div>
-									<input
-										type="text"
-										placeholder="telefone"
-										className="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-									/>
-								</div>
-							</div>
-							<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-								{/* CEP */}
-								<div>
-									<input
-										type="text"
-										placeholder="CEP"
-										className="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-									/>
-								</div>
-
-								{/* Endereço */}
-								<div className="md:col-span-2">
-									<input
-										type="text"
-										placeholder="Endereço"
-										className="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-									/>
-								</div>
-
-								{/* Número */}
-								<div>
-									<input
-										type="text"
-										placeholder="Número"
-										className="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-									/>
-								</div>
-
-								{/* Complemento */}
-								<div>
-									<input
-										type="text"
-										placeholder="Complemento"
-										className="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-									/>
-								</div>
-
-								{/* Bairro */}
-								<div>
-									<input
-										type="text"
-										placeholder="Bairro"
-										className="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-									/>
-								</div>
-
-								{/* Cidade */}
-								<div>
-									<input
-										type="text"
-										placeholder="Cidade"
-										className="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-									/>
-								</div>
-
-								{/* Estado */}
-								<div>
-									<select
-										className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-										defaultValue=""
-									>
-										<option value="" disabled>
-											Estado
-										</option>
-										<option value="AC">Acre (AC)</option>
-										<option value="AL">Alagoas (AL)</option>
-										<option value="AP">Amapá (AP)</option>
-										<option value="AM">Amazonas (AM)</option>
-										<option value="BA">Bahia (BA)</option>
-										<option value="CE">Ceará (CE)</option>
-										<option value="DF">Distrito Federal (DF)</option>
-										<option value="ES">Espírito Santo (ES)</option>
-										<option value="GO">Goiás (GO)</option>
-										<option value="MA">Maranhão (MA)</option>
-										<option value="MT">Mato Grosso (MT)</option>
-										<option value="MS">Mato Grosso do Sul (MS)</option>
-										<option value="MG">Minas Gerais (MG)</option>
-										<option value="PA">Pará (PA)</option>
-										<option value="PB">Paraíba (PB)</option>
-										<option value="PR">Paraná (PR)</option>
-										<option value="PE">Pernambuco (PE)</option>
-										<option value="PI">Piauí (PI)</option>
-										<option value="RJ">Rio de Janeiro (RJ)</option>
-										<option value="RN">Rio Grande do Norte (RN)</option>
-										<option value="RS">Rio Grande do Sul (RS)</option>
-										<option value="RO">Rondônia (RO)</option>
-										<option value="RR">Roraima (RR)</option>
-										<option value="SC">Santa Catarina (SC)</option>
-										<option value="SP">São Paulo (SP)</option>
-										<option value="SE">Sergipe (SE)</option>
-										<option value="TO">Tocantins (TO)</option>
-									</select>
+								<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+									{/* CEP */}
+									<div>
+										<input
+											type="text"
+											placeholder="CEP"
+											className="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+										/>
+									</div>
+									{/* Endereço */}
+									<div className="md:col-span-2">
+										<input
+											type="text"
+											placeholder="Endereço"
+											className="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+										/>
+									</div>
+									{/* Número */}
+									<div>
+										<input
+											type="text"
+											placeholder="Número"
+											className="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+										/>
+									</div>
+									{/* Complemento */}
+									<div>
+										<input
+											type="text"
+											placeholder="Complemento"
+											className="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+										/>
+									</div>
+									{/* Bairro */}
+									<div>
+										<input
+											type="text"
+											placeholder="Bairro"
+											className="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+										/>
+									</div>
+									{/* Cidade */}
+									<div>
+										<input
+											type="text"
+											placeholder="Cidade"
+											className="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+										/>
+									</div>
+									{/* Estado */}
+									<div>
+										<select
+											className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+											defaultValue=""
+										>
+											<option value="" disabled>
+												Estado
+											</option>
+											<option value="AC">Acre (AC)</option>
+											<option value="AL">Alagoas (AL)</option>
+											<option value="AP">Amapá (AP)</option>
+											<option value="AM">Amazonas (AM)</option>
+											<option value="BA">Bahia (BA)</option>
+											<option value="CE">Ceará (CE)</option>
+											<option value="DF">Distrito Federal (DF)</option>
+											<option value="ES">Espírito Santo (ES)</option>
+											<option value="GO">Goiás (GO)</option>
+											<option value="MA">Maranhão (MA)</option>
+											<option value="MT">Mato Grosso (MT)</option>
+											<option value="MS">Mato Grosso do Sul (MS)</option>
+											<option value="MG">Minas Gerais (MG)</option>
+											<option value="PA">Pará (PA)</option>
+											<option value="PB">Paraíba (PB)</option>
+											<option value="PR">Paraná (PR)</option>
+											<option value="PE">Pernambuco (PE)</option>
+											<option value="PI">Piauí (PI)</option>
+											<option value="RJ">Rio de Janeiro (RJ)</option>
+											<option value="RN">Rio Grande do Norte (RN)</option>
+											<option value="RS">Rio Grande do Sul (RS)</option>
+											<option value="RO">Rondônia (RO)</option>
+											<option value="RR">Roraima (RR)</option>
+											<option value="SC">Santa Catarina (SC)</option>
+											<option value="SP">São Paulo (SP)</option>
+											<option value="SE">Sergipe (SE)</option>
+											<option value="TO">Tocantins (TO)</option>
+										</select>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -591,7 +598,6 @@ export default function CheckoutPage() {
 										Cancelamento: USD{" "}
 										{selectedPlan.coberturaCancelamento.toLocaleString()}
 									</p>
-									<p> COVID-19: Incluído</p>
 								</div>
 							</div>
 

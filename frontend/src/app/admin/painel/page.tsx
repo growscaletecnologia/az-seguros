@@ -45,11 +45,31 @@ const AdminDashboard = () => {
 	];
 
 	const recentActivities = [
-		{ id: 1, action: "Novo usuário cadastrado", user: "João Silva", time: "2 min atrás" },
-		{ id: 2, action: "Pedido finalizado", user: "Maria Santos", time: "5 min atrás" },
+		{
+			id: 1,
+			action: "Novo usuário cadastrado",
+			user: "João Silva",
+			time: "2 min atrás",
+		},
+		{
+			id: 2,
+			action: "Pedido finalizado",
+			user: "Maria Santos",
+			time: "5 min atrás",
+		},
 		{ id: 3, action: "Cupom criado", user: "Admin", time: "10 min atrás" },
-		{ id: 4, action: "Post publicado no blog", user: "Editor", time: "15 min atrás" },
-		{ id: 5, action: "Integração configurada", user: "Admin", time: "30 min atrás" },
+		{
+			id: 4,
+			action: "Post publicado no blog",
+			user: "Editor",
+			time: "15 min atrás",
+		},
+		{
+			id: 5,
+			action: "Integração configurada",
+			user: "Admin",
+			time: "30 min atrás",
+		},
 	];
 
 	return (
@@ -57,7 +77,9 @@ const AdminDashboard = () => {
 			{/* Header */}
 			<div className="flex items-center justify-between">
 				<div>
-					<h1 className="text-3xl font-bold text-gray-900">Dashboard Administrativo</h1>
+					<h1 className="text-3xl font-bold text-gray-900">
+						Dashboard Administrativo
+					</h1>
 					<p className="text-gray-600 mt-1">Bem-vindo ao painel de controle</p>
 				</div>
 				<div className="flex items-center space-x-4">
@@ -88,7 +110,9 @@ const AdminDashboard = () => {
 					>
 						<div className="flex items-center justify-between">
 							<div>
-								<p className="text-sm font-medium text-gray-600">{stat.title}</p>
+								<p className="text-sm font-medium text-gray-600">
+									{stat.title}
+								</p>
 								<p className="text-2xl font-bold text-gray-900 mt-1">
 									{stat.value}
 								</p>
@@ -107,7 +131,9 @@ const AdminDashboard = () => {
 							>
 								{stat.change}
 							</span>
-							<span className="text-sm text-gray-600 ml-1">vs mês anterior</span>
+							<span className="text-sm text-gray-600 ml-1">
+								vs mês anterior
+							</span>
 						</div>
 					</div>
 				))}
@@ -145,13 +171,17 @@ const AdminDashboard = () => {
 				{/* Quick Actions */}
 				<div className="bg-white rounded-lg shadow-sm border border-gray-200">
 					<div className="p-6 border-b border-gray-200">
-						<h3 className="text-lg font-semibold text-gray-900">Ações Rápidas</h3>
+						<h3 className="text-lg font-semibold text-gray-900">
+							Ações Rápidas
+						</h3>
 					</div>
 					<div className="p-6">
 						<div className="grid grid-cols-2 gap-4">
 							<button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
 								<Users className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-								<p className="text-sm font-medium text-gray-900">Novo Usuário</p>
+								<p className="text-sm font-medium text-gray-900">
+									Novo Usuário
+								</p>
 							</button>
 							<button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
 								<FileText className="h-8 w-8 text-green-600 mx-auto mb-2" />
@@ -172,7 +202,9 @@ const AdminDashboard = () => {
 
 			{/* Additional Info */}
 			<div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-				<h3 className="text-lg font-semibold text-gray-900 mb-4">Resumo do Sistema</h3>
+				<h3 className="text-lg font-semibold text-gray-900 mb-4">
+					Resumo do Sistema
+				</h3>
 				<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 					<div className="text-center">
 						<div className="text-2xl font-bold text-blue-600">12</div>

@@ -1,7 +1,10 @@
 "use client";
 import { ArrowLeft, Mail, Minus, Plus } from "lucide-react";
 import React, { useState } from "react";
-import { getProductsForComparison, mockProducts } from "../../lib/mock-products";
+import {
+	getProductsForComparison,
+	mockProducts,
+} from "../../lib/mock-products";
 
 const ComparacaoPage = () => {
 	const [selectedProducts, setSelectedProducts] = useState<number[]>([1, 2]);
@@ -11,7 +14,9 @@ const ComparacaoPage = () => {
 	const productsToCompare = getProductsForComparison(selectedProducts);
 
 	const handleAddProduct = () => {
-		const availableProducts = mockProducts.filter((p) => !selectedProducts.includes(p.id));
+		const availableProducts = mockProducts.filter(
+			(p) => !selectedProducts.includes(p.id),
+		);
 		if (availableProducts.length > 0) {
 			setSelectedProducts([...selectedProducts, availableProducts[0].id]);
 		}
@@ -31,7 +36,10 @@ const ComparacaoPage = () => {
 	};
 
 	const formatPrice = (price: number) => {
-		return price.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+		return price.toLocaleString("pt-BR", {
+			style: "currency",
+			currency: "BRL",
+		});
 	};
 
 	return (
@@ -63,7 +71,9 @@ const ComparacaoPage = () => {
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 				{/* Título e ações */}
 				<div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-					<h1 className="text-2xl font-bold text-gray-900">Compare os planos:</h1>
+					<h1 className="text-2xl font-bold text-gray-900">
+						Compare os planos:
+					</h1>
 					<div className="flex space-x-3">
 						<button
 							onClick={() => setShowEmailModal(true)}
@@ -97,9 +107,7 @@ const ComparacaoPage = () => {
 													</h3>
 													{selectedProducts.length > 1 && (
 														<button
-															onClick={() =>
-																handleRemoveProduct(product.id)
-															}
+															onClick={() => handleRemoveProduct(product.id)}
 															className="text-red-500 hover:text-red-700"
 														>
 															<Minus className="h-4 w-4" />
@@ -116,9 +124,7 @@ const ComparacaoPage = () => {
 													<p className="text-xl font-bold text-green-600">
 														{formatPrice(product.preco)}
 													</p>
-													<p className="text-xs text-gray-600">
-														10x sem juros
-													</p>
+													<p className="text-xs text-gray-600">10x sem juros</p>
 													<div className="bg-orange-100 text-orange-800 px-2 py-1 rounded text-xs">
 														5% off no PIX
 													</div>
@@ -191,7 +197,9 @@ const ComparacaoPage = () => {
 								<h3 className="font-semibold text-gray-900 mb-2">
 									{product.plano}
 								</h3>
-								<p className="text-sm text-gray-600 mb-3">{product.seguradora}</p>
+								<p className="text-sm text-gray-600 mb-3">
+									{product.seguradora}
+								</p>
 								<div className="space-y-2 text-sm">
 									<div className="flex justify-between">
 										<span>Cobertura Médica:</span>

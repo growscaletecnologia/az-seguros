@@ -12,7 +12,11 @@ interface LoginFormProps extends React.ComponentProps<"div"> {
 	goToBackStep: () => void;
 }
 
-export function LoginForm({ className, goToBackStep, ...props }: LoginFormProps) {
+export function LoginForm({
+	className,
+	goToBackStep,
+	...props
+}: LoginFormProps) {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [error, setError] = useState("");
@@ -20,7 +24,9 @@ export function LoginForm({ className, goToBackStep, ...props }: LoginFormProps)
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
-		const user = users.find((u) => u.email === email && u.password === password);
+		const user = users.find(
+			(u) => u.email === email && u.password === password,
+		);
 		if (user) {
 			if (user.role === "admin") {
 				router.push("/admin/painel");
@@ -67,7 +73,10 @@ export function LoginForm({ className, goToBackStep, ...props }: LoginFormProps)
 			</div>
 			<div className="flex gap-4 w-full items-center flex-col">
 				<Link href={"/admin/painel"} className="w-fit">
-					<Button variant="default" className="w-full bg-blue-600 hover:bg-blue-400">
+					<Button
+						variant="default"
+						className="w-full bg-blue-600 hover:bg-blue-400"
+					>
 						Entrar
 					</Button>
 				</Link>

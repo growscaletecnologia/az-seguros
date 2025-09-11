@@ -33,7 +33,9 @@ export default function CotacaoPage() {
 	const [errors, setErrors] = useState<{ [key: string]: string }>({});
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
-	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+	const handleInputChange = (
+		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+	) => {
 		const { name, value, type } = e.target;
 		const checked = (e.target as HTMLInputElement).checked;
 
@@ -56,11 +58,13 @@ export default function CotacaoPage() {
 
 		if (!formData.destino) newErrors.destino = "Destino é obrigatório";
 		if (!formData.dataIda) newErrors.dataIda = "Data de ida é obrigatória";
-		if (!formData.dataVolta) newErrors.dataVolta = "Data de volta é obrigatória";
+		if (!formData.dataVolta)
+			newErrors.dataVolta = "Data de volta é obrigatória";
 		if (!formData.nome) newErrors.nome = "Nome é obrigatório";
 		if (!formData.email) newErrors.email = "E-mail é obrigatório";
 		if (!formData.telefone) newErrors.telefone = "Telefone é obrigatório";
-		if (!formData.aceitaTermos) newErrors.aceitaTermos = "Você deve aceitar os termos";
+		if (!formData.aceitaTermos)
+			newErrors.aceitaTermos = "Você deve aceitar os termos";
 		if (!formData.viagemBrasil)
 			newErrors.viagemBrasil = "Confirme que a viagem inicia no Brasil";
 
@@ -109,9 +113,12 @@ export default function CotacaoPage() {
 			<div className="bg-white shadow-sm border-b">
 				<div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
 					<div className="text-center">
-						<h1 className="text-3xl font-bold text-gray-900">Faça sua Cotação</h1>
+						<h1 className="text-3xl font-bold text-gray-900">
+							Faça sua Cotação
+						</h1>
 						<p className="text-gray-600 mt-2">
-							Preencha os dados abaixo e encontre o melhor seguro de viagem para você
+							Preencha os dados abaixo e encontre o melhor seguro de viagem para
+							você
 						</p>
 					</div>
 				</div>
@@ -140,16 +147,12 @@ export default function CotacaoPage() {
 												value={formData.destino}
 												onChange={handleInputChange}
 												className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-													errors.destino
-														? "border-red-500"
-														: "border-gray-300"
+													errors.destino ? "border-red-500" : "border-gray-300"
 												}`}
 											>
 												<option value="">Selecione o destino</option>
 												<option value="europa">Europa</option>
-												<option value="america-norte">
-													América do Norte
-												</option>
+												<option value="america-norte">América do Norte</option>
 												<option value="america-sul">América do Sul</option>
 												<option value="asia">Ásia</option>
 												<option value="oceania">Oceania</option>
@@ -191,9 +194,7 @@ export default function CotacaoPage() {
 												value={formData.dataIda}
 												onChange={handleInputChange}
 												className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-													errors.dataIda
-														? "border-red-500"
-														: "border-gray-300"
+													errors.dataIda ? "border-red-500" : "border-gray-300"
 												}`}
 											/>
 											{errors.dataIda && (
@@ -246,9 +247,7 @@ export default function CotacaoPage() {
 												onChange={handleInputChange}
 												placeholder="Digite seu nome completo"
 												className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-													errors.nome
-														? "border-red-500"
-														: "border-gray-300"
+													errors.nome ? "border-red-500" : "border-gray-300"
 												}`}
 											/>
 											{errors.nome && (
@@ -269,9 +268,7 @@ export default function CotacaoPage() {
 												onChange={handleInputChange}
 												placeholder="seu@email.com"
 												className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-													errors.email
-														? "border-red-500"
-														: "border-gray-300"
+													errors.email ? "border-red-500" : "border-gray-300"
 												}`}
 											/>
 											{errors.email && (
@@ -292,9 +289,7 @@ export default function CotacaoPage() {
 												onChange={handleInputChange}
 												placeholder="(11) 99999-9999"
 												className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-													errors.telefone
-														? "border-red-500"
-														: "border-gray-300"
+													errors.telefone ? "border-red-500" : "border-gray-300"
 												}`}
 											/>
 											{errors.telefone && (
@@ -399,9 +394,7 @@ export default function CotacaoPage() {
 									<div className="flex items-start space-x-3">
 										<DollarSign className="h-5 w-5 text-green-500 mt-0.5" />
 										<div>
-											<p className="font-medium text-gray-900">
-												Melhor Preço
-											</p>
+											<p className="font-medium text-gray-900">Melhor Preço</p>
 											<p className="text-sm text-gray-600">
 												Garantimos o melhor preço do mercado
 											</p>
@@ -419,9 +412,7 @@ export default function CotacaoPage() {
 									<div className="flex items-start space-x-3">
 										<Shield className="h-5 w-5 text-purple-500 mt-0.5" />
 										<div>
-											<p className="font-medium text-gray-900">
-												Compra Segura
-											</p>
+											<p className="font-medium text-gray-900">Compra Segura</p>
 											<p className="text-sm text-gray-600">
 												Transações 100% protegidas
 											</p>

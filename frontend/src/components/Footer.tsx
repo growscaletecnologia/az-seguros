@@ -1,4 +1,12 @@
-import { Facebook, Instagram, Mail, MapPin, Phone, Shield, Twitter } from "lucide-react";
+import {
+	Facebook,
+	Instagram,
+	Mail,
+	MapPin,
+	Phone,
+	Shield,
+	Twitter,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -28,27 +36,26 @@ export default function Footer() {
 
 					<div className="flex flex-col items-center">
 						<h3 className="text-lg font-semibold mb-6">Formas de Pagamento</h3>
-							<div className="flex flex-row gap-2 justify-center items-center">
-								<Image
-										alt="Cartão de Crédito"
-										width={400}
-										height={40}
-										src={"/cards-footer-icon.svg"}
-									/>
-								<Image
-										alt="Cartão de Crédito"
-										width={100}
-										height={40}
-										src={"/pix-footer-icon.svg"}
-									/>
-								<Image
-										alt="Cartão de Crédito"
-										width={50}
-										height={40}
-										src={"/boleto-footer-icon.svg"}
-									/>
-							</div>
-					
+						<div className="flex flex-row gap-2 justify-center items-center">
+							<Image
+								alt="Cartão de Crédito"
+								width={400}
+								height={40}
+								src={"/cards-footer-icon.svg"}
+							/>
+							<Image
+								alt="Cartão de Crédito"
+								width={100}
+								height={40}
+								src={"/pix-footer-icon.svg"}
+							/>
+							<Image
+								alt="Cartão de Crédito"
+								width={50}
+								height={40}
+								src={"/boleto-footer-icon.svg"}
+							/>
+						</div>
 					</div>
 
 					{/* Contato */}
@@ -80,7 +87,11 @@ export default function Footer() {
 						<div className="flex flex-row gap-2">
 							<p>Desenvolvido com ❤️ por </p>
 
-							<a href="https://growscale.com.br/" target="_blank" rel="noreferrer">
+							<a
+								href="https://growscale.com.br/"
+								target="_blank"
+								rel="noreferrer"
+							>
 								<Image
 									alt="logo-grow"
 									width={100}

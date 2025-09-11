@@ -25,7 +25,12 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
 
@@ -144,8 +149,16 @@ const SidebarLinks = () => {
 					</DropdownMenuContent>
 				</DropdownMenu>
 
-				<SidebarLink href="#" icon={<ShoppingCart className="h-5 w-5" />} text="Reservas" />
-				<SidebarLink href="#" icon={<Package2 className="h-5 w-5" />} text="Clientes" />
+				<SidebarLink
+					href="#"
+					icon={<ShoppingCart className="h-5 w-5" />}
+					text="Reservas"
+				/>
+				<SidebarLink
+					href="#"
+					icon={<Package2 className="h-5 w-5" />}
+					text="Clientes"
+				/>
 				<SidebarLink
 					href="/admin/settings"
 					icon={<Settings className="h-5 w-5" />}

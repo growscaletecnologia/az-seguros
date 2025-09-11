@@ -1,6 +1,14 @@
 "use client";
 
-import { Menu, Phone, Settings, Settings2, Shield, User, X } from "lucide-react";
+import {
+	Menu,
+	Phone,
+	Settings,
+	Settings2,
+	Shield,
+	User,
+	X,
+} from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -14,7 +22,9 @@ export default function Header() {
 					{/* Logo */}
 					<Link href="/" className="flex items-center space-x-2">
 						<Shield className="h-8 w-8 text-blue-600" />
-						<span className="text-xl font-bold text-gray-900">Seguro Viagem</span>
+						<span className="text-xl font-bold text-gray-900">
+							Seguro Viagem
+						</span>
 					</Link>
 
 					{/* Desktop Navigation */}
@@ -24,6 +34,12 @@ export default function Header() {
 							className="text-gray-700 hover:text-blue-600 font-medium"
 						>
 							Seguro Viagem
+						</Link>
+						<Link
+							href="/ajuda"
+							className="text-gray-700 hover:text-blue-600 font-medium"
+						>
+							FAQ
 						</Link>
 						<Link
 							href="/ajuda"
@@ -59,7 +75,11 @@ export default function Header() {
 						onClick={() => setIsMenuOpen(!isMenuOpen)}
 						className="md:hidden p-2 rounded-md text-gray-700 hover:text-blue-600"
 					>
-						{isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+						{isMenuOpen ? (
+							<X className="h-6 w-6" />
+						) : (
+							<Menu className="h-6 w-6" />
+						)}
 					</button>
 				</div>
 

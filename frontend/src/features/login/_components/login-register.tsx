@@ -6,7 +6,11 @@ interface LoginRegisterProps extends React.ComponentProps<"div"> {
 	goToBackStep: () => void;
 }
 
-export function LoginRegister({ className, goToBackStep, ...props }: LoginRegisterProps) {
+export function LoginRegister({
+	className,
+	goToBackStep,
+	...props
+}: LoginRegisterProps) {
 	return (
 		<div className={className} {...props}>
 			{/* <h1 className="text-4xl text-center my-3 font-medium">

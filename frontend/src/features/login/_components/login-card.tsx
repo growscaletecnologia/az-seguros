@@ -8,7 +8,11 @@ interface LoginCardProps extends React.ComponentProps<"div"> {
 	goToNextStep: () => void;
 }
 
-export function LoginCard({ className, goToNextStep, ...props }: LoginCardProps) {
+export function LoginCard({
+	className,
+	goToNextStep,
+	...props
+}: LoginCardProps) {
 	return (
 		<div className={className} {...props}>
 			{/* <h1 className="hidden md:block text-4xl text-center my-3 font-medium">

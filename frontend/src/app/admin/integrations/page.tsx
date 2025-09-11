@@ -92,7 +92,15 @@
 // export default IntegrationsPage;
 
 "use client";
-import { Eye, Pencil, Plus, ToggleLeft, ToggleRight, Trash2, X } from "lucide-react";
+import {
+	Eye,
+	Pencil,
+	Plus,
+	ToggleLeft,
+	ToggleRight,
+	Trash2,
+	X,
+} from "lucide-react";
 import type React from "react";
 import { useMemo, useState } from "react";
 
@@ -172,17 +180,22 @@ export default function IntegrationsPage() {
 		setOpen(false);
 	};
 
-	const handleDelete = (id: string) => setIntegracoes((prev) => prev.filter((i) => i.id !== id));
+	const handleDelete = (id: string) =>
+		setIntegracoes((prev) => prev.filter((i) => i.id !== id));
 
 	const toggleAtiva = (id: string) =>
-		setIntegracoes((prev) => prev.map((i) => (i.id === id ? { ...i, ativa: !i.ativa } : i)));
+		setIntegracoes((prev) =>
+			prev.map((i) => (i.id === id ? { ...i, ativa: !i.ativa } : i)),
+		);
 
 	const [search, setSearch] = useState("");
 	const filtered = useMemo(() => {
 		const q = search.trim().toLowerCase();
 		if (!q) return integracoes;
 		return integracoes.filter(
-			(i) => i.seguradora.toLowerCase().includes(q) || i.id.toLowerCase().includes(q),
+			(i) =>
+				i.seguradora.toLowerCase().includes(q) ||
+				i.id.toLowerCase().includes(q),
 		);
 	}, [integracoes, search]);
 
@@ -191,7 +204,9 @@ export default function IntegrationsPage() {
 			{/* Header */}
 			<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
 				<div>
-					<h1 className="text-2xl font-semibold text-gray-900">Integrações de Seguros</h1>
+					<h1 className="text-2xl font-semibold text-gray-900">
+						Integrações de Seguros
+					</h1>
 					<p className="text-sm text-gray-600">
 						Gerencie plataformas de seguradoras, tokens e markup.
 					</p>
@@ -226,13 +241,18 @@ export default function IntegrationsPage() {
 
 				<div className="divide-y">
 					{filtered.map((i) => (
-						<div key={i.id} className="grid grid-cols-12 items-center px-4 py-3">
+						<div
+							key={i.id}
+							className="grid grid-cols-12 items-center px-4 py-3"
+						>
 							<div className="col-span-3">
 								<div className="font-medium text-gray-900">{i.seguradora}</div>
 								<div className="text-xs text-gray-500">{i.id}</div>
 							</div>
 
-							<div className="col-span-3 text-gray-900">{maskToken(i.token)}</div>
+							<div className="col-span-3 text-gray-900">
+								{maskToken(i.token)}
+							</div>
 
 							<div className="col-span-2">
 								<span

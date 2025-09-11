@@ -38,7 +38,12 @@ const BlogPage = () => {
 			dataPublicacao: new Date().toISOString().split("T")[0],
 		};
 		setPosts([...posts, post]);
-		setNovoPost({ titulo: "", conteudo: "", autor: "Admin", status: "rascunho" });
+		setNovoPost({
+			titulo: "",
+			conteudo: "",
+			autor: "Admin",
+			status: "rascunho",
+		});
 		alert("Post criado com sucesso!");
 	};
 
@@ -95,7 +100,10 @@ const BlogPage = () => {
 							value={editandoPost ? editandoPost.conteudo : novoPost.conteudo}
 							onChange={(e) => {
 								if (editandoPost) {
-									setEditandoPost({ ...editandoPost, conteudo: e.target.value });
+									setEditandoPost({
+										...editandoPost,
+										conteudo: e.target.value,
+									});
 								} else {
 									setNovoPost({ ...novoPost, conteudo: e.target.value });
 								}

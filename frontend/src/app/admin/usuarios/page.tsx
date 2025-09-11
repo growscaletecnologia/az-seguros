@@ -84,14 +84,20 @@ const UsuariosPage = () => {
 
 	const salvarEdicao = () => {
 		if (editandoUsuario) {
-			setUsuarios(usuarios.map((u) => (u.id === editandoUsuario.id ? editandoUsuario : u)));
+			setUsuarios(
+				usuarios.map((u) =>
+					u.id === editandoUsuario.id ? editandoUsuario : u,
+				),
+			);
 			setEditandoUsuario(null);
 			alert("Usuário atualizado com sucesso!");
 		}
 	};
 
 	const toggleUsuario = (id: number) => {
-		setUsuarios(usuarios.map((u) => (u.id === id ? { ...u, ativo: !u.ativo } : u)));
+		setUsuarios(
+			usuarios.map((u) => (u.id === id ? { ...u, ativo: !u.ativo } : u)),
+		);
 	};
 
 	const excluirUsuario = (id: number) => {
@@ -101,7 +107,10 @@ const UsuariosPage = () => {
 		}
 	};
 
-	const atualizarRole = (role: "admin" | "cliente" | "gerente", isEditing = false) => {
+	const atualizarRole = (
+		role: "admin" | "cliente" | "gerente",
+		isEditing = false,
+	) => {
 		const permissoes = permissoesPadrao[role];
 		if (isEditing && editandoUsuario) {
 			setEditandoUsuario({ ...editandoUsuario, role, permissoes });
@@ -163,7 +172,9 @@ const UsuariosPage = () => {
 						<input
 							type="email"
 							className="w-full p-2 border rounded"
-							value={editandoUsuario ? editandoUsuario.email : novoUsuario.email}
+							value={
+								editandoUsuario ? editandoUsuario.email : novoUsuario.email
+							}
 							onChange={(e) => {
 								if (editandoUsuario) {
 									setEditandoUsuario({
@@ -202,29 +213,33 @@ const UsuariosPage = () => {
 				</div>
 
 				<div className="mb-4">
-					<label className="block text-sm font-medium mb-2">Permissões CRUD</label>
+					<label className="block text-sm font-medium mb-2">
+						Permissões CRUD
+					</label>
 					<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-						{(["ver", "editar", "criar", "excluir"] as const).map((permissao) => (
-							<label key={permissao} className="flex items-center">
-								<input
-									type="checkbox"
-									checked={
-										(editandoUsuario
-											? editandoUsuario.permissoes
-											: novoUsuario.permissoes)[permissao]
-									}
-									onChange={(e) =>
-										atualizarPermissao(
-											permissao,
-											e.target.checked,
-											!!editandoUsuario,
-										)
-									}
-									className="mr-2"
-								/>
-								{permissao.charAt(0).toUpperCase() + permissao.slice(1)}
-							</label>
-						))}
+						{(["ver", "editar", "criar", "excluir"] as const).map(
+							(permissao) => (
+								<label key={permissao} className="flex items-center">
+									<input
+										type="checkbox"
+										checked={
+											(editandoUsuario
+												? editandoUsuario.permissoes
+												: novoUsuario.permissoes)[permissao]
+										}
+										onChange={(e) =>
+											atualizarPermissao(
+												permissao,
+												e.target.checked,
+												!!editandoUsuario,
+											)
+										}
+										className="mr-2"
+									/>
+									{permissao.charAt(0).toUpperCase() + permissao.slice(1)}
+								</label>
+							),
+						)}
 					</div>
 				</div>
 

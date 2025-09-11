@@ -73,20 +73,27 @@ const CuponsPage = () => {
 
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 					<div>
-						<label className="block text-sm font-medium mb-2">Código do Cupom</label>
+						<label className="block text-sm font-medium mb-2">
+							Código do Cupom
+						</label>
 						<input
 							type="text"
 							className="w-full p-2 border rounded"
 							value={novoCupom.codigo}
 							onChange={(e) =>
-								setNovoCupom({ ...novoCupom, codigo: e.target.value.toUpperCase() })
+								setNovoCupom({
+									...novoCupom,
+									codigo: e.target.value.toUpperCase(),
+								})
 							}
 							placeholder="Ex: PROMO20"
 						/>
 					</div>
 
 					<div>
-						<label className="block text-sm font-medium mb-2">Tipo de Desconto</label>
+						<label className="block text-sm font-medium mb-2">
+							Tipo de Desconto
+						</label>
 						<select
 							className="w-full p-2 border rounded"
 							value={novoCupom.tipoDesconto}
@@ -119,7 +126,9 @@ const CuponsPage = () => {
 					</div>
 
 					<div>
-						<label className="block text-sm font-medium mb-2">Data de Expiração</label>
+						<label className="block text-sm font-medium mb-2">
+							Data de Expiração
+						</label>
 						<input
 							type="date"
 							className="w-full p-2 border rounded"
@@ -131,13 +140,18 @@ const CuponsPage = () => {
 					</div>
 
 					<div>
-						<label className="block text-sm font-medium mb-2">Limite de Uso</label>
+						<label className="block text-sm font-medium mb-2">
+							Limite de Uso
+						</label>
 						<input
 							type="number"
 							className="w-full p-2 border rounded"
 							value={novoCupom.limitesUso}
 							onChange={(e) =>
-								setNovoCupom({ ...novoCupom, limitesUso: Number(e.target.value) })
+								setNovoCupom({
+									...novoCupom,
+									limitesUso: Number(e.target.value),
+								})
 							}
 							min="1"
 							placeholder="Quantas vezes pode ser usado"
@@ -149,7 +163,9 @@ const CuponsPage = () => {
 					onClick={criarCupom}
 					className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
 					disabled={
-						!novoCupom.codigo || !novoCupom.dataExpiracao || novoCupom.limitesUso <= 0
+						!novoCupom.codigo ||
+						!novoCupom.dataExpiracao ||
+						novoCupom.limitesUso <= 0
 					}
 				>
 					Criar Cupom

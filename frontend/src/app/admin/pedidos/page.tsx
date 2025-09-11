@@ -276,7 +276,9 @@ const PedidosPage = () => {
 			<div className="bg-white p-6 rounded-lg shadow mb-6">
 				<div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
 					<div>
-						<label className="block text-sm font-medium mb-2">Filtrar por Data</label>
+						<label className="block text-sm font-medium mb-2">
+							Filtrar por Data
+						</label>
 						<input
 							type="date"
 							className="w-full p-2 border rounded"
@@ -298,7 +300,9 @@ const PedidosPage = () => {
 					</div>
 
 					<div>
-						<label className="block text-sm font-medium mb-2">Filtrar por Status</label>
+						<label className="block text-sm font-medium mb-2">
+							Filtrar por Status
+						</label>
 						<select
 							className="w-full p-2 border rounded"
 							value={filtroStatus}
@@ -444,7 +448,9 @@ const PedidosPage = () => {
 			{/* Resumo estatístico */}
 			<div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
 				{["pago", "pendente", "cancelado", "reembolsado"].map((status) => {
-					const count = pedidosFiltrados.filter((p) => p.status === status).length;
+					const count = pedidosFiltrados.filter(
+						(p) => p.status === status,
+					).length;
 					const valor = pedidosFiltrados
 						.filter((p) => p.status === status)
 						.reduce((sum, p) => sum + p.valor, 0);

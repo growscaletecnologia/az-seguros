@@ -44,8 +44,12 @@ const ConteudosPage = () => {
 			dataAtualizacao: "2024-01-12",
 		},
 	]);
-	const [editandoConteudo, setEditandoConteudo] = useState<Conteudo | null>(null);
-	const [sectionTitle, setSectionTitle] = useState<string>("Por que escolher a SeguroViagem?");
+	const [editandoConteudo, setEditandoConteudo] = useState<Conteudo | null>(
+		null,
+	);
+	const [sectionTitle, setSectionTitle] = useState<string>(
+		"Por que escolher a SeguroViagem?",
+	);
 
 	const [novoConteudo, setNovoConteudo] = useState({
 		titulo: "",
@@ -76,7 +80,9 @@ const ConteudosPage = () => {
 				dataAtualizacao: new Date().toISOString().split("T")[0],
 			};
 			setConteudos(
-				conteudos.map((c) => (c.id === editandoConteudo.id ? conteudoAtualizado : c)),
+				conteudos.map((c) =>
+					c.id === editandoConteudo.id ? conteudoAtualizado : c,
+				),
 			);
 			setEditandoConteudo(null);
 			alert("Conteúdo atualizado com sucesso!");
@@ -84,7 +90,9 @@ const ConteudosPage = () => {
 	};
 
 	const toggleConteudo = (id: number) => {
-		setConteudos(conteudos.map((c) => (c.id === id ? { ...c, ativo: !c.ativo } : c)));
+		setConteudos(
+			conteudos.map((c) => (c.id === id ? { ...c, ativo: !c.ativo } : c)),
+		);
 	};
 
 	const excluirConteudo = (id: number) => {
@@ -115,13 +123,15 @@ const ConteudosPage = () => {
 			id: 1,
 			icone: "💰",
 			titulo: "Melhor Preço",
-			descricao: "Garantimos o melhor preço do mercado ou devolvemos a diferença.",
+			descricao:
+				"Garantimos o melhor preço do mercado ou devolvemos a diferença.",
 		},
 		{
 			id: 2,
 			icone: "⏰",
 			titulo: "Suporte 24h",
-			descricao: "Atendimento especializado 24 horas por dia, 7 dias por semana.",
+			descricao:
+				"Atendimento especializado 24 horas por dia, 7 dias por semana.",
 		},
 		{
 			id: 3,
@@ -133,7 +143,8 @@ const ConteudosPage = () => {
 			id: 4,
 			icone: "👥",
 			titulo: "+1M Clientes",
-			descricao: "Mais de 1 milhão de viajantes já confiaram em nossos serviços.",
+			descricao:
+				"Mais de 1 milhão de viajantes já confiaram em nossos serviços.",
 		},
 	]);
 
@@ -184,7 +195,9 @@ const ConteudosPage = () => {
 						<div className="space-y-4">
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 								<div>
-									<label className="block text-sm font-medium mb-2">Título</label>
+									<label className="block text-sm font-medium mb-2">
+										Título
+									</label>
 									<input
 										type="text"
 										className="w-full p-2 border rounded"
@@ -239,7 +252,9 @@ const ConteudosPage = () => {
 								</div>
 							</div>
 							<div>
-								<label className="block text-sm font-medium mb-2">Conteúdo</label>
+								<label className="block text-sm font-medium mb-2">
+									Conteúdo
+								</label>
 								<textarea
 									className="w-full p-2 border rounded h-40"
 									value={
@@ -377,11 +392,7 @@ const ConteudosPage = () => {
 									<Textarea
 										value={item.descricao}
 										onChange={(e) =>
-											handleUpdateSection(
-												item.id,
-												"descricao",
-												e.target.value,
-											)
+											handleUpdateSection(item.id, "descricao", e.target.value)
 										}
 										placeholder="Descrição"
 									/>
@@ -399,22 +410,32 @@ const ConteudosPage = () => {
 					<div className="bg-white p-6 rounded-lg shadow space-y-6">
 						<h2 className="text-xl font-semibold mb-4">Header & Footer</h2>
 						<div>
-							<label className="block text-sm font-medium mb-2">Código Header</label>
+							<label className="block text-sm font-medium mb-2">
+								Código Header
+							</label>
 							<Textarea
 								className="h-32"
 								value={headerFooter.headerCode}
 								onChange={(e) =>
-									setHeaderFooter({ ...headerFooter, headerCode: e.target.value })
+									setHeaderFooter({
+										...headerFooter,
+										headerCode: e.target.value,
+									})
 								}
 							/>
 						</div>
 						<div>
-							<label className="block text-sm font-medium mb-2">Código Footer</label>
+							<label className="block text-sm font-medium mb-2">
+								Código Footer
+							</label>
 							<Textarea
 								className="h-32"
 								value={headerFooter.footerCode}
 								onChange={(e) =>
-									setHeaderFooter({ ...headerFooter, footerCode: e.target.value })
+									setHeaderFooter({
+										...headerFooter,
+										footerCode: e.target.value,
+									})
 								}
 							/>
 						</div>
@@ -454,7 +475,9 @@ const ConteudosPage = () => {
 							))}
 						</div>
 						<div className="border-t pt-4">
-							<h3 className="text-lg font-semibold mb-2">Adicionar Avaliação</h3>
+							<h3 className="text-lg font-semibold mb-2">
+								Adicionar Avaliação
+							</h3>
 							<Input placeholder="Nome do cliente" className="mb-2" />
 							<Textarea placeholder="Comentário" className="mb-2" />
 							<Button className="bg-blue-600 text-white hover:bg-blue-700">

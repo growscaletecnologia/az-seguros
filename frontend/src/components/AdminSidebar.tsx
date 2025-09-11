@@ -94,7 +94,11 @@ const AdminSidebar = () => {
 					onClick={() => setIsMobileOpen(!isMobileOpen)}
 					className="p-2 bg-white rounded-lg shadow-md border"
 				>
-					{isMobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+					{isMobileOpen ? (
+						<X className="h-5 w-5" />
+					) : (
+						<Menu className="h-5 w-5" />
+					)}
 				</button>
 			</div>
 
@@ -122,7 +126,9 @@ const AdminSidebar = () => {
 								<div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
 									<span className="text-white font-bold text-sm">SP</span>
 								</div>
-								<span className="font-semibold text-gray-900">Seguros Promo</span>
+								<span className="font-semibold text-gray-900">
+									Seguros Promo
+								</span>
 							</div>
 						)}
 						<button
@@ -149,10 +155,10 @@ const AdminSidebar = () => {
 								className={`
                   flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors
                   ${
-						isActiveRoute(item.href)
-							? "bg-blue-50 text-blue-700 border-r-2 border-blue-700"
-							: "text-gray-700 hover:bg-gray-100"
-					}
+										isActiveRoute(item.href)
+											? "bg-blue-50 text-blue-700 border-r-2 border-blue-700"
+											: "text-gray-700 hover:bg-gray-100"
+									}
                 `}
 							>
 								<span
@@ -191,7 +197,9 @@ const AdminSidebar = () => {
 			</div>
 
 			{/* Main content spacer */}
-			<div className={`${isCollapsed ? "lg:ml-16" : "lg:ml-64"} transition-all duration-300`}>
+			<div
+				className={`${isCollapsed ? "lg:ml-16" : "lg:ml-64"} transition-all duration-300`}
+			>
 				{/* This div pushes the main content to the right */}
 			</div>
 		</>

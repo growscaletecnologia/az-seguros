@@ -91,7 +91,9 @@ const policies = [
 
 export default function ClientePage() {
 	const [activeTab, setActiveTab] = useState("dashboard");
-	const [selectedPolicy, setSelectedPolicy] = useState<(typeof policies)[0] | null>(null);
+	const [selectedPolicy, setSelectedPolicy] = useState<
+		(typeof policies)[0] | null
+	>(null);
 	const [showCancelModal, setShowCancelModal] = useState(false);
 	const [openModal, setOpenModal] = useState(false);
 
@@ -123,7 +125,9 @@ export default function ClientePage() {
 		// Simular envio por email
 		const policy = policies.find((p) => p.id === policyId);
 		if (policy) {
-			alert(`Enviando detalhes da apólice ${policy.numero} para ${userData.email}...`);
+			alert(
+				`Enviando detalhes da apólice ${policy.numero} para ${userData.email}...`,
+			);
 			// Em uma implementação real, aqui seria feita a chamada para a API de envio de email
 			setTimeout(() => {
 				alert(`E-mail enviado com sucesso para ${userData.email}!`);
@@ -138,7 +142,9 @@ export default function ClientePage() {
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
 					<div className="flex items-center justify-between">
 						<div>
-							<h1 className="text-3xl font-bold text-gray-900">Área do Cliente</h1>
+							<h1 className="text-3xl font-bold text-gray-900">
+								Área do Cliente
+							</h1>
 							<p className="text-gray-600 mt-1">Bem-vindo, {userData.nome}</p>
 						</div>
 						<div className="flex items-center space-x-4">
@@ -217,21 +223,16 @@ export default function ClientePage() {
 									<div className="bg-white rounded-lg shadow-sm p-6">
 										<div className="flex items-center justify-between">
 											<div>
-												<p className="text-sm text-gray-600">
-													Apólices Ativas
-												</p>
+												<p className="text-sm text-gray-600">Apólices Ativas</p>
 												<p className="text-2xl font-bold text-gray-900">
-													{
-														policies.filter((p) => p.status === "Ativa")
-															.length
-													}
+													{policies.filter((p) => p.status === "Ativa").length}
 												</p>
 											</div>
 											<Shield className="h-8 w-8 text-green-600" />
 										</div>
 									</div>
 
-									<div className="bg-white rounded-lg shadow-sm p-6">
+									{/* <div className="bg-white rounded-lg shadow-sm p-6">
 										<div className="flex items-center justify-between">
 											<div>
 												<p className="text-sm text-gray-600">Total Gasto</p>
@@ -244,14 +245,12 @@ export default function ClientePage() {
 											</div>
 											<CreditCard className="h-8 w-8 text-blue-600" />
 										</div>
-									</div>
+									</div> */}
 
 									<div className="bg-white rounded-lg shadow-sm p-6">
 										<div className="flex items-center justify-between">
 											<div>
-												<p className="text-sm text-gray-600">
-													Próxima Viagem
-												</p>
+												<p className="text-sm text-gray-600">Próxima Viagem</p>
 												<p className="text-lg font-bold text-gray-900">
 													15/03/2024
 												</p>
@@ -334,20 +333,13 @@ export default function ClientePage() {
 
 														<div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
 															<div>
-																<p className="text-sm text-gray-600">
-																	Destino
-																</p>
-																<p className="font-medium">
-																	{policy.destino}
-																</p>
+																<p className="text-sm text-gray-600">Destino</p>
+																<p className="font-medium">{policy.destino}</p>
 															</div>
 															<div>
-																<p className="text-sm text-gray-600">
-																	Período
-																</p>
+																<p className="text-sm text-gray-600">Período</p>
 																<p className="font-medium">
-																	{policy.dataIda} -{" "}
-																	{policy.dataVolta}
+																	{policy.dataIda} - {policy.dataVolta}
 																</p>
 															</div>
 															<div>
@@ -355,8 +347,7 @@ export default function ClientePage() {
 																	Viajantes
 																</p>
 																<p className="font-medium">
-																	{policy.viajantes.length}{" "}
-																	pessoa(s)
+																	{policy.viajantes.length} pessoa(s)
 																</p>
 															</div>
 															<div>
@@ -370,24 +361,20 @@ export default function ClientePage() {
 														</div>
 
 														<div className="flex flex-wrap gap-2 mb-4">
-															{policy.viajantes.map(
-																(viajante, index) => (
-																	<span
-																		key={index}
-																		className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full"
-																	>
-																		{viajante}
-																	</span>
-																),
-															)}
+															{policy.viajantes.map((viajante, index) => (
+																<span
+																	key={index}
+																	className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full"
+																>
+																	{viajante}
+																</span>
+															))}
 														</div>
 													</div>
 
 													<div className="flex flex-col space-y-2 ml-4">
 														<button
-															onClick={() =>
-																downloadVoucher(policy.id)
-															}
+															onClick={() => downloadVoucher(policy.id)}
 															className="flex items-center space-x-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
 														>
 															<Download className="h-4 w-4" />
@@ -395,9 +382,7 @@ export default function ClientePage() {
 														</button>
 
 														<button
-															onClick={() =>
-																enviarPorEmail(policy.id)
-															}
+															onClick={() => enviarPorEmail(policy.id)}
 															className="flex items-center space-x-2 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
 														>
 															<Mail className="h-4 w-4" />
@@ -405,9 +390,7 @@ export default function ClientePage() {
 														</button>
 
 														<button
-															onClick={() =>
-																setSelectedPolicy(policy)
-															}
+															onClick={() => setSelectedPolicy(policy)}
 															className="flex items-center space-x-2 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm"
 														>
 															<Eye className="h-4 w-4" />

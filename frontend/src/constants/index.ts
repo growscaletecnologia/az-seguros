@@ -6,9 +6,13 @@ const appEnvSchema = z.object({
 	}),
 	NODE_ENV: z.enum(["development", "production"]),
 	DB_SERVER: z.string({ message: "Variável de ambiente DB_SERVER faltando." }),
-	DB_DATABASE: z.string({ message: "Variável de ambiente DB_DATABASE faltando." }),
+	DB_DATABASE: z.string({
+		message: "Variável de ambiente DB_DATABASE faltando.",
+	}),
 	DB_USER: z.string({ message: "Variável de ambiente DB_USER faltando." }),
-	DB_PASSWORD: z.string({ message: "Variável de ambiente DB_PASSWORD faltando." }),
+	DB_PASSWORD: z.string({
+		message: "Variável de ambiente DB_PASSWORD faltando.",
+	}),
 	DB_PORT: z
 		.string({ message: "Variável de ambiente DB_PORT faltando." })
 		.transform((arg, ctx) => {
