@@ -4,17 +4,6 @@ import { DateRangePicker } from "@/components/Inputs/CustomCalendar";
 import EmailField from "@/components/Inputs/EmailInput";
 import EmblaCarousel from "@/components/EmblaCarousel";
 import PhoneField from "@/components/Inputs/PhoneInput";
-import { Calendar } from "@/components/ui/calendar";
-import { Input } from "@/components/ui/input";
-import {
-	Select,
-	SelectContent,
-	SelectGroup,
-	SelectItem,
-	SelectLabel,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
 import { PreRegisterForm } from "@/types/types";
 import {
 	ArrowRight,
@@ -23,29 +12,28 @@ import {
 	DollarSign,
 	Globe,
 	Heart,
-	Mail,
+	Info,
 	MapPin,
-	
-	Phone,
 	Plane,
 	Shield,
 	Star,
-	
 	User,
 	Users,
 	
-	UserSquare2,
 } from "lucide-react";
-
+import { useRouter } from "next/navigation"
 
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { DateRange } from "react-day-picker";
+
 import DestinationSelect from "@/components/Inputs/DestinationSelect";
 import PassengersSelect from "@/components/Inputs/PassengersSelect,";
+import { usePreRegisterForm } from "@/hooks/useRegisterStore";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 
 export default function HomePage() {
+	const { formData:dados, setForm } = usePreRegisterForm()
 	const [formData, setFormData] = useState<PreRegisterForm>({
 		name: "",
 		email: "",
@@ -55,10 +43,12 @@ export default function HomePage() {
 		destination: "BA",
 		step: 1,
 		coupon: "",
-	});
-	console.log(formData)
-	const [datas, setDatas] = useState<DateRange | undefined>();
+		term:false
+	})
+	
+	const router = useRouter()
 	const [coupomChecked, setCoupomChecked] = useState(false);
+	const [errors, setErrors] = useState<Partial<Record<keyof PreRegisterForm, boolean>>>({})
 	function smoothScrollTo(targetY: number, duration = 600) {
 		const startY = window.scrollY || document.documentElement.scrollTop;
 		const distance = targetY - startY;
@@ -68,7 +58,7 @@ export default function HomePage() {
 		}
 
 		const startTime = performance.now();
-		const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3); // suavinho
+		const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
 
 		function step(now: number) {
 			const elapsed = now - startTime;
@@ -82,7 +72,26 @@ export default function HomePage() {
 	}
 	function handleSubmit(event: React.FormEvent) {
 		event.preventDefault();
-		console.log("Form submitted:", formData);
+
+		const requiredFields: (keyof PreRegisterForm)[] = ["name", "email", "phone", "range", "destination", "term"]
+    	const newErrors: Partial<Record<keyof PreRegisterForm, boolean>> = {}
+
+		requiredFields.forEach((field) => {
+		if (!formData[field] || (field === "range" && !formData.range?.from)) {
+			newErrors[field] = true
+		}
+		})
+
+		if (Object.keys(newErrors).length > 0) {
+		setErrors(newErrors)
+		return
+		}
+
+		const finalForm = { ...formData, coupon: coupomChecked ? "SEGURO25" : "" }
+		
+		setForm(finalForm)
+		router.push("/planos")
+		console.log("Form submitted:", finalForm)
 	}
 	return (
 		<div className="bg-white">
@@ -125,7 +134,7 @@ export default function HomePage() {
 									<input
 										type="checkbox"
 										id="cupom"
-										className="w-4 h-4 rounded-2xl mt-1"
+										className="w-5 h-5 rounded-2xl mt-1"
 										checked={coupomChecked}
 										onChange={() => {
 											setCoupomChecked(!coupomChecked)
@@ -142,7 +151,7 @@ export default function HomePage() {
 								<input
 									type="checkbox"
 									id="cupom"
-									className="w-4 h-4 rounded-2xl mt-1"
+									className="w-5 h-5 rounded-2xl mt-1"
 									checked={coupomChecked}
 									onChange={() => {
 										setCoupomChecked(!coupomChecked)
@@ -173,6 +182,7 @@ export default function HomePage() {
 												setFormData((prev) => ({ ...prev, destination: value }))
 											}
 										/>
+										  {errors.destination && <p className="text-red-500 text-sm">Selecione um destino</p>}
 										<div className="col-span-1 md:col-span-2 lg:col-span-2">
 											<DateRangePicker
 												onChange={(value)=>{
@@ -183,31 +193,42 @@ export default function HomePage() {
 												range={formData.range}
 							
 											/>
+											 {errors.range && <p className="text-red-500 text-sm">Informe as datas da viagem</p>}
 										</div>
-										<div className="flex items-center h-[52px] w-full px-3 rounded-lg bg-white/20 border border-white/30 text-white focus-within:ring-2 focus-within:ring-yellow-400">
+										 <div
+											className={`flex items-center h-[52px] w-full px-3 rounded-lg bg-white/20 border ${
+											errors.name ? "border-red-500" : "border-white/30"
+											} text-white focus-within:ring-2 focus-within:ring-yellow-400`}
+										>
 											<User className="h-5 w-5 mr-2 opacity-80" />
 											<input
 												type="text"
 												placeholder="Nome completo"
-												className="w-full bg-transparent border-0 placeholder-white/70 text-white focus:ring-0 focus:outline-none"
+									 			className="w-full bg-transparent border-0 placeholder-white/70 text-white focus:ring-0 focus:outline-none"
 												value={formData.name}
 												onChange={(e) =>
 													setFormData((prev) => ({ ...prev, name: e.target.value }))
 												}
 											/>
 										</div>
-										<EmailField
-												email={formData.email}
-												setEmail={(value) =>
-													setFormData((prev) => ({ ...prev, email: value }))
+										<div>
+											<EmailField
+													email={formData.email}
+													setEmail={(value) =>
+														setFormData((prev) => ({ ...prev, email: value }))
+													}
+											/>
+											 {errors.email && <p className="text-red-500 text-sm">Informe um email válido</p>}
+										</div>
+										<div>
+											<PhoneField
+												phone={formData.phone}
+												setPhone={(value) =>
+													setFormData((prev) => ({ ...prev, phone: value }))
 												}
-										/>
-										<PhoneField
-											phone={formData.phone}
-											setPhone={(value) =>
-												setFormData((prev) => ({ ...prev, phone: value }))
-											}
-										/>
+											/>
+											 {errors.phone && <p className="text-red-500 text-sm">Informe um telefone válido</p>}
+										</div>
 									</div>
 							
 									<div className="flex flex-row justify-between items-center gap-4 mt-4">
@@ -227,9 +248,44 @@ export default function HomePage() {
 												</button>
 										</div>
 									</div>
+							<div className=" relative flex flex-row p-4 gap-4 mt-4">
+							
+								<input
+									type="checkbox"
+									id="cupom"
+									className="w-5 h-5 rounded-2xl mt-1"
+									checked={formData.term}
+									onChange={() => {
+										setFormData((prev) => ({ ...prev, term: !prev.term }))
+									}}
+								/>
+							
+								
+															<HoverCard>
+							<HoverCardTrigger>
+								<span
+								className={`text-lg hover:cursor-pointer transition-colors ${
+									errors.term  ? "text-red-500 font-semibold" : "text-white"
+								}`}
+								>
+								Confirmo que o passageiro ainda não iniciou a viagem.
+								</span>
+							</HoverCardTrigger>
+							<HoverCardContent className="flex flex-row gap-2">
+								<div className="flex flex-col gap-1">
+								Este campo é obrigatório para confirmar que a viagem ainda não foi iniciada.
+								<b>Atenção: não é permitido renovar caso o passageiro já esteja em viagem.</b>
 								</div>
+							</HoverCardContent>
+							</HoverCard>
 							</div>
+								</div>
+							
+							</div>
+								
 						</form>
+
+					
 
 						
 					</div>

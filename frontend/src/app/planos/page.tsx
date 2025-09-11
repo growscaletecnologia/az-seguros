@@ -1,5 +1,9 @@
 "use client";
 
+import { DateRangePicker } from "@/components/Inputs/CustomCalendar";
+import DestinationSelect from "@/components/Inputs/DestinationSelect";
+import { Button } from "@/components/ui/button";
+import { usePreRegisterForm } from "@/hooks/useRegisterStore";
 import {
 	Activity,
 	ArrowRight,
@@ -7,6 +11,7 @@ import {
 	Calendar,
 	CheckCircle,
 	Eye,
+	EyeIcon,
 	Filter as FilterIcon,
 	GitCompare,
 	Heart,
@@ -16,6 +21,8 @@ import {
 	Plane,
 	Plus,
 	Search,
+	SearchCheck,
+	SearchIcon,
 	Shield,
 	ShieldOff,
 	Star,
@@ -23,7 +30,8 @@ import {
 	Wallet,
 	X,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { DateRange } from "react-day-picker";
 
 /* ============================== */
 /*           MOCK DATA            */
@@ -34,6 +42,7 @@ type Plan = {
 	plano: string;
 	preco: number;
 	precoOriginal: number;
+	precoCartao: number;
 	coberturaMedica: number; // DMH
 	coberturaBagagem: number;
 	coberturaCancelamento: number;
@@ -54,8 +63,9 @@ const mockPlans: Plan[] = [
 		plano: "AC 60 Europa",
 		preco: 89.9,
 		precoOriginal: 99.9,
+    precoCartao: 127.6,
 		coberturaMedica: 60000,
-		coberturaBagagem: 1200,
+		coberturaBagagem: 1200, 
 		coberturaCancelamento: 5000,
 		coberturaPandemia: true,
 		coberturaPraticaEsportiva: true,
@@ -77,6 +87,7 @@ const mockPlans: Plan[] = [
 		plano: "TA 40 Especial",
 		preco: 67.5,
 		precoOriginal: 75.0,
+    precoCartao: 127.6,
 		coberturaMedica: 40000,
 		coberturaBagagem: 800,
 		coberturaCancelamento: 3000,
@@ -100,6 +111,7 @@ const mockPlans: Plan[] = [
 		plano: "GTA 75 Euromax",
 		preco: 125.8,
 		precoOriginal: 140.0,
+    precoCartao: 127.6,
 		coberturaMedica: 75000,
 		coberturaBagagem: 1500,
 		coberturaCancelamento: 8000,
@@ -124,6 +136,7 @@ const mockPlans: Plan[] = [
 		plano: "VC 30 Basic",
 		preco: 45.9,
 		precoOriginal: 52.0,
+    precoCartao: 127.6,
 		coberturaMedica: 30000,
 		coberturaBagagem: 600,
 		coberturaCancelamento: 2000,
@@ -146,6 +159,7 @@ const mockPlans: Plan[] = [
 		plano: "I60 Europa",
 		preco: 98.7,
 		precoOriginal: 110.0,
+    precoCartao: 127.6,
 		coberturaMedica: 60000,
 		coberturaBagagem: 1000,
 		coberturaCancelamento: 6000,
@@ -520,33 +534,27 @@ function PlanDetailsModal({
 
 				<div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-6">
 					<div className="text-center p-3 bg-gray-50 rounded-lg">
-						<Heart className="h-5 w-5 text-red-500 mx-auto mb-1" />
+						<Activity className="h-5 w-5 text-green-500 mx-auto mb-1" />
 						<p className="text-xs text-gray-600">Cobertura Médica</p>
 						<p className="font-semibold text-sm">
 							USD {plan.coberturaMedica.toLocaleString()}
 						</p>
 					</div>
 					<div className="text-center p-3 bg-gray-50 rounded-lg">
-						<Shield className="h-5 w-5 text-blue-500 mx-auto mb-1" />
+						<BaggageClaim className="h-5 w-5 text-blue-500 mx-auto mb-1" />
 						<p className="text-xs text-gray-600">Bagagem</p>
 						<p className="font-semibold text-sm">
 							USD {plan.coberturaBagagem.toLocaleString()}
 						</p>
 					</div>
 					<div className="text-center p-3 bg-gray-50 rounded-lg">
-						<Plane className="h-5 w-5 text-green-500 mx-auto mb-1" />
+						<ShieldOff className="h-5 w-5 text-red-500 mx-auto mb-1" />
 						<p className="text-xs text-gray-600">Cancelamento</p>
 						<p className="font-semibold text-sm">
 							USD {plan.coberturaCancelamento.toLocaleString()}
 						</p>
 					</div>
-					<div className="text-center p-3 bg-gray-50 rounded-lg">
-						<CheckCircle className="h-5 w-5 text-purple-500 mx-auto mb-1" />
-						<p className="text-xs text-gray-600">COVID-19</p>
-						<p className="font-semibold text-sm">
-							{plan.coberturaPandemia ? "Incluído" : "Não"}
-						</p>
-					</div>
+					
 				</div>
 
 				<div className="px-6 pb-6">
@@ -579,7 +587,10 @@ function AccordionRow({
 	extra?: string;
 }) {
 	const [open, setOpen] = useState(false);
+
+
 	return (
+    
 		<div className="border-b last:border-b-0">
 			<button
 				onClick={() => setOpen((v) => !v)}
@@ -612,15 +623,51 @@ function AccordionRow({
 /* ============================== */
 /*         LISTAGEM + MODAL       */
 /* ============================== */
-
+interface searchForm {
+  destination: string | undefined;
+  range: DateRange | undefined;
+}
 export default function PlanosPage() {
 	const [selectedPlans, setSelectedPlans] = useState<number[]>([]);
 	const [showComparison, setShowComparison] = useState(false);
 	const [viewPlanId, setViewPlanId] = useState<number | null>(null);
+  const {  formData } = usePreRegisterForm()
+  const data = formData
 
+  const minhaDataI = new Date(formData?.range?.from || "");
+
+  const diaI = String(minhaDataI.getDate()).padStart(2, '0');
+  const mesI = String(minhaDataI.getMonth() + 1).padStart(2, '0'); // Mês é 0-indexado
+  const anoI = minhaDataI.getFullYear();
+
+
+
+  const dataI = `${diaI}/${mesI}/${anoI}`;
+
+  const minhaDataF = new Date(formData?.range?.to || "");
+  minhaDataF.setDate(minhaDataF.getDate() + 16); // Adiciona 16 dias
+
+  const diaF = String(minhaDataF.getDate()).padStart(2, '0');
+  const mesF = String(minhaDataF.getMonth() + 1).padStart(2, '0'); // Mês é 0-indexado
+  const anoF = minhaDataF.getFullYear();
+
+  const dataF = `${diaF}/${mesF}/${anoF}`;
 	// NOVO: estado do modal de filtros
 	const [isFilterOpen, setIsFilterOpen] = useState(false);
 	const [filters, setFilters] = useState<FilterState>(initialFilters);
+  const [form, setForm ] = useState<searchForm>({
+    destination: formData?.destination,
+    range: formData?.range,
+
+  })
+
+  useEffect(() => {
+    setForm({
+      destination: formData?.destination,
+      range: formData?.range,
+    })
+  }, [formData])
+
 
 	// Opções dinâmicas a partir do mock
 	const options = useMemo(() => {
@@ -697,8 +744,8 @@ export default function PlanosPage() {
 			{/* Header */}
 			<div className="bg-white shadow-sm border-b">
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-					<div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-						<div>
+					<div className="flex flex-auto lg:items-center lg:justify-between gap-4">
+						<div className="text-center lg:text-left ">
 							<h1 className="text-3xl font-bold text-gray-900">
 								Compare Planos de Seguro
 							</h1>
@@ -706,29 +753,67 @@ export default function PlanosPage() {
 								Encontre o seguro de viagem perfeito para sua próxima aventura
 							</p>
 						</div>
-						<div className="flex items-center space-x-4">
+						<div className="flex  items-center space-x-4">
 							<div className="flex items-center space-x-2 text-sm text-gray-600">
 								<MapPin className="h-4 w-4" />
-								<span>Europa</span>
+								<span>{data ? data.destination : "Selecione um destino"}</span>
 							</div>
 							<div className="flex items-center space-x-2 text-sm text-gray-600">
 								<Calendar className="h-4 w-4" />
-								<span>15/03 - 25/03</span>
+								<span>{data ? `${dataI} - ${dataF}` : "Selecione as datas"}</span>
 							</div>
 							<div className="flex items-center space-x-2 text-sm text-gray-600">
 								<Users className="h-4 w-4" />
-								<span>2 adultos</span>
+								<span>{data ? `${data.passengers} passageiro${Number(data?.passengers) > 1 ? "s" : ""}` : "Selecione o número de passageiros"}</span>
 							</div>
+
 						</div>
+          
+          
+       
 					</div>
 				</div>
 			</div>
+         	<div className="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow" >
+             
+              <div className="text-sm bg-blue-300 text-gray-700 flex items-center justify-center gap-2">
+             
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
+                      <DestinationSelect
+                        data={form?.destination || ""}
+                        setData={(value) =>
+                          setForm((prev) => ({ ...prev, destination: value }))
+                        }
+                      />
+                      
+                      <div className="col-span-1 md:col-span-2 lg:col-span-2">
+                        <DateRangePicker
+                          onChange={(value)=>{
+                            setForm((prev) => ({ ...prev, range: value }))
+                          }}
+                          minDate={new Date()}
+                          months={2}
+                          range={form.range}
+                
+                        />
+                        
+                      </div>
 
+                    <Button 
+                    className="inline-flex items-center h-[52px] gap-2 px-4 py-2 rounded-lg bg-blue-700 text-white hover:bg-blue-800"         
+                
+                    >
+                        <SearchIcon className="h-4 w-4" />
+                        Buscar 
+                    </Button>
+                  </div>
+            </div>
+                  </div>                             
 			{/* Conteúdo */}
 			<div className="max-w-7xl mx-auto px-4 sm:px-6  py-8">
 				<div className="grid grid-cols-1 lg:grid-cols-1 gap-8">
 					{/* Coluna lateral antiga pode permanecer ou ser removida; deixei só a listagem principal. */}
-					<div className="lg:col-span-2 lg:col-start-2">
+					<div className="lg:col-span-1 lg:col-start-1">
 						{/* Barra de ações */}
 						<div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
 							<div className="flex items-center gap-3">
@@ -861,29 +946,44 @@ export default function PlanosPage() {
 											</div>
 
 											{/* Preço/Ações */}
-											<div className="lg:w-64 text-center lg:text-right">
-												<div className="mb-4">
+											<div className="lg:w-64 text-center lg:text-right ">
+												<div className="relative inline-block  right-34 mb-4 z-10 w-100 px-4 ">
 													{plan.precoOriginal > plan.preco && (
 														<p className="text-sm text-gray-500 line-through">
-															{formatPrice(plan.precoOriginal)}
+															{plan.precoOriginal.toLocaleString("en-US", {
+                                style: "currency",
+                                currency: "USD",
+                              })}
 														</p>
 													)}
-													<p className="text-3xl font-bold text-gray-900">
-														{formatPrice(plan.preco)}
-													</p>
-													<p className="text-sm text-gray-600">por pessoa</p>
+
+                          	
+													<div className= "flex flex-row gap-2 items-end justify-end ">
+                            <p className="text-3xl font-bold text-gray-900">
+                              {plan.preco.toLocaleString("pt-BR", {
+                                                          style: "currency",
+                                                          currency: "BRL",
+                                                        })}
+                            </p>
+                            <p className="text-sm font-semibold text-gray-600"> / Por pessoa no PIX</p>
+                          </div>
+													<p className="text-sm mt-2 font-semibold text-gray-600">ou {plan.precoCartao.toLocaleString("pt-BR", {
+                              style: "currency",
+                              currency: "BRL",
+                            })} em até 12x sem juros no cartão
+                          </p>
 												</div>
 
 												<div className="space-y-3">
-													<button className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2">
+													<button  className="w-full bg-blue-600  hover:cursor-pointer hover:animate-pulse text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2">
 														<span>Selecionar Plano</span>
 														<ArrowRight className="h-4 w-4" />
 													</button>
 
-													<div className="flex space-x-2">
+													
 														<button
 															onClick={() => handleSelectPlan(plan.id)}
-															className={`flex-1 py-2 px-4 rounded-lg border transition-colors flex items-center justify-center space-x-1 ${
+															className={`flex-1 py-2 px-4 rounded-lg w-full hover:cursor-pointer border transition-colors flex items-center justify-center space-x-1 ${
 																selectedPlans.includes(plan.id)
 																	? "bg-blue-50 border-blue-500 text-blue-700"
 																	: "border-gray-300 text-gray-700 hover:bg-gray-50"
@@ -903,13 +1003,13 @@ export default function PlanosPage() {
 
 														<button
 															onClick={() => setViewPlanId(plan.id)}
-															className="py-2 px-4 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+															className="flex-1 py-2 px-4 w-full rounded-lg text-sm hover:cursor-pointer  border transition-colors flex items-center justify-center space-x-1"
 															aria-label="Ver detalhes"
 														>
-															Ver detalhes
-															{/* <Eye className="h-4 w-4" /> */}
+														
+															Ver todas as coberturas
 														</button>
-													</div>
+													
 												</div>
 											</div>
 										</div>

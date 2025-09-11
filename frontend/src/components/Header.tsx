@@ -36,7 +36,7 @@ export default function Header() {
 							Seguro Viagem
 						</Link>
 						<Link
-							href="/ajuda"
+							href="/faq"
 							className="text-gray-700 hover:text-blue-600 font-medium"
 						>
 							FAQ

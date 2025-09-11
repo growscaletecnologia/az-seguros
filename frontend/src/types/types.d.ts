@@ -9,4 +9,5 @@ export interface PreRegisterForm{
     destination: string;
     step?: number;
     coupon?: string;
+    term?:boolean;
 }
