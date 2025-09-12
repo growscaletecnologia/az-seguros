@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { N8nService } from './n8n.service';
 import { CreateN8nDto } from './dto/create-n8n.dto';
 import { UpdateN8nDto } from './dto/update-n8n.dto';

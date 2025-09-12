@@ -1,0 +1,117 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/* 
+ * ==========================================================
+ *  USER Models
+ * =========================================================
+  - Role: Different roles for users (e.g., ADMIN, CUSTOMER, SELLER, AFFILIATE, MANAGER, SUPPORT)
+  - UserStatus: Status of the user account (e.g., ACTIVE, INACTIVE, SUSPENDED, PENDING, DELETED, BLOCKED)
+  - User: Represents a user in the system with fields for personal information and relationships to addresses
+  - Address: Represents an address associated with a user
+ */
+
+enum Role {
+  ADMIN
+  CUSTOMER
+  SELLER
+  AFFILIATE
+  MANAGER
+  SUPPORT
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  PENDING
+  DELETED
+  BLOCKED
+}
+
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  phone     String?
+  cpfCnpj   String?  @unique
+  password  String
+  oldPassword String?
+  birthDate DateTime?
+  addresses Address[]
+
+  role      Role     @default(CUSTOMER)
+  status    UserStatus @default(PENDING)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+}
+
+model Address {
+  id        String   @id @default(cuid())
+  userId    String
+  street    String
+  city      String
+  state     String
+  zipCode   String
+  country   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+
+/* 
+ * ==========================================================
+ *  CUPOM Models
+ * =========================================================
+  - CupomStatus: Status of the cupom (e.g., ACTIVE, INACTIVE, REDEEMED, EXPIRED)
+  - Cupom: Represents a cupom in the system with fields for code, discount, expiration date, and relationships to users
+  - User: Represents a user in the system with fields for personal information and relationships to addresses
+  - Address: Represents an address associated with a user
+ */
+
+enum CoupomStatus {
+  ACTIVE
+  INACTIVE
+  REDEEMED
+  EXPIRED
+}
+
+
+
+model Coupom {
+  id          String      @id @default(cuid())
+  code       String      @unique
+  discount   Float
+  expiresAt  DateTime
+  userId     String
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+ // TODO   estudar possibilidade de relaciomentos
+}
+
+/*
+ *  VOUCHER Models
+ * =========================================================
+  - VoucherStatus: Status of the voucher (e.g., ACTIVE, INACTIVE, REDEEMED, EXPIRED)
+  - Voucher: Represents a voucher in the system with fields for code, discount, expiration date, and relationships to users
+  - User: Represents a user in the system with fields for personal information and relationships to addresses
+  - Address: Represents an address associated with a user
+ */
