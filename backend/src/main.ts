@@ -3,6 +3,7 @@ import { AppModule } from './app.module'
 import { VersioningType } from '@nestjs/common'
 import session from 'express-session'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
+import { AllExceptionsFilter } from './common/errors/all-exceptions.filter'
 
 function normalizeOrigins(envVal?: string | string[]) {
   if (!envVal) return []
@@ -103,6 +104,8 @@ async function bootstrap() {
 
   //   return next(params);
   // });
+
+  app.useGlobalFilters(new AllExceptionsFilter())
 
   await app.listen(process.env.PORT ?? 5000)
 }

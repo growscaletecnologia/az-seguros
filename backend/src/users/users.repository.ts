@@ -58,6 +58,13 @@ export class UserRepository {
     })
   }
 
+  async listByEmail(email: string) {
+    return prisma.user.findUnique({
+      where: { email },
+      include: { addresses: true },
+    })
+  }
+
   async delete(id: string) {
     return prisma.user.delete({ where: { id } })
   }
