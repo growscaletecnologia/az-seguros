@@ -49,9 +49,10 @@ model User {
   name      String?
   phone     String?
   cpfCnpj   String?  @unique
+  birthDate DateTime?
   password  String
   oldPassword String?
-  birthDate DateTime?
+
   addresses Address[]
 
   role      Role     @default(CUSTOMER)

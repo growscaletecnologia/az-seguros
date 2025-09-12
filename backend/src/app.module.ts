@@ -13,6 +13,7 @@ import { VouchersModule } from './vouchers/vouchers.module';
 import { CmdModule } from './cmd/cmd.module';
 import { N8nModule } from './n8n/n8n.module';
 import { AdminModule } from './admin/admin.module';
+import { AddressModule } from './address/address.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { AdminModule } from './admin/admin.module';
     CmdModule,
     N8nModule,
     AdminModule,
+    AddressModule,
   ],
   controllers: [AppController],
   providers: [AppService],
