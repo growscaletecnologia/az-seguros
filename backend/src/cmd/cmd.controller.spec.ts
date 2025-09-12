@@ -1,20 +1,20 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { CmdController } from './cmd.controller';
-import { CmdService } from './cmd.service';
+import { Test, TestingModule } from '@nestjs/testing'
+import { CmdController } from './cmd.controller'
+import { CmdService } from './cmd.service'
 
 describe('CmdController', () => {
-  let controller: CmdController;
+  let controller: CmdController
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [CmdController],
       providers: [CmdService],
-    }).compile();
+    }).compile()
 
-    controller = module.get<CmdController>(CmdController);
-  });
+    controller = module.get<CmdController>(CmdController)
+  })
 
   it('should be defined', () => {
-    expect(controller).toBeDefined();
-  });
-});
+    expect(controller).toBeDefined()
+  })
+})

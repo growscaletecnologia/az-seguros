@@ -59,6 +59,8 @@ model User {
   status    UserStatus @default(PENDING)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+  deleted   Boolean   @default(false) // flag de soft delete
 
 }
 
@@ -72,6 +74,8 @@ model Address {
   country   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+  deleted   Boolean   @default(false) 
 
   user      User     @relation(fields: [userId], references: [id])
 }

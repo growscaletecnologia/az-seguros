@@ -1,19 +1,21 @@
-import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { UsersModule } from './users/users.module';
-import { InsurersModule } from './insurers/insurers.module';
-import { QuotesModule } from './quotes/quotes.module';
-import { PlansModule } from './plans/plans.module';
-import { CouponsModule } from './coupons/coupons.module';
-import { PricingModule } from './pricing/pricing.module';
-import { CheckoutModule } from './checkout/checkout.module';
-import { OrdersModule } from './orders/orders.module';
-import { VouchersModule } from './vouchers/vouchers.module';
-import { CmdModule } from './cmd/cmd.module';
-import { N8nModule } from './n8n/n8n.module';
-import { AdminModule } from './admin/admin.module';
-import { AddressModule } from './address/address.module';
+import { Module } from '@nestjs/common'
+import { AppController } from './app.controller'
+import { AppService } from './app.service'
+import { UsersModule } from './users/users.module'
+import { InsurersModule } from './insurers/insurers.module'
+import { QuotesModule } from './quotes/quotes.module'
+import { PlansModule } from './plans/plans.module'
+import { CouponsModule } from './coupons/coupons.module'
+import { PricingModule } from './pricing/pricing.module'
+import { CheckoutModule } from './checkout/checkout.module'
+import { OrdersModule } from './orders/orders.module'
+import { VouchersModule } from './vouchers/vouchers.module'
+import { CmdModule } from './cmd/cmd.module'
+import { N8nModule } from './n8n/n8n.module'
+import { AdminModule } from './admin/admin.module'
+import { AddressModule } from './address/address.module'
+import { CqrsModule } from '@nestjs/cqrs'
+import { AuthModule } from './auth/auth.module'
 
 @Module({
   imports: [
@@ -30,6 +32,8 @@ import { AddressModule } from './address/address.module';
     N8nModule,
     AdminModule,
     AddressModule,
+    CqrsModule.forRoot(),
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
