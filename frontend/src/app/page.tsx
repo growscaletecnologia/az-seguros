@@ -96,16 +96,16 @@ export default function HomePage() {
 	return (
 		<div className="bg-white">
 			{/* Hero Section */}
-			<section className="relative  min-h-[695px] flex flex-auto bg-gradient-to-br from-blue-700 via-blue-400 to-blue-600 text-white  bg-[url('/banners/hero_promo.png')] bg-cover bg-no-repeat">
+			<section className="relative  h-[650px] flex flex-auto bg-gradient-to-br from-blue-700 via-blue-400 to-blue-600 text-white bg-[url('/banners/hero_promo.png')] bg-cover bg-no-repeat">
 				<div className="absolute inset-0 bg-black/20"></div>
 				<div
 					id="top"
-					className="flex flex-1 justify-end relative  mx-auto px-4 w-full sm:px-6 lg:px-8  lg:py-3"
+					className="flex flex-1 justify-end relative ml-4  px-4 w-full sm:px-6 lg:px-1  lg:py-3"
 				>
-					<div className="flex py-20 flex-col max-w-1/2 items-center gap-8">
+					<div className="flex py-2 flex-col max-w-1/2 items-center gap-3">
 						<div className="space-y-2">
-							<div className="space-y-4">
-								<h1 className="text-xl lg:text-4xl font-bold leading-tight">
+							<div className="space-y-2">
+								<h1 className="text-2xl lg:text-4xl font-bold leading-tight">
 									Viaje com
 									<span className="text-yellow-400"> Segurança Total</span>
 								</h1>
@@ -115,7 +115,7 @@ export default function HomePage() {
 								</p>
 							</div>
 
-							<div className="flex items-center space-x-8 text-sm">
+							<div className="flex items-center space-x-1 text-sm">
 								<div className="flex items-center space-x-2">
 									<CheckCircle className="h-5 w-5 text-green-400" />
 									<span>Melhor Preço Garantido</span>
@@ -146,7 +146,7 @@ export default function HomePage() {
 							</>
 								
 							):(
-							<div className="rounded-lg border-2 relative flex flex-row p-4 gap-4">
+							<div className="rounded-lg border-2 relative flex flex-row p-2 gap-2">
 							
 								<input
 									type="checkbox"
@@ -171,8 +171,8 @@ export default function HomePage() {
 
 						<form onSubmit={handleSubmit}>
 							<div className="relative ">
-								<div className="relative z-10 bg-gradient-to-br from-transparent via-transparent to-blue-100/50  backdrop-blur-md rounded-2xl p-8 border border-white/20">
-									<h3 className="text-2xl font-bold mb-6">
+								<div className="relative z-10 bg-gradient-to-br from-transparent via-transparent to-blue-100/50  backdrop-blur-md rounded-2xl p-4 border border-white/20">
+									<h3 className="text-2xl font-bold mb-4">
 										Realize uma cotação de Seguro de Viagem para seu destino
 									</h3>
 									<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -243,42 +243,42 @@ export default function HomePage() {
 							
 										{/* Botão */}
 										<div className="w-full">
-												<button type="submit" className="w-full bg-yellow-400 h-[52px] text-blue-900 py-3 rounded-lg font-bold hover:bg-yellow-300 transition-colors">
+												<button type="submit" className="w-full bg-yellow-400 h-[52px] text-blue-900 py-1 rounded-lg font-bold hover:bg-yellow-300 transition-colors">
 													Encontrar Seguro viagem
 												</button>
 										</div>
 									</div>
-							<div className=" relative flex flex-row p-4 gap-4 mt-4">
-							
-								<input
-									type="checkbox"
-									id="cupom"
-									className="w-5 h-5 rounded-2xl mt-1"
-									checked={formData.term}
-									onChange={() => {
-										setFormData((prev) => ({ ...prev, term: !prev.term }))
-									}}
-								/>
-							
-								
-															<HoverCard>
-							<HoverCardTrigger>
-								<span
-								className={`text-lg hover:cursor-pointer transition-colors ${
-									errors.term  ? "text-red-500 font-semibold" : "text-white"
-								}`}
-								>
-								Confirmo que o passageiro ainda não iniciou a viagem.
-								</span>
-							</HoverCardTrigger>
-							<HoverCardContent className="flex flex-row gap-2">
-								<div className="flex flex-col gap-1">
-								Este campo é obrigatório para confirmar que a viagem ainda não foi iniciada.
-								<b>Atenção: não é permitido renovar caso o passageiro já esteja em viagem.</b>
-								</div>
-							</HoverCardContent>
-							</HoverCard>
-							</div>
+										<div className=" relative flex flex-row px-1 gap-4 mt-4">
+										
+											<input
+												type="checkbox"
+												id="cupom"
+												className="w-5 h-5 rounded-2xl mt-1"
+												checked={formData.term}
+												onChange={() => {
+													setFormData((prev) => ({ ...prev, term: !prev.term }))
+												}}
+											/>
+										
+											
+																		<HoverCard>
+										<HoverCardTrigger>
+											<span
+											className={`text-lg hover:cursor-pointer transition-colors ${
+												errors.term  ? "text-red-500 font-semibold" : "text-white"
+											}`}
+											>
+											Confirmo que o passageiro ainda não iniciou a viagem.
+											</span>
+										</HoverCardTrigger>
+										<HoverCardContent className="flex flex-row gap-2">
+											<div className="flex flex-col gap-1">
+											Este campo é obrigatório para confirmar que a viagem ainda não foi iniciada.
+											<b>Atenção: não é permitido renovar caso o passageiro já esteja em viagem.</b>
+											</div>
+										</HoverCardContent>
+										</HoverCard>
+										</div>
 								</div>
 							
 							</div>
