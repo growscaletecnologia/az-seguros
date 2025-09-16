@@ -4,6 +4,8 @@ import { VersioningType } from '@nestjs/common'
 import session from 'express-session'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { AllExceptionsFilter } from './common/errors/all-exceptions.filter'
+import { ValidationPipe } from '@nestjs/common'
+import helmet from 'helmet'
 
 function normalizeOrigins(envVal?: string | string[]) {
   if (!envVal) return []
@@ -17,6 +19,8 @@ function normalizeOrigins(envVal?: string | string[]) {
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
 
+  app.use(helmet())
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
   const config = new DocumentBuilder()
     .setTitle('API de Faturamentos')
     .setDescription('Documentação API Asaas backend')
@@ -40,20 +44,20 @@ async function bootstrap() {
     credentials: true, // cookies/autenticação cross-site exigem origin específico
     origin(origin, callback) {
       //eslint-disable-next-line
-      if (!origin) return callback(null, true);
+      if (!origin) return callback(null, true)
 
       //eslint-disable-next-line
-      const cleaned = origin.replace(/\/+$/, '');
+      const cleaned = origin.replace(/\/+$/, '')
 
       //eslint-disable-next-line
-      if (ALLOWLIST.has(cleaned)) return callback(null, true);
+      if (ALLOWLIST.has(cleaned)) return callback(null, true)
 
       if (REGEX_ORIGINS.some((rx) => rx.test(cleaned))) {
         //eslint-disable-next-line
-        return callback(null, true);
+        return callback(null, true)
       }
       //eslint-disable-next-line
-      return callback(new Error(`CORS: origin não autorizado: ${origin}`));
+      return callback(new Error(`CORS: origin não autorizado: ${origin}`))
     },
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Accept', 'Authorization', 'X-CSRF-Token', 'X-Requested-With'],
@@ -72,38 +76,6 @@ async function bootstrap() {
       cookie: { secure: true },
     }),
   )
-
-  // prisma.use(async (params, next) => {
-  //   if (params.model === 'User') {
-  //     if (params.action === 'delete') {
-  //       params.action = 'update';
-  //       params.args['data'] = { deleted: true };
-  //     }
-  //     if (params.action === 'deleteMany') {
-  //       params.action = 'updateMany';
-  //       params.args['data'] = {
-  //         ...params.args.data,
-  //         deleted: true,
-  //       };
-  //     }
-  //     if (params.action === 'findMany') {
-  //       // sempre esconde os soft-deletados
-  //       if (!params.args.where) {
-  //         params.args.where = {};
-  //       }
-  //       params.args.where['deleted'] = false;
-  //     }
-  //     if (params.action === 'findUnique' || params.action === 'findFirst') {
-  //       params.action = 'findFirst';
-  //       params.args.where = {
-  //         ...params.args.where,
-  //         deleted: false,
-  //       };
-  //     }
-  //   }
-
-  //   return next(params);
-  // });
 
   app.useGlobalFilters(new AllExceptionsFilter())
 

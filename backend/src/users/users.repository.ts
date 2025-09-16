@@ -1,4 +1,4 @@
-import prisma from '../../prisma/client'
+import prisma from 'src/prisma/client'
 import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 
@@ -12,7 +12,10 @@ export class UserRepository {
         cpfCnpj: data.cpfCnpj,
         birthDate: data.birthDate,
         password: data.password,
-        oldPassword: data.oldPassword,
+        role: data.role,
+        status: data.status,
+        createdAt: data.createdAt || new Date(),
+        emailVerifiedAt: null,
         addresses: data.addresses
           ? {
               create: data.addresses,
@@ -22,7 +25,12 @@ export class UserRepository {
       include: { addresses: true },
     })
   }
-
+  async verifyEmail(id: string) {
+    return prisma.user.update({
+      where: { id: id },
+      data: { emailVerifiedAt: new Date() },
+    })
+  }
   async update(id: string, data: UpdateUserDto) {
     return prisma.user.update({
       where: { id },
@@ -37,7 +45,7 @@ export class UserRepository {
         addresses: data.addresses
           ? {
               updateMany: data.addresses.map((addr) => ({
-                where: { id: addr.id }, // precisa do id do endereço
+                where: { id: addr.id },
                 data: addr,
               })),
             }

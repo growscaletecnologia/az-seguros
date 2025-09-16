@@ -1,8 +1,20 @@
-import { IsEmail, IsOptional, IsString, MinLength, IsDateString } from 'class-validator'
+import {
+  IsEmail,
+  IsOptional,
+  IsString,
+  MinLength,
+  IsDateString,
+  IsNotEmpty,
+  Matches,
+  IsEnum,
+} from 'class-validator'
 import { CreateAddressDto } from 'src/address/dto/create-address.dto'
+import { Role } from '../../enums/Roles'
+import { UserStatus } from '@prisma/client'
 
 export class CreateUserDto {
   @IsEmail()
+  @IsNotEmpty()
   email: string
 
   @IsString()
@@ -21,15 +33,29 @@ export class CreateUserDto {
   @IsOptional()
   birthDate?: Date
 
-  @IsString()
   @MinLength(6, { message: 'A senha deve ter no mínimo 6 caracteres' })
+  @Matches(/[0-9]/, { message: 'A senha deve conter pelo menos um número' })
+  @Matches(/[^\w\s]/, { message: 'A senha deve conter pelo menos um caractere especial' })
   password: string
 
   @IsString()
   @IsOptional()
   oldPassword?: string
 
-  // Se for permitir criar o endereço junto:
   @IsOptional()
   addresses?: CreateAddressDto[]
+
+  @IsEnum(Role)
+  @IsOptional()
+  role?: Role
+
+  @IsEnum(UserStatus)
+  @IsOptional()
+  status?: UserStatus
+
+  @IsOptional()
+  emailVerifiedAt?: Date | null
+
+  @IsOptional()
+  createdAt?: Date
 }

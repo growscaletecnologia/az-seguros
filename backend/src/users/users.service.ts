@@ -3,10 +3,13 @@ import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { UserRepository } from './users.repository'
 import { BadRequestError, ConflictError } from 'src/common/errors/http-errors'
+import * as bcrypt from 'bcrypt'
+import { UserStatus } from 'src/generated/prisma'
 
 @Injectable()
 export class UsersService {
   userRepository = new UserRepository()
+  private readonly SALT_ROUNDS = 12
 
   async create(createUserDto: CreateUserDto) {
     const foundedUser = await this.userRepository.listByEmail(createUserDto.email)
@@ -15,9 +18,30 @@ export class UsersService {
       // dispara 409 Conflict com mensagem clara
       throw new ConflictError('User already exists')
     }
+    if (!createUserDto.role) {
+      throw new BadRequestError('Role is required')
+    }
+    const userStatus: UserStatus = createUserDto.status ?? 'PENDING'
+    const passwordHash = await bcrypt.hash(createUserDto.password, this.SALT_ROUNDS)
+    const user = await this.userRepository.create({
+      email: createUserDto.email.toLowerCase().trim(),
+      name: createUserDto.name,
+      cpfCnpj: createUserDto.cpfCnpj,
+      phone: createUserDto.phone,
+      birthDate: createUserDto.birthDate,
+      password: passwordHash,
+      role: createUserDto.role ?? 'CUSTOMER',
+      status: userStatus,
+      createdAt: new Date(),
+      addresses: createUserDto.addresses || [],
+    })
 
-    // aqui você chamaria o repo de verdade pra criar
-    return await this.userRepository.create(createUserDto)
+    return { id: user.id, email: user.email, name: user.name, role: user.role, status: user.status }
+  }
+
+  async verifyEmail(id: string) {
+    const user = await this.userRepository.verifyEmail(id)
+    return { id: user.id, email: user.email, emailVerifiedAt: user.emailVerifiedAt }
   }
 
   async findAll() {
@@ -26,6 +50,10 @@ export class UsersService {
 
   async findOne(id: string) {
     return await this.userRepository.listById(id)
+  }
+
+  async findByEmail(email: string) {
+    return await this.userRepository.listByEmail(email)
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
