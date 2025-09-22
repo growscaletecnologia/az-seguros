@@ -2,7 +2,6 @@ import {
   Injectable,
   UnauthorizedException,
   ForbiddenException,
-  NotFoundException,
   BadRequestException,
 } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
@@ -11,9 +10,8 @@ import { UsersService } from '../users/users.service'
 import { RedisService } from '../redis/redis.service'
 import { v4 as uuidv4 } from 'uuid'
 import { EmailService } from 'src/email/email.service'
-import { resetTemplate } from 'src/email/templates/reset.html'
-const VERIFY_TTL_SECONDS = 60 * 60 * 24 // 24h
-const RESET_TTL_SECONDS = 60 * 30 // 30min
+import { User } from 'generated/prisma'
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -80,27 +78,24 @@ export class AuthService {
     const data = await client.get(`pwdReset:${token}`)
     if (!data) throw new BadRequestException('Token inválido ou expirado')
 
-    const { userId } = JSON.parse(data)
-    await this.usersService.setPasswordById(userId, newPassword)
+    const { id } = JSON.parse(data)
+    await this.usersService.setPasswordById(id, newPassword)
     await client.del(`pwdReset:${token}`)
     return { message: 'Senha redefinida com sucesso' }
   }
 
   async validateUser(email: string, pass: string) {
-   
     const user = await this.usersService.findByEmail(email)
     if (!user) throw new UnauthorizedException('Credenciais inválidas')
-
     const isMatch = await bcrypt.compare(pass, user.password)
     if (!isMatch) throw new UnauthorizedException('Credenciais inválidas')
 
     if (user.status === 'SUSPENDED') throw new ForbiddenException('Conta suspensa')
     if (user.status === 'BLOCKED') throw new ForbiddenException('Conta bloqueada')
-    console.log("user" , user)
     return user
   }
 
-  async login(user: any) {
+  async login(user: User) {
     const payload = { sub: user.id, role: user.role }
 
     const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' })
@@ -114,14 +109,14 @@ export class AuthService {
       'EX',
       60 * 60 * 24 * 7, // 7 dias
     )
-    
+
     // Cria uma sessão para o usuário
     const sessionId = await this.redis.getClient().get(`user:${user.id}:session`)
     if (sessionId) {
       // Invalida sessão anterior se existir
       await this.redis.getClient().del(sessionId)
     }
-    
+
     // Cria nova sessão
     const userData = {
       id: user.id,
@@ -139,11 +134,13 @@ export class AuthService {
         lastActivity: new Date().toISOString(),
       }),
       'EX',
-      60 * 60 * 24 * 7 // 7 dias
+      60 * 60 * 24 * 7, // 7 dias
     )
-    
+
     // Armazena referência da sessão ativa para o usuário
-    await this.redis.getClient().set(`user:${user.id}:session`, newSessionId, 'EX', 60 * 60 * 24 * 7)
+    await this.redis
+      .getClient()
+      .set(`user:${user.id}:session`, newSessionId, 'EX', 60 * 60 * 24 * 7)
 
     return {
       accessToken,

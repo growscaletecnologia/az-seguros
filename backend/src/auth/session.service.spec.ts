@@ -44,13 +44,13 @@ describe('SessionService', () => {
     it('should create a session and return sessionId', async () => {
       const userId = 'user-123'
       const userData = { name: 'Test User', email: 'test@example.com' }
-      
+
       // Executar o método
       const result = await service.createSession(userId, userData)
-      
+
       // Verificar se o ID da sessão começa com o prefixo correto
       expect(result).toContain(`session:${userId}:`)
-      
+
       // Verificar se o Redis foi chamado corretamente
       expect(mockRedisClient.set).toHaveBeenCalledTimes(2)
       expect(mockRedisClient.set.mock.calls[0][0]).toBe(result)
@@ -67,18 +67,18 @@ describe('SessionService', () => {
         createdAt: new Date().toISOString(),
         lastActivity: new Date().toISOString(),
       })
-      
+
       // Configurar o mock para retornar dados da sessão
       mockRedisClient.get.mockResolvedValueOnce(sessionData)
-      
+
       // Executar o método
       const result = await service.validateSession(sessionId)
-      
+
       // Verificar se os dados da sessão foram retornados corretamente
       expect(result).toBeDefined()
       expect(result.userId).toBe('user-123')
       expect(result.userData.name).toBe('Test User')
-      
+
       // Verificar se o Redis foi chamado corretamente
       expect(mockRedisClient.get).toHaveBeenCalledWith(sessionId)
       expect(mockRedisClient.set).toHaveBeenCalledTimes(1) // Para atualizar lastActivity
@@ -86,16 +86,16 @@ describe('SessionService', () => {
 
     it('should return null if session does not exist', async () => {
       const sessionId = 'session:user-123:1234567890'
-      
+
       // Configurar o mock para retornar null (sessão não existe)
       mockRedisClient.get.mockResolvedValueOnce(null)
-      
+
       // Executar o método
       const result = await service.validateSession(sessionId)
-      
+
       // Verificar se retornou null
       expect(result).toBeNull()
-      
+
       // Verificar se o Redis foi chamado corretamente
       expect(mockRedisClient.get).toHaveBeenCalledWith(sessionId)
       expect(mockRedisClient.set).not.toHaveBeenCalled() // Não deve atualizar lastActivity
@@ -112,35 +112,35 @@ describe('SessionService', () => {
         createdAt: new Date().toISOString(),
         lastActivity: new Date().toISOString(),
       })
-      
+
       // Configurar os mocks
       mockRedisClient.get
         .mockResolvedValueOnce(sessionId) // Para a primeira chamada (obter sessionId)
         .mockResolvedValueOnce(sessionData) // Para a segunda chamada (obter dados da sessão)
-      
+
       // Executar o método
       const result = await service.getUserActiveSession(userId)
-      
+
       // Verificar se os dados da sessão foram retornados corretamente
       expect(result).toBeDefined()
       expect(result.userId).toBe('user-123')
-      
+
       // Verificar se o Redis foi chamado corretamente
       expect(mockRedisClient.get).toHaveBeenCalledWith(`user:${userId}:session`)
     })
 
     it('should return null if user has no active session', async () => {
       const userId = 'user-123'
-      
+
       // Configurar o mock para retornar null (usuário sem sessão)
       mockRedisClient.get.mockResolvedValueOnce(null)
-      
+
       // Executar o método
       const result = await service.getUserActiveSession(userId)
-      
+
       // Verificar se retornou null
       expect(result).toBeNull()
-      
+
       // Verificar se o Redis foi chamado corretamente
       expect(mockRedisClient.get).toHaveBeenCalledWith(`user:${userId}:session`)
     })
@@ -153,13 +153,13 @@ describe('SessionService', () => {
         userId: 'user-123',
         userData: { name: 'Test User' },
       })
-      
+
       // Configurar o mock para retornar dados da sessão
       mockRedisClient.get.mockResolvedValueOnce(sessionData)
-      
+
       // Executar o método
       await service.invalidateSession(sessionId)
-      
+
       // Verificar se o Redis foi chamado corretamente
       expect(mockRedisClient.get).toHaveBeenCalledWith(sessionId)
       expect(mockRedisClient.del).toHaveBeenCalledWith(`user:user-123:session`)
@@ -168,13 +168,13 @@ describe('SessionService', () => {
 
     it('should do nothing if session does not exist', async () => {
       const sessionId = 'session:user-123:1234567890'
-      
+
       // Configurar o mock para retornar null (sessão não existe)
       mockRedisClient.get.mockResolvedValueOnce(null)
-      
+
       // Executar o método
       await service.invalidateSession(sessionId)
-      
+
       // Verificar se o Redis foi chamado corretamente
       expect(mockRedisClient.get).toHaveBeenCalledWith(sessionId)
       expect(mockRedisClient.del).not.toHaveBeenCalled() // Não deve excluir nada

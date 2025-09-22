@@ -17,7 +17,7 @@ export class SessionService {
   async createSession(userId: string, userData: any): Promise<string> {
     const sessionId = `session:${userId}:${Date.now()}`
     const client = this.redisService.getClient()
-    
+
     // Armazena os dados da sessão no Redis
     await client.set(
       sessionId,
@@ -28,12 +28,12 @@ export class SessionService {
         lastActivity: new Date().toISOString(),
       }),
       'EX',
-      SESSION_TTL_SECONDS
+      SESSION_TTL_SECONDS,
     )
 
     // Armazena referência da sessão ativa para o usuário
     await client.set(`user:${userId}:session`, sessionId, 'EX', SESSION_TTL_SECONDS)
-    
+
     return sessionId
   }
 
@@ -45,17 +45,17 @@ export class SessionService {
   async validateSession(sessionId: string): Promise<any | null> {
     const client = this.redisService.getClient()
     const sessionData = await client.get(sessionId)
-    
+
     if (!sessionData) {
       return null
     }
-    
+
     const session = JSON.parse(sessionData)
-    
+
     // Atualiza o timestamp de última atividade
     session.lastActivity = new Date().toISOString()
     await client.set(sessionId, JSON.stringify(session), 'EX', SESSION_TTL_SECONDS)
-    
+
     return session
   }
 
@@ -67,11 +67,11 @@ export class SessionService {
   async getUserActiveSession(userId: string): Promise<any | null> {
     const client = this.redisService.getClient()
     const sessionId = await client.get(`user:${userId}:session`)
-    
+
     if (!sessionId) {
       return null
     }
-    
+
     return this.validateSession(sessionId)
   }
 
@@ -82,7 +82,7 @@ export class SessionService {
   async invalidateSession(sessionId: string): Promise<void> {
     const client = this.redisService.getClient()
     const sessionData = await client.get(sessionId)
-    
+
     if (sessionData) {
       const session = JSON.parse(sessionData)
       // Remove a referência da sessão ativa para o usuário
@@ -99,7 +99,7 @@ export class SessionService {
   async invalidateAllUserSessions(userId: string): Promise<void> {
     const client = this.redisService.getClient()
     const sessionId = await client.get(`user:${userId}:session`)
-    
+
     if (sessionId) {
       // Remove a sessão
       await client.del(sessionId)

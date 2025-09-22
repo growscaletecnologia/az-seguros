@@ -14,6 +14,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum HttpMethod {
+  GET
+  POST
+  PUT
+  DELETE
+  PATCH
+  OPTIONS
+  HEAD
+}
+
 /* 
  * ==========================================================
  *  USER Models & RBAC System
@@ -27,6 +37,7 @@ datasource db {
   - UserRole: Maps roles to users
   - InviteToken: Manages user invitations
   - Address: Represents an address associated with a user
+  - Log: Registra logs de requisições com informações do usuário, rota e tempo de resposta
  */
 
 // Legacy role enum - will be replaced by the Role model
@@ -76,6 +87,7 @@ model User {
   inviteTokens    InviteToken[]
   
   addresses       Address[]
+  logs            Log[]
   status          UserStatus @default(PENDING)
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
@@ -170,6 +182,26 @@ model Address {
   deleted   Boolean   @default(false) 
 
   user      User     @relation(fields: [userId], references: [id])
+}
+
+model Log {
+  id           String     @id @default(cuid())
+  userId       String?
+  path         String
+  method       HttpMethod
+  statusCode   Int
+  userAgent    String?
+  ip           String?
+  requestBody  Json?
+  responseTime Int        // em milissegundos
+  createdAt    DateTime   @default(now())
+
+  user         User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([path])
+  @@index([method])
+  @@index([createdAt])
 }
 
 

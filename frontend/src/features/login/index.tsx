@@ -35,12 +35,7 @@ export default function Login() {
 	return (
 		<div>
 			<div
-				className="min-h-svh w-full relative overflow-hidden"
-				style={{
-					backgroundImage: backgroundImage,
-					backgroundSize: "cover",
-					backgroundRepeat: "no-repeat",
-				}}
+				className="min-h-svh w-full relative overflow-hidden bg-gradient-to-br from-sky-600 via-blue-300 to-purple-400"
 			>
 				<Button
 					variant="secondary"

@@ -32,89 +32,46 @@ export default function DestinationSelect({ data, setData }: Props) {
                     <SelectContent className="w-[var(--radix-select-trigger-width)]">
                         <SelectGroup>
                             <SelectLabel>
-                                Estados do Brasil
+                                Destinos
                             </SelectLabel>
-                            <SelectItem value="AC">
-                                        Acre (AC)
-                                    </SelectItem>
-                                    <SelectItem value="AL">
-                                        Alagoas (AL)
-                                    </SelectItem>
-                                    <SelectItem value="AP">
-                                        Amapá (AP)
-                                    </SelectItem>
-                                    <SelectItem value="AM">
-                                        Amazonas (AM)
-                                    </SelectItem>
-                                    <SelectItem value="BA">
-                                        Bahia (BA)
-                                    </SelectItem>
-                                    <SelectItem value="CE">
-                                        Ceará (CE)
-                                    </SelectItem>
-                                    <SelectItem value="DF">
-                                        Distrito Federal (DF)
-                                    </SelectItem>
-                                    <SelectItem value="ES">
-                                        Espírito Santo (ES)
-                                    </SelectItem>
-                                    <SelectItem value="GO">
-                                        Goiás (GO)
-                                    </SelectItem>
-                                    <SelectItem value="MA">
-                                        Maranhão (MA)
-                                    </SelectItem>
-                                    <SelectItem value="MT">
-                                        Mato Grosso (MT)
-                                    </SelectItem>
-                                    <SelectItem value="MS">
-                                        Mato Grosso do Sul (MS)
-                                    </SelectItem>
-                                    <SelectItem value="MG">
-                                        Minas Gerais (MG)
-                                    </SelectItem>
-                                    <SelectItem value="PA">
-                                        Pará (PA)
-                                    </SelectItem>
-                                    <SelectItem value="PB">
-                                        Paraíba (PB)
-                                    </SelectItem>
-                                    <SelectItem value="PR">
-                                        Paraná (PR)
-                                    </SelectItem>
-                                    <SelectItem value="PE">
-                                        Pernambuco (PE)
-                                    </SelectItem>
-                                    <SelectItem value="PI">
-                                        Piauí (PI)
-                                    </SelectItem>
-                                    <SelectItem value="RJ">
-                                        Rio de Janeiro (RJ)
-                                    </SelectItem>
-                                    <SelectItem value="RN">
-                                        Rio Grande do Norte (RN)
-                                    </SelectItem>
-                                    <SelectItem value="RS">
-                                        Rio Grande do Sul (RS)
-                                    </SelectItem>
-                                    <SelectItem value="RO">
-                                        Rondônia (RO)
-                                    </SelectItem>
-                                    <SelectItem value="RR">
-                                        Roraima (RR)
-                                    </SelectItem>
-                                    <SelectItem value="SC">
-                                        Santa Catarina (SC)
-                                    </SelectItem>
-                                    <SelectItem value="SP">
-                                        São Paulo (SP)
-                                    </SelectItem>
-                                    <SelectItem value="SE">
-                                        Sergipe (SE)
-                                    </SelectItem>
-                                    <SelectItem value="TO">
-                                        Tocantins (TO)
-                                    </SelectItem>
+                            <SelectItem value="europa">
+                                Europa
+                            </SelectItem>
+                            <SelectItem value="america-norte">
+                                América do Norte
+                            </SelectItem>
+                            <SelectItem value="america-sul">
+                                América do Sul
+                            </SelectItem>
+                            <SelectItem value="argentina">
+                                Argentina
+                            </SelectItem>
+                            <SelectItem value="asia">
+                                Ásia
+                            </SelectItem>
+                            <SelectItem value="oceania">
+                                Oceania
+                            </SelectItem>
+                            <SelectItem value="oriente-medio">
+                                Oriente Médio
+                            </SelectItem>
+                            <SelectItem value="africa">
+                                África
+                            </SelectItem>
+                            <SelectItem value="internacional">
+                                Internacional
+                            </SelectItem>
+                            <SelectItem value="america-central">
+                                América Central
+                            </SelectItem>
+                            <SelectItem value="brasil">
+                                Brasil
+                                <span className="block text-xs text-gray-500">Para viagens dentro do Brasil</span>
+                            </SelectItem>
+                            <SelectItem value="incoming">
+                                Incoming
+                                <span className="block text-xs text-gray-500">Para quem vem visitar o Brasil</span>
+                            </SelectItem>
                         </SelectGroup>
                     </SelectContent>
                 </Select>

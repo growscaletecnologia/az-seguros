@@ -96,40 +96,38 @@ export default function HomePage() {
 	return (
 		<div className="bg-white">
 			{/* Hero Section */}
-			<section className="relative  h-[650px] flex flex-auto bg-gradient-to-br from-blue-700 via-blue-400 to-blue-600 text-white bg-[url('/banners/hero_promo.png')] bg-cover bg-no-repeat">
+			<section className="relative h-[650px] flex flex-auto bg-gradient-to-br from-blue-700 via-blue-400 to-blue-600 text-white bg-[url('/banners/hero_promo.png')] bg-cover bg-no-repeat">
 				<div className="absolute inset-0 bg-black/20"></div>
 				<div
 					id="top"
-					className="flex flex-1 justify-end relative ml-4  px-4 w-full sm:px-6 lg:px-1  lg:py-3"
+					className="container mx-auto flex flex-col md:flex-row items-center justify-between relative px-4 w-full sm:px-6 lg:px-8 py-8 md:py-12"
 				>
-					<div className="flex py-2 flex-col max-w-1/2 items-center gap-3">
-						<div className="space-y-2">
-							<div className="space-y-2">
-								<h1 className="text-2xl lg:text-4xl font-bold leading-tight">
-									Viaje com
-									<span className="text-yellow-400"> Segurança Total</span>
-								</h1>
-								<p className="text-xl lg:text-2xl text-blue-50">
-									Compare preços, encontre o melhor seguro de viagem e contrate
-									em minutos. Proteção completa para suas aventuras pelo mundo.
-								</p>
-							</div>
+					{/* Lado esquerdo - Texto e descrição */}
+					<div className="w-full md:w-5/12 mb-8 md:mb-0 space-y-6">
+						<div className="space-y-4">
+							<h1 className="text-3xl lg:text-5xl font-bold leading-tight">
+								Viaje com
+								<span className="text-yellow-400"> Segurança Total</span>
+							</h1>
+							<p className="text-xl lg:text-2xl text-blue-50">
+								Compare preços, encontre o melhor seguro de viagem e contrate
+								em minutos. Proteção completa para suas aventuras pelo mundo.
+							</p>
+						</div>
 
-							<div className="flex items-center space-x-1 text-sm">
-								<div className="flex items-center space-x-2">
-									<CheckCircle className="h-5 w-5 text-green-400" />
-									<span>Melhor Preço Garantido</span>
-								</div>
-								<div className="flex items-center space-x-2">
-									<CheckCircle className="h-5 w-5 text-green-400" />
-									<span>Suporte 24h</span>
-								</div>
+						<div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
+							<div className="flex items-center space-x-2">
+								<CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0" />
+								<span>Melhor Preço Garantido</span>
+							</div>
+							<div className="flex items-center space-x-2">
+								<CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0" />
+								<span>Suporte 24h</span>
 							</div>
 						</div>
-						<div className="relative left-0  w-full h-15 flex items-start justify-center">
-							{coupomChecked ?
-							
-							(<>
+						
+						<div className="w-full sm:max-w-md">
+							{coupomChecked ? (
 								<div className="rounded-lg border-2 flex flex-row p-4 animate-wiggle gap-4">
 									<input
 										type="checkbox"
@@ -141,37 +139,34 @@ export default function HomePage() {
 											setFormData((prev) => ({ ...prev, coupon: "" }))
 										}}
 									/>
-									<span className=" text-lg font-bold">Cupom aplicado com sucesso!</span>
+									<span className="text-lg font-bold">Cupom aplicado com sucesso!</span>
 								</div>
-							</>
-								
-							):(
-							<div className="rounded-lg border-2 relative flex flex-row p-2 gap-2">
-							
-								<input
-									type="checkbox"
-									id="cupom"
-									className="w-5 h-5 rounded-2xl mt-1"
-									checked={coupomChecked}
-									onChange={() => {
-										setCoupomChecked(!coupomChecked)
-										setFormData((prev) => ({ ...prev, coupon: "SEGURO25" }))
-									}}
-								/>
-								<span className=" text-lg">Aplicar cupom</span>
-								<span className="text-yellow-300 mt-0.5 font-bold"> "SEGURO25"</span>
-
-								<span className="text-lg">para ganhar</span>
-								<span className="text-yellow-300 mt-0.5  font-bold"> 25% OFF</span>
-							</div>
+							) : (
+								<div className="rounded-lg border-2 relative flex flex-row p-4 mt-1 gap-2">
+									<input
+										type="checkbox"
+										id="cupom"
+										className="size-4 rounded-2xl mt-1"
+										checked={coupomChecked}
+										onChange={() => {
+											setCoupomChecked(!coupomChecked)
+											setFormData((prev) => ({ ...prev, coupon: "SEGURO25" }))
+										}}
+									/>
+									<span className="text-sm">Aplicar cupom</span>
+									<span className="text-yellow-300 mt-0.5 font-bold text-sm"> "SEGURO25"</span>
+									<span className="text-sm">para ganhar</span>
+									<span className="text-yellow-300 mt-0.5 font-bold text-sm"> 25% OFF</span>
+								</div>
 							)}
-						
-							
 						</div>
-
+					</div>
+					
+					{/* Lado direito - Formulário */}
+					<div className="w-full md:w-6/12">
 						<form onSubmit={handleSubmit}>
-							<div className="relative ">
-								<div className="relative z-10 bg-gradient-to-br from-transparent via-transparent to-blue-100/50  backdrop-blur-md rounded-2xl p-4 border border-white/20">
+							<div className="relative">
+								<div className="relative z-10 bg-gradient-to-br from-transparent via-transparent to-blue-100/50 backdrop-blur-md rounded-2xl p-4 border border-white/20">
 									<h3 className="text-2xl font-bold mb-4">
 										Realize uma cotação de Seguro de Viagem para seu destino
 									</h3>

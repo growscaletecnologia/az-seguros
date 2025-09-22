@@ -45,6 +45,12 @@ const AdminSidebar = () => {
 			icon: <Users className="h-5 w-5" />,
 		},
 		{
+			id: "rbac",
+			label: "Gerenciamento de Permissões de Acesso",
+			href: "/admin/rbac",
+			icon: <Settings className="h-5 w-5" />,
+		},
+		{
 			id: "blog",
 			label: "Blog",
 			href: "/admin/blog",

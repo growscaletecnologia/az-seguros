@@ -22,7 +22,6 @@ export function LoginForm({
 }: LoginFormProps) {
 	const [isLoading, setIsLoading] = useState(false);
 	const router = useRouter();
-	
 	const {
 		register,
 		handleSubmit,
@@ -42,7 +41,6 @@ export function LoginForm({
 				email: data.email,
 				password: data.password,
 			});
-			
 			// Redirecionar com base na role do usuário
 			switch (response.user.role) {
 				case "ADMIN":
@@ -65,7 +63,6 @@ export function LoginForm({
 					router.push("/cliente");
 					break;
 			}
-			
 			toast.success("Login realizado com sucesso!");
 		} catch (error) {
 			console.error("Erro no login:", error);
@@ -76,7 +73,7 @@ export function LoginForm({
 	};
 
 	return (
-		<div {...props} className={className}>
+		<div className={className}>
 			<div>
 				<h2 className="text-2xl mb-4 font-medium">Entrar na sua conta</h2>
 			</div>

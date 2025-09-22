@@ -1,7 +1,6 @@
 import { Controller, Post, Body, UseGuards, Req, Query, Get } from '@nestjs/common'
 import { AuthService } from './auth.service'
 import { DoResetDto } from './dto/do-reset.dto'
-import { RequestPasswordResetDto } from './dto/request-password-reset.dto'
 import { JwtAuthGuard } from './guards/jwt-auth.guard'
 import { SessionService } from './session.service'
 import { SessionCheckDto } from './dto/session.dto'
@@ -19,7 +18,7 @@ export class AuthController {
   async login(@Body() body: { email: string; password: string }) {
     console.log(body.email, body.password)
     const user = await this.authService.validateUser(body.email, body.password)
-    console.log("user", user)
+    console.log('user', user)
     return this.authService.login(user)
   }
 

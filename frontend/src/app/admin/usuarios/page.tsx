@@ -1,266 +1,318 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { usersService, User, CreateUserDto, UpdateUserDto } from "@/services/api/users";
+import { toast } from "sonner";
+import { userRbacService } from "@/services/api/rbac";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { InviteUserForm } from "@/components/rbac/invite-user-form";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface Usuario {
-	id: number;
-	nome: string;
-	email: string;
-	role: "admin" | "cliente" | "gerente";
-	permissoes: {
-		ver: boolean;
-		editar: boolean;
-		criar: boolean;
-		excluir: boolean;
-	};
-	ativo: boolean;
-	dataCriacao: string;
+  id: string;
+  nome: string;
+  email: string;
+  role: string;
+  permissoes: {
+    ver: boolean;
+    editar: boolean;
+    criar: boolean;
+    excluir: boolean;
+  };
+  ativo: boolean;
+  dataCriacao: string;
 }
 
+// Função para converter usuário da API para o formato da interface
+const mapApiUserToUsuario = (user: User): Usuario => {
+  // Determinar permissões com base nos dados do usuário
+  const permissoes = {
+    ver: false,
+    editar: false,
+    criar: false,
+    excluir: false
+  };
+
+  // Se o usuário tem permissões diretas, verificamos elas
+  if (user.userPermissions) {
+    user.userPermissions.forEach(up => {
+      if (up.permission) {
+        if (up.permission.action === 'read' && up.allow) permissoes.ver = true;
+        if (up.permission.action === 'update' && up.allow) permissoes.editar = true;
+        if (up.permission.action === 'create' && up.allow) permissoes.criar = true;
+        if (up.permission.action === 'delete' && up.allow) permissoes.excluir = true;
+      }
+    });
+  }
+
+  return {
+    id: user.id,
+    nome: user.name || '',
+    email: user.email,
+    role: user.role.toLowerCase(),
+    permissoes,
+    ativo: user.status === 'ACTIVE',
+    dataCriacao: new Date().toISOString() // A API não retorna data de criação
+  };
+};
+
 const UsuariosPage = () => {
-	const [usuarios, setUsuarios] = useState<Usuario[]>([
-		{
-			id: 1,
-			nome: "Admin Principal",
-			email: "admin@example.com",
-			role: "admin",
-			permissoes: { ver: true, editar: true, criar: true, excluir: true },
-			ativo: true,
-			dataCriacao: "2024-01-01",
-		},
-		{
-			id: 2,
-			nome: "João Cliente",
-			email: "cliente@example.com",
-			role: "cliente",
-			permissoes: { ver: true, editar: false, criar: false, excluir: false },
-			ativo: true,
-			dataCriacao: "2024-01-15",
-		},
-		{
-			id: 3,
-			nome: "Maria Gerente",
-			email: "gerente@example.com",
-			role: "gerente",
-			permissoes: { ver: true, editar: true, criar: true, excluir: false },
-			ativo: true,
-			dataCriacao: "2024-01-10",
-		},
-	]);
+  const [usuarios, setUsuarios] = useState<Usuario[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isInviteOpen, setIsInviteOpen] = useState(false);
 
-	const [editandoUsuario, setEditandoUsuario] = useState<Usuario | null>(null);
-	const [novoUsuario, setNovoUsuario] = useState({
-		nome: "",
-		email: "",
-		role: "cliente" as "admin" | "cliente" | "gerente",
-		permissoes: { ver: true, editar: false, criar: false, excluir: false },
-	});
+  const [editandoUsuario, setEditandoUsuario] = useState<Usuario | null>(null);
 
-	const permissoesPadrao = {
-		admin: { ver: true, editar: true, criar: true, excluir: true },
-		gerente: { ver: true, editar: true, criar: true, excluir: false },
-		cliente: { ver: true, editar: false, criar: false, excluir: false },
-	};
+  // Carregar usuários da API
+  const carregarUsuarios = async () => {
+    try {
+      setLoading(true);
+      const data = await usersService.getAll();
+      const usuariosMapeados = data.map(mapApiUserToUsuario);
+      setUsuarios(usuariosMapeados);
+    } catch (error) {
+      console.error("Erro ao carregar usuários:", error);
+      toast.error("Erro ao carregar usuários");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-	const criarUsuario = () => {
-		const usuario: Usuario = {
-			id: Date.now(),
-			...novoUsuario,
-			ativo: true,
-			dataCriacao: new Date().toISOString().split("T")[0],
-		};
-		setUsuarios([...usuarios, usuario]);
-		setNovoUsuario({
-			nome: "",
-			email: "",
-			role: "cliente",
-			permissoes: { ver: true, editar: false, criar: false, excluir: false },
-		});
-		alert("Usuário criado com sucesso!");
-	};
+  useEffect(() => {
+    carregarUsuarios();
+  }, []);
 
-	const editarUsuario = (usuario: Usuario) => {
-		setEditandoUsuario({ ...usuario });
-	};
+  const permissoesPadrao = {
+    ADMIN: { ver: true, editar: true, criar: true, excluir: true },
+    MANAGER: { ver: true, editar: true, criar: true, excluir: false },
+    CUSTOMER: { ver: true, editar: false, criar: false, excluir: false },
+  };
 
-	const salvarEdicao = () => {
-		if (editandoUsuario) {
-			setUsuarios(
-				usuarios.map((u) =>
-					u.id === editandoUsuario.id ? editandoUsuario : u,
-				),
-			);
-			setEditandoUsuario(null);
-			alert("Usuário atualizado com sucesso!");
-		}
-	};
+  const atualizarUsuario = async () => {
+    if (!editandoUsuario) return;
+    
+    try {
+      const updateUserDto: UpdateUserDto = {
+        name: editandoUsuario.nome,
+        email: editandoUsuario.email,
+        role: editandoUsuario.role.toUpperCase() as 'ADMIN' | 'MANAGER' | 'CUSTOMER',
+        status: editandoUsuario.ativo ? 'ACTIVE' : 'INACTIVE'
+      };
+      
+      await usersService.update(editandoUsuario.id, updateUserDto);
+      toast.success("Usuário atualizado com sucesso!");
+      carregarUsuarios();
+      setEditandoUsuario(null);
+    } catch (error) {
+      console.error("Erro ao atualizar usuário:", error);
+      toast.error("Erro ao atualizar usuário");
+    }
+  };
 
-	const toggleUsuario = (id: number) => {
-		setUsuarios(
-			usuarios.map((u) => (u.id === id ? { ...u, ativo: !u.ativo } : u)),
-		);
-	};
+  const excluirUsuario = async (id: string) => {
+    try {
+      await usersService.remove(id);
+      toast.success("Usuário excluído com sucesso!");
+      carregarUsuarios();
+    } catch (error) {
+      console.error("Erro ao excluir usuário:", error);
+      toast.error("Erro ao excluir usuário");
+    }
+  };
 
-	const excluirUsuario = (id: number) => {
-		if (confirm("Tem certeza que deseja excluir este usuário?")) {
-			setUsuarios(usuarios.filter((u) => u.id !== id));
-			alert("Usuário excluído com sucesso!");
-		}
-	};
+  // Função antiga removida para evitar duplicação
+  // A função criarUsuario já foi implementada acima com integração à API
 
-	const atualizarRole = (
-		role: "admin" | "cliente" | "gerente",
-		isEditing = false,
-	) => {
-		const permissoes = permissoesPadrao[role];
-		if (isEditing && editandoUsuario) {
-			setEditandoUsuario({ ...editandoUsuario, role, permissoes });
-		} else {
-			setNovoUsuario({ ...novoUsuario, role, permissoes });
-		}
-	};
+  const editarUsuario = (usuario: Usuario) => {
+    setEditandoUsuario({ ...usuario });
+  };
 
-	const atualizarPermissao = (
-		permissao: keyof Usuario["permissoes"],
-		valor: boolean,
-		isEditing = false,
-	) => {
-		if (isEditing && editandoUsuario) {
-			setEditandoUsuario({
-				...editandoUsuario,
-				permissoes: { ...editandoUsuario.permissoes, [permissao]: valor },
-			});
-		} else {
-			setNovoUsuario({
-				...novoUsuario,
-				permissoes: { ...novoUsuario.permissoes, [permissao]: valor },
-			});
-		}
-	};
+  const salvarEdicao = async () => {
+    if (editandoUsuario) {
+      await atualizarUsuario();
+    }
+  };
+
+  const toggleUsuario = async (id: string) => {
+    const usuario = usuarios.find(u => u.id === id);
+    if (!usuario) return;
+    
+    try {
+      const updateUserDto: UpdateUserDto = {
+        name: usuario.nome,
+        email: usuario.email,
+        role: usuario.role.toUpperCase() as 'ADMIN' | 'MANAGER' | 'CUSTOMER',
+        status: usuario.ativo ? 'INACTIVE' : 'ACTIVE'
+      };
+      
+      await usersService.update(id, updateUserDto);
+      toast.success(`Usuário ${usuario.ativo ? 'desativado' : 'ativado'} com sucesso!`);
+      carregarUsuarios();
+    } catch (error) {
+      console.error("Erro ao alterar status do usuário:", error);
+      toast.error("Erro ao alterar status do usuário");
+    }
+  };
+
+  const atualizarRole = (
+    role: string,
+    isEditing = false,
+  ) => {
+    const permissoes = permissoesPadrao[role as keyof typeof permissoesPadrao] || 
+                      permissoesPadrao.CUSTOMER;
+    
+    if (isEditing && editandoUsuario) {
+      setEditandoUsuario({ ...editandoUsuario, role, permissoes });
+    }
+  };
+
+  const atualizarPermissao = (
+    permissao: keyof Usuario["permissoes"],
+    valor: boolean,
+    isEditing = false,
+  ) => {
+    if (isEditing && editandoUsuario) {
+      setEditandoUsuario({
+        ...editandoUsuario,
+        permissoes: { ...editandoUsuario.permissoes, [permissao]: valor },
+      });
+    }
+  };
 
 	return (
-		<div className="p-6">
-			<h1 className="text-2xl font-bold mb-6">Gerenciamento de Usuários</h1>
-
-			{/* Formulário para criar/editar usuário */}
-			<div className="bg-white p-6 rounded-lg shadow mb-6">
-				<h2 className="text-xl font-semibold mb-4">
-					{editandoUsuario ? "Editar Usuário" : "Criar Novo Usuário"}
-				</h2>
-
-				<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-					<div>
-						<label className="block text-sm font-medium mb-2">Nome</label>
-						<input
-							type="text"
-							className="w-full p-2 border rounded"
-							value={editandoUsuario ? editandoUsuario.nome : novoUsuario.nome}
-							onChange={(e) => {
-								if (editandoUsuario) {
-									setEditandoUsuario({
-										...editandoUsuario,
-										nome: e.target.value,
-									});
-								} else {
-									setNovoUsuario({ ...novoUsuario, nome: e.target.value });
-								}
-							}}
-						/>
-					</div>
-
-					<div>
-						<label className="block text-sm font-medium mb-2">Email</label>
-						<input
-							type="email"
-							className="w-full p-2 border rounded"
-							value={
-								editandoUsuario ? editandoUsuario.email : novoUsuario.email
-							}
-							onChange={(e) => {
-								if (editandoUsuario) {
-									setEditandoUsuario({
-										...editandoUsuario,
-										email: e.target.value,
-									});
-								} else {
-									setNovoUsuario({ ...novoUsuario, email: e.target.value });
-								}
-							}}
-						/>
-					</div>
-				</div>
-
-				<div className="mb-4">
-					<label className="block text-sm font-medium mb-2">Role</label>
-					<div className="flex space-x-4">
-						{(["admin", "gerente", "cliente"] as const).map((role) => (
-							<label key={role} className="flex items-center">
-								<input
-									type="radio"
-									name="role"
-									value={role}
-									checked={
-										(editandoUsuario
-											? editandoUsuario.role
-											: novoUsuario.role) === role
-									}
-									onChange={() => atualizarRole(role, !!editandoUsuario)}
-									className="mr-2"
-								/>
-								{role.charAt(0).toUpperCase() + role.slice(1)}
-							</label>
-						))}
-					</div>
-				</div>
-
-				<div className="mb-4">
-					<label className="block text-sm font-medium mb-2">
-						Permissões CRUD
-					</label>
-					<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-						{(["ver", "editar", "criar", "excluir"] as const).map(
-							(permissao) => (
-								<label key={permissao} className="flex items-center">
-									<input
-										type="checkbox"
-										checked={
-											(editandoUsuario
-												? editandoUsuario.permissoes
-												: novoUsuario.permissoes)[permissao]
-										}
-										onChange={(e) =>
-											atualizarPermissao(
-												permissao,
-												e.target.checked,
-												!!editandoUsuario,
-											)
-										}
-										className="mr-2"
-									/>
-									{permissao.charAt(0).toUpperCase() + permissao.slice(1)}
-								</label>
-							),
-						)}
-					</div>
-				</div>
-
-				<div className="flex space-x-2">
-					<button
-						onClick={editandoUsuario ? salvarEdicao : criarUsuario}
-						className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-					>
-						{editandoUsuario ? "Salvar Alterações" : "Criar Usuário"}
-					</button>
-
-					{editandoUsuario && (
-						<button
-							onClick={() => setEditandoUsuario(null)}
-							className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-						>
-							Cancelar
-						</button>
-					)}
+		<div className="container py-6">
+			<div className="flex justify-between items-center mb-6">
+				<h1 className="text-3xl font-bold">Gestão de Usuários</h1>
+				<div className="flex gap-2">
+					<Dialog>
+						<DialogTrigger asChild>
+							<Button variant="outline">Convidar Usuário</Button>
+						</DialogTrigger>
+						<DialogContent className="sm:max-w-[600px]">
+							<DialogHeader>
+								<DialogTitle>Convidar Novo Usuário</DialogTitle>
+							</DialogHeader>
+							<Card>
+								<CardContent className="pt-4">
+									<InviteUserForm onSuccess={() => {
+										toast.success("Convite enviado com sucesso!");
+										carregarUsuarios();
+									}} />
+								</CardContent>
+							</Card>
+						</DialogContent>
+					</Dialog>
 				</div>
 			</div>
+
+			{/* Modal para edição de usuário */}
+			<Dialog open={!!editandoUsuario} onOpenChange={(open) => !open && setEditandoUsuario(null)}>
+				<DialogContent className="sm:max-w-[600px]">
+					<DialogHeader>
+						<DialogTitle>Editar Usuário</DialogTitle>
+					</DialogHeader>
+					<Card>
+						<CardContent className="pt-4">
+							{editandoUsuario && (
+								<>
+									<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+										<div>
+											<label className="block text-sm font-medium mb-2">Nome</label>
+											<input
+												type="text"
+												className="w-full p-2 border rounded"
+												value={editandoUsuario.nome}
+												onChange={(e) => {
+													setEditandoUsuario({
+														...editandoUsuario,
+														nome: e.target.value,
+													});
+												}}
+											/>
+										</div>
+
+										<div>
+											<label className="block text-sm font-medium mb-2">Email</label>
+											<input
+												type="email"
+												className="w-full p-2 border rounded"
+												value={editandoUsuario.email}
+												onChange={(e) => {
+													setEditandoUsuario({
+														...editandoUsuario,
+														email: e.target.value,
+													});
+												}}
+											/>
+										</div>
+									</div>
+
+									<div className="mb-4">
+										<label className="block text-sm font-medium mb-2">Role</label>
+										<div className="flex space-x-4">
+											{(["admin", "gerente", "cliente"] as const).map((role) => (
+												<label key={role} className="flex items-center">
+													<input
+														type="radio"
+														name="role"
+														value={role}
+														checked={editandoUsuario.role === role}
+														onChange={() => atualizarRole(role, true)}
+														className="mr-2"
+													/>
+													{role.charAt(0).toUpperCase() + role.slice(1)}
+												</label>
+											))}
+										</div>
+									</div>
+
+									<div className="mb-4">
+										<label className="block text-sm font-medium mb-2">
+											Permissões CRUD
+										</label>
+										<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+											{(["ver", "editar", "criar", "excluir"] as const).map(
+												(permissao) => (
+													<label key={permissao} className="flex items-center">
+														<input
+															type="checkbox"
+															checked={editandoUsuario.permissoes[permissao]}
+															onChange={(e) =>
+																atualizarPermissao(
+																	permissao,
+																	e.target.checked,
+																	true,
+																)
+															}
+															className="mr-2"
+														/>
+														{permissao.charAt(0).toUpperCase() + permissao.slice(1)}
+													</label>
+												),
+											)}
+										</div>
+									</div>
+
+									<div className="flex space-x-2">
+										<Button
+											onClick={salvarEdicao}
+											className="bg-blue-500 hover:bg-blue-600"
+										>
+											Salvar Alterações
+										</Button>
+										<Button
+											variant="outline"
+											onClick={() => setEditandoUsuario(null)}
+										>
+											Cancelar
+										</Button>
+									</div>
+								</>
+							)}
+						</CardContent>
+					</Card>
+				</DialogContent>
+			</Dialog>
 
 			{/* Lista de usuários */}
 			<div className="bg-white p-6 rounded-lg shadow">
@@ -273,7 +325,6 @@ const UsuariosPage = () => {
 								<th className="px-4 py-2 text-left">Nome</th>
 								<th className="px-4 py-2 text-left">Email</th>
 								<th className="px-4 py-2 text-left">Role</th>
-								<th className="px-4 py-2 text-left">Permissões</th>
 								<th className="px-4 py-2 text-left">Status</th>
 								<th className="px-4 py-2 text-left">Ações</th>
 							</tr>
@@ -296,7 +347,7 @@ const UsuariosPage = () => {
 											{usuario.role}
 										</span>
 									</td>
-									<td className="px-4 py-2">
+									{/* <td className="px-4 py-2">
 										<div className="flex space-x-1">
 											{Object.entries(usuario.permissoes).map(
 												([perm, ativo]) => (
@@ -313,7 +364,7 @@ const UsuariosPage = () => {
 												),
 											)}
 										</div>
-									</td>
+									</td> */}
 									<td className="px-4 py-2">
 										<span
 											className={`px-2 py-1 text-xs rounded ${
