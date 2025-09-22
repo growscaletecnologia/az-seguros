@@ -6,6 +6,7 @@ import { AuthController } from './auth.controller'
 import { UsersModule } from '../users/users.module'
 import { JwtStrategy } from './strategies/jwt.strategy'
 import { RedisModule } from 'src/redis/redis.module'
+import { EmailModule } from 'src/email/email.module'
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { RedisModule } from 'src/redis/redis.module'
       signOptions: { expiresIn: '15m' },
     }),
     RedisModule,
+    EmailModule,
   ],
   providers: [AuthService, JwtStrategy],
   controllers: [AuthController],

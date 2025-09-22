@@ -55,7 +55,10 @@ export class UsersService {
   async findByEmail(email: string) {
     return await this.userRepository.listByEmail(email)
   }
-
+  async setPasswordById(id: string, newPassword: string) {
+    const passwordHash = await bcrypt.hash(newPassword, this.SALT_ROUNDS)
+    return await this.userRepository.update(id, { password: passwordHash })
+  }
   async update(id: string, updateUserDto: UpdateUserDto) {
     const foundedUser = await this.userRepository.listById(id)
     if (!foundedUser) {

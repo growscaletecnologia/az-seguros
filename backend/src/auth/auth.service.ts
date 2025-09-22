@@ -1,17 +1,90 @@
-import { Injectable, UnauthorizedException, ForbiddenException } from '@nestjs/common'
+import {
+  Injectable,
+  UnauthorizedException,
+  ForbiddenException,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import * as bcrypt from 'bcrypt'
 import { UsersService } from '../users/users.service'
 import { RedisService } from '../redis/redis.service'
 import { v4 as uuidv4 } from 'uuid'
-
+import { EmailService } from 'src/email/email.service'
+import { resetTemplate } from 'src/email/templates/reset.html'
+const VERIFY_TTL_SECONDS = 60 * 60 * 24 // 24h
+const RESET_TTL_SECONDS = 60 * 30 // 30min
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
     private redisService: RedisService,
+    private readonly email: EmailService,
+    private readonly redis: RedisService,
   ) {}
+
+  // // ----- VERIFICAÇÃO DE E-MAIL -----
+  // async sendVerificationEmail(userId: string) {
+  //   const user = await this.usersService.findOne(userId)
+  //   if (!user) throw new NotFoundException('Usuário não encontrado')
+  //   if (user.emailVerifiedAt) return { message: 'E-mail já verificado' }
+
+  //   const token = uuidv4()
+  //   const client = this.redis.getClient()
+  //   await client.set(`emailVerify:${token}`, JSON.stringify({ userId }), 'EX', VERIFY_TTL_SECONDS)
+
+  //   const verifyUrl = `${process.env.FRONTEND_URL}/verify-email?token=${token}`
+  //   await this.email.sendHtml(
+  //     user.email,
+  //     'Confirme seu e-mail',
+  //     verifyTemplate(user.name, verifyUrl),
+  //   )
+  //   return { message: 'E-mail de verificação enviado' }
+  // }
+
+  async verifyEmail(token: string) {
+    const client = this.redis.getClient()
+    const data = await client.get(`emailVerify:${token}`)
+    if (!data) throw new BadRequestException('Token inválido ou expirado')
+
+    const { userId } = JSON.parse(data)
+    await this.usersService.verifyEmail(userId)
+    await client.del(`emailVerify:${token}`)
+    return { message: 'E-mail verificado com sucesso' }
+  }
+
+  // // ----- RESET DE SENHA -----
+  // async requestPasswordReset(email: string) {
+  //   const user = await this.usersService.findByEmail(email)
+  //   // resposta neutra para não revelar se o e-mail existe
+  //   const generic = { message: 'Se o e-mail existir, enviaremos instruções de redefinição.' }
+  //   if (!user) return generic
+
+  //   const token = uuidv4()
+  //   const client = this.redis.getClient()
+  //   await client.set(
+  //     `pwdReset:${token}`,
+  //     JSON.stringify({ userId: user.id }),
+  //     'EX',
+  //     RESET_TTL_SECONDS,
+  //   )
+
+  //   const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`
+  //   await this.email.sendHtml(user.email, 'Redefinir senha', resetTemplate(user.name, resetUrl))
+  //   return generic
+  // }
+
+  async doPasswordReset(token: string, newPassword: string) {
+    const client = this.redis.getClient()
+    const data = await client.get(`pwdReset:${token}`)
+    if (!data) throw new BadRequestException('Token inválido ou expirado')
+
+    const { userId } = JSON.parse(data)
+    await this.usersService.setPasswordById(userId, newPassword)
+    await client.del(`pwdReset:${token}`)
+    return { message: 'Senha redefinida com sucesso' }
+  }
 
   async validateUser(email: string, pass: string) {
     const user = await this.usersService.findByEmail(email)
