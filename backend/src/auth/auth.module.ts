@@ -7,6 +7,7 @@ import { UsersModule } from '../users/users.module'
 import { JwtStrategy } from './strategies/jwt.strategy'
 import { RedisModule } from 'src/redis/redis.module'
 import { EmailModule } from 'src/email/email.module'
+import { SessionService } from './session.service'
 
 @Module({
   imports: [
@@ -19,8 +20,8 @@ import { EmailModule } from 'src/email/email.module'
     RedisModule,
     EmailModule,
   ],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy, SessionService],
   controllers: [AuthController],
-  exports: [AuthService, JwtModule, PassportModule],
+  exports: [AuthService, JwtModule, PassportModule, SessionService],
 })
 export class AuthModule {}

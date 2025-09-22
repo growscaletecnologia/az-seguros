@@ -16,15 +16,21 @@ datasource db {
 
 /* 
  * ==========================================================
- *  USER Models
+ *  USER Models & RBAC System
  * =========================================================
-  - Role: Different roles for users (e.g., ADMIN, CUSTOMER, SELLER, AFFILIATE, MANAGER, SUPPORT)
+  - User: Represents a user in the system with fields for personal information
   - UserStatus: Status of the user account (e.g., ACTIVE, INACTIVE, SUSPENDED, PENDING, DELETED, BLOCKED)
-  - User: Represents a user in the system with fields for personal information and relationships to addresses
+  - Role: Represents a role in the RBAC system (e.g., ADMIN, CUSTOMER)
+  - Permission: Represents a permission for a specific resource and action
+  - RolePermission: Maps permissions to roles
+  - UserPermission: Maps permissions directly to users (overrides)
+  - UserRole: Maps roles to users
+  - InviteToken: Manages user invitations
   - Address: Represents an address associated with a user
  */
 
-enum Role {
+// Legacy role enum - will be replaced by the Role model
+enum LegacyRole {
   ADMIN
   CUSTOMER
   SELLER
@@ -42,27 +48,112 @@ enum UserStatus {
   BLOCKED
 }
 
+enum Action {
+  CREATE
+  READ
+  UPDATE
+  DELETE
+}
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  phone     String?
-  cpfCnpj   String?  @unique
-  birthDate DateTime?
-  password  String
-  oldPassword String?
+  id              String    @id @default(cuid())
+  email           String    @unique
+  name            String?
+  phone           String?
+  cpfCnpj         String?   @unique
+  birthDate       DateTime?
+  password        String
+  oldPassword     String?
   emailVerifiedAt DateTime?
+  isActive        Boolean   @default(false)
 
-  addresses Address[]
+  // Legacy role field - will be migrated to use UserRole
+  role            LegacyRole @default(CUSTOMER)
+  
+  // RBAC relationships
+  roles           UserRole[]
+  userPermissions UserPermission[]
+  inviteTokens    InviteToken[]
+  
+  addresses       Address[]
+  status          UserStatus @default(PENDING)
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  deletedAt       DateTime?
+  deleted         Boolean    @default(false) // flag de soft delete
+}
 
-  role      Role     @default(CUSTOMER)
-  status    UserStatus @default(PENDING)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  deletedAt DateTime?
-  deleted   Boolean   @default(false) // flag de soft delete
+model Role {
+  id              Int              @id @default(autoincrement())
+  name            String           @unique
+  description     String?
+  isSystem        Boolean          @default(false) // ex.: ADMIN
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 
+  rolePermissions RolePermission[]
+  users           UserRole[]
+}
+
+model Permission {
+  id              Int              @id @default(autoincrement())
+  resource        String
+  action          Action
+  description     String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  rolePermissions RolePermission[]
+  userPermissions UserPermission[]
+
+  @@unique([resource, action])
+}
+
+model RolePermission {
+  id            Int         @id @default(autoincrement())
+  roleId        Int
+  permissionId  Int
+  allow         Boolean     @default(true)
+
+  role          Role        @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission    Permission  @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+}
+
+model UserPermission {
+  id            Int         @id @default(autoincrement())
+  userId        String
+  permissionId  Int
+  allow         Boolean     // true = allow, false = deny
+
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  permission    Permission  @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, permissionId])
+}
+
+model UserRole {
+  id      Int     @id @default(autoincrement())
+  userId  String
+  roleId  Int
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role    Role    @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId])
+}
+
+model InviteToken {
+  id               String    @id @default(cuid())
+  userId           String
+  token            String    @unique
+  expiresAt        DateTime
+  usedAt           DateTime?
+  createdByUserId  String?
+  createdAt        DateTime  @default(now())
+
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Address {

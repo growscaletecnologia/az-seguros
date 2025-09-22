@@ -87,6 +87,7 @@ export class AuthService {
   }
 
   async validateUser(email: string, pass: string) {
+   
     const user = await this.usersService.findByEmail(email)
     if (!user) throw new UnauthorizedException('Credenciais inválidas')
 
@@ -95,7 +96,7 @@ export class AuthService {
 
     if (user.status === 'SUSPENDED') throw new ForbiddenException('Conta suspensa')
     if (user.status === 'BLOCKED') throw new ForbiddenException('Conta bloqueada')
-
+    console.log("user" , user)
     return user
   }
 
@@ -113,16 +114,42 @@ export class AuthService {
       'EX',
       60 * 60 * 24 * 7, // 7 dias
     )
+    
+    // Cria uma sessão para o usuário
+    const sessionId = await this.redis.getClient().get(`user:${user.id}:session`)
+    if (sessionId) {
+      // Invalida sessão anterior se existir
+      await this.redis.getClient().del(sessionId)
+    }
+    
+    // Cria nova sessão
+    const userData = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    }
+    const newSessionId = `session:${user.id}:${Date.now()}`
+    await this.redis.getClient().set(
+      newSessionId,
+      JSON.stringify({
+        userId: user.id,
+        userData,
+        createdAt: new Date().toISOString(),
+        lastActivity: new Date().toISOString(),
+      }),
+      'EX',
+      60 * 60 * 24 * 7 // 7 dias
+    )
+    
+    // Armazena referência da sessão ativa para o usuário
+    await this.redis.getClient().set(`user:${user.id}:session`, newSessionId, 'EX', 60 * 60 * 24 * 7)
 
     return {
       accessToken,
       refreshToken,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
+      sessionId: newSessionId,
+      user: userData,
     }
   }
 }

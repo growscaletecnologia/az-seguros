@@ -3,14 +3,23 @@ import { AuthService } from './auth.service'
 import { DoResetDto } from './dto/do-reset.dto'
 import { RequestPasswordResetDto } from './dto/request-password-reset.dto'
 import { JwtAuthGuard } from './guards/jwt-auth.guard'
+import { SessionService } from './session.service'
+import { SessionCheckDto } from './dto/session.dto'
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 
+@ApiTags('Autenticação')
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private sessionService: SessionService,
+  ) {}
 
   @Post('login')
   async login(@Body() body: { email: string; password: string }) {
+    console.log(body.email, body.password)
     const user = await this.authService.validateUser(body.email, body.password)
+    console.log("user", user)
     return this.authService.login(user)
   }
 
@@ -37,5 +46,40 @@ export class AuthController {
   @Post('reset-password')
   async doReset(@Body() dto: DoResetDto) {
     return this.authService.doPasswordReset(dto.token, dto.newPassword)
+  }
+
+  @ApiOperation({ summary: 'Verifica se a sessão está ativa' })
+  @ApiResponse({ status: 200, description: 'Sessão válida' })
+  @ApiResponse({ status: 401, description: 'Sessão inválida ou expirada' })
+  @Post('session/check')
+  async checkSession(@Body() dto: SessionCheckDto) {
+    const session = await this.sessionService.validateSession(dto.sessionId)
+    if (!session) {
+      return { valid: false, message: 'Sessão inválida ou expirada' }
+    }
+    return { valid: true, user: session.userData }
+  }
+
+  @ApiOperation({ summary: 'Verifica se o usuário tem sessão ativa' })
+  @ApiResponse({ status: 200, description: 'Retorna status da sessão do usuário' })
+  @UseGuards(JwtAuthGuard)
+  @Get('session/user')
+  async getUserSession(@Req() req: any) {
+    const userId = req.user.sub
+    const session = await this.sessionService.getUserActiveSession(userId)
+    if (!session) {
+      return { active: false, message: 'Usuário não possui sessão ativa' }
+    }
+    return { active: true, lastActivity: session.lastActivity }
+  }
+
+  @ApiOperation({ summary: 'Invalida a sessão atual do usuário' })
+  @ApiResponse({ status: 200, description: 'Sessão invalidada com sucesso' })
+  @UseGuards(JwtAuthGuard)
+  @Post('session/logout')
+  async logout(@Req() req: any) {
+    const userId = req.user.sub
+    await this.sessionService.invalidateAllUserSessions(userId)
+    return { message: 'Logout realizado com sucesso' }
   }
 }
