@@ -17,13 +17,23 @@ import {
 	User,
 	Users,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+
+import { usePreRegisterForm } from "@/hooks/useRegisterStore";
+import { toast } from "sonner";
 
 export default function CheckoutPage() {
+	const router = useRouter();
+	const { formData } = usePreRegisterForm();
+	// Estados para o checkout
 	const [paymentMethod, setPaymentMethod] = useState("credit");
-	const [couponCode, setCouponCode] = useState("");
+	const [couponCode, setCouponCode] = useState(formData?.coupon || "");
 	const [couponApplied, setCouponApplied] = useState(false);
 	const [isProcessing, setIsProcessing] = useState(false);
+	const [couponLoading, setCouponLoading] = useState(false);
+	const [couponError, setCouponError] = useState("");
+	const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
 
 	// Dados mock do plano selecionado
 	const selectedPlan = {
@@ -47,16 +57,72 @@ export default function CheckoutPage() {
 		telefone: "(11) 99999-9999",
 	};
 
-	const applyCoupon = () => {
-		if (couponCode.toLowerCase() === "desconto10") {
+	// Função para aplicar cupom
+	const applyCoupon = async () => {
+		if (!couponCode || couponApplied) return;
+		
+		setCouponLoading(true);
+		setCouponError("");
+		
+		try {
+			// Importação dinâmica para evitar problemas de SSR
+			const { couponsService } = await import("@/services/api/coupons");
+			
+			const coupon = await couponsService.getByCode(couponCode);
+			
+			// Verificar se o cupom existe
+			if (!coupon) {
+				setCouponError("Cupom inválido ou não encontrado");
+				setCouponApplied(false);
+				return;
+			}
+			
+			// Verificar se o cupom está ativo
+			if (coupon.status !== 'ACTIVE') {
+				setCouponError("Este cupom não está mais ativo");
+				setCouponApplied(false);
+				return;
+			}
+			
+			// Verificar se o cupom expirou
+			if (coupon.expiresAt && new Date(coupon.expiresAt) < new Date()) {
+				setCouponError("Este cupom expirou");
+				setCouponApplied(false);
+				return;
+			}
+			
+			// Aplicar o cupom
+			setAppliedCoupon(coupon);
 			setCouponApplied(true);
+			toast.success("Cupom aplicado com sucesso!");
+			
+			// Registrar uso do cupom (será finalizado na conclusão da compra)
+			// Isso será feito na função de finalização do checkout
+			
+		} catch (error) {
+			console.error("Erro ao aplicar cupom:", error);
+			setCouponError("Erro ao verificar o cupom. Tente novamente.");
+			setCouponApplied(false);
+		} finally {
+			setCouponLoading(false);
 		}
 	};
 
 	const calculateTotal = () => {
 		const subtotal = selectedPlan.preco * quotationData.viajantes;
-		const discount = couponApplied ? subtotal * 0.1 : 0;
+		
+		// Calcula o desconto do cupom com base no tipo (percentual ou fixo)
+		let discount = 0;
+		if (couponApplied && appliedCoupon) {
+			if (appliedCoupon.discountType === 'PERCENTAGE') {
+				discount = subtotal * (appliedCoupon.discount / 100);
+			} else {
+				discount = Math.min(appliedCoupon.discount, subtotal); // Não permitir desconto maior que o subtotal
+			}
+		}
+		
 		const pixDiscount = paymentMethod === "pix" ? subtotal * 0.05 : 0;
+		
 		return {
 			subtotal,
 			discount,
@@ -86,15 +152,41 @@ export default function CheckoutPage() {
 
 	const totals = calculateTotal();
 
-	const handlePayment = () => {
+	const handlePayment = async () => {
 		setIsProcessing(true);
-		// Simular processamento do pagamento
-		setTimeout(() => {
+		
+		try {
+			// Simular processamento do pagamento
+			await new Promise(resolve => setTimeout(resolve, 3000));
+			
+			// Se um cupom foi aplicado, registrar o uso
+			if (couponApplied && appliedCoupon) {
+				try {
+					// Importação dinâmica para evitar problemas de SSR
+					const { couponsService } = await import("@/services/api/coupons");
+					
+					await couponsService.registerUsage(appliedCoupon.id, {
+						userId: "user-id", // Aqui seria o ID do usuário logado
+						orderId: `order-${Date.now()}`, // Aqui seria o ID do pedido gerado
+						discountApplied: appliedCoupon.discountType === 'PERCENTAGE' 
+							? (selectedPlan.preco * quotationData.viajantes) * (appliedCoupon.discount / 100)
+							: appliedCoupon.discount
+					});
+				} catch (error) {
+					console.error("Erro ao registrar uso do cupom:", error);
+					// Não interromper o checkout se o registro do cupom falhar
+				}
+			}
+			
+			toast.success("Pagamento processado com sucesso! Você receberá sua apólice por email.");
+			// Aqui poderia redirecionar para uma página de sucesso
+			// router.push("/checkout/sucesso");
+		} catch (error) {
+			console.error("Erro ao processar pagamento:", error);
+			toast.error("Ocorreu um erro ao processar o pagamento. Tente novamente.");
+		} finally {
 			setIsProcessing(false);
-			alert(
-				"Pagamento processado com sucesso! Você receberá sua apólice por email.",
-			);
-		}, 3000);
+		}
 	};
 
 	return (
@@ -239,24 +331,45 @@ export default function CheckoutPage() {
 								<input
 									type="text"
 									value={couponCode}
-									onChange={(e) => setCouponCode(e.target.value)}
+									onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
 									placeholder="Digite seu cupom"
 									className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
 									disabled={couponApplied}
 								/>
 								<button
 									onClick={applyCoupon}
-									disabled={couponApplied || !couponCode}
+									disabled={couponApplied || !couponCode || couponLoading}
 									className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 								>
-									{couponApplied ? "Aplicado" : "Aplicar"}
+									{couponLoading ? (
+										<span className="flex items-center">
+											<svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+												<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+												<path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+											</svg>
+											Verificando
+										</span>
+									) : couponApplied ? "Aplicado" : "Aplicar"}
 								</button>
 							</div>
-							{couponApplied && (
+							
+							{couponError && (
+								<div className="mt-3 flex items-center space-x-2 text-red-600">
+									<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+									</svg>
+									<span className="text-sm">{couponError}</span>
+								</div>
+							)}
+							
+							{couponApplied && appliedCoupon && (
 								<div className="mt-3 flex items-center space-x-2 text-green-600">
 									<CheckCircle className="h-4 w-4" />
 									<span className="text-sm">
-										Cupom aplicado com sucesso! 10% de desconto
+										Cupom aplicado com sucesso! 
+										{appliedCoupon.discountType === 'PERCENTAGE' 
+											? ` ${appliedCoupon.discount}% de desconto` 
+											: ` R$ ${appliedCoupon.discount.toFixed(2)} de desconto`}
 									</span>
 								</div>
 							)}

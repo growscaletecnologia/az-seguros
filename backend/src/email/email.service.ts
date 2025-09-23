@@ -49,7 +49,7 @@ export class EmailService {
   private async initializeTransporter() {
     try {
       // Em ambiente de desenvolvimento, usar Ethereal para testes
-      if (this.isDev) {
+      if (!this.isDev) {
         // Criar uma conta de teste no Ethereal
         const testAccount = await nodemailer.createTestAccount()
         this.logger.log('Conta de teste Ethereal criada para capturar emails em desenvolvimento')

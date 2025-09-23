@@ -5,9 +5,8 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js" 
+  provider = "prisma-client-js"
 }
-
 
 datasource db {
   provider = "postgresql"
@@ -24,20 +23,32 @@ enum HttpMethod {
   HEAD
 }
 
-/* 
+/**
  * ==========================================================
- *  USER Models & RBAC System
+ * USER Models & RBAC System
  * =========================================================
-  - User: Represents a user in the system with fields for personal information
-  - UserStatus: Status of the user account (e.g., ACTIVE, INACTIVE, SUSPENDED, PENDING, DELETED, BLOCKED)
-  - Role: Represents a role in the RBAC system (e.g., ADMIN, CUSTOMER)
-  - Permission: Represents a permission for a specific resource and action
-  - RolePermission: Maps permissions to roles
-  - UserPermission: Maps permissions directly to users (overrides)
-  - UserRole: Maps roles to users
-  - InviteToken: Manages user invitations
-  - Address: Represents an address associated with a user
-  - Log: Registra logs de requisições com informações do usuário, rota e tempo de resposta
+ * - User: Represents a user in the system with fields for personal information
+ * - UserStatus: Status of the user account (e.g., ACTIVE, INACTIVE, SUSPENDED, PENDING, DELETED, BLOCKED)
+ * - Role: Represents a role in the RBAC system (e.g., ADMIN, CUSTOMER)
+ * - Permission: Represents a permission for a specific resource and action
+ * - RolePermission: Maps permissions to roles
+ * - UserPermission: Maps permissions directly to users (overrides)
+ * - UserRole: Maps roles to users
+ * - InviteToken: Manages user invitations
+ * - Address: Represents an address associated with a user
+ * - Log: Registra logs de requisições com informações do usuário, rota e tempo de resposta
+ */
+
+/**
+ * ==========================================================
+ * Content Management System (CMS)
+ * =========================================================
+ * - Post: Representa uma página ou artigo no sistema
+ * - Category: Categorias para organizar os posts
+ * - Tag: Tags para classificar os posts
+ * - PostCategory: Relacionamento entre posts e categorias
+ * - PostTag: Relacionamento entre posts e tags
+ * - PostMedia: Mídias associadas aos posts
  */
 
 // Legacy role enum - will be replaced by the Role model
@@ -79,41 +90,49 @@ model User {
   isActive        Boolean   @default(false)
 
   // Legacy role field - will be migrated to use UserRole
-  role            LegacyRole @default(CUSTOMER)
-  
+  role LegacyRole @default(CUSTOMER)
+
   // RBAC relationships
   roles           UserRole[]
   userPermissions UserPermission[]
   inviteTokens    InviteToken[]
-  
-  addresses       Address[]
-  logs            Log[]
-  status          UserStatus @default(PENDING)
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @updatedAt
-  deletedAt       DateTime?
-  deleted         Boolean    @default(false) // flag de soft delete
+
+  // CMS relationships
+  posts Post[]
+
+  addresses Address[]
+  logs      Log[]
+
+  // Cupom relationships
+  coupons      Coupom[]
+  couponUsages CoupomUsage[]
+
+  status    UserStatus @default(PENDING)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  deletedAt DateTime?
+  deleted   Boolean    @default(false) // flag de soft delete
 }
 
 model Role {
-  id              Int              @id @default(autoincrement())
-  name            String           @unique
-  description     String?
-  isSystem        Boolean          @default(false) // ex.: ADMIN
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+  isSystem    Boolean  @default(false) // ex.: ADMIN
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   rolePermissions RolePermission[]
   users           UserRole[]
 }
 
 model Permission {
-  id              Int              @id @default(autoincrement())
-  resource        String
-  action          Action
-  description     String?
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
+  id          Int      @id @default(autoincrement())
+  resource    String
+  action      Action
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   rolePermissions RolePermission[]
   userPermissions UserPermission[]
@@ -122,66 +141,66 @@ model Permission {
 }
 
 model RolePermission {
-  id            Int         @id @default(autoincrement())
-  roleId        Int
-  permissionId  Int
-  allow         Boolean     @default(true)
+  id           Int     @id @default(autoincrement())
+  roleId       Int
+  permissionId Int
+  allow        Boolean @default(true)
 
-  role          Role        @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  permission    Permission  @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
 
   @@unique([roleId, permissionId])
 }
 
 model UserPermission {
-  id            Int         @id @default(autoincrement())
-  userId        String
-  permissionId  Int
-  allow         Boolean     // true = allow, false = deny
+  id           Int     @id @default(autoincrement())
+  userId       String
+  permissionId Int
+  allow        Boolean // true = allow, false = deny
 
-  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  permission    Permission  @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
 
   @@unique([userId, permissionId])
 }
 
 model UserRole {
-  id      Int     @id @default(autoincrement())
-  userId  String
-  roleId  Int
+  id     Int    @id @default(autoincrement())
+  userId String
+  roleId Int
 
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  role    Role    @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
   @@unique([userId, roleId])
 }
 
 model InviteToken {
-  id               String    @id @default(cuid())
-  userId           String
-  token            String    @unique
-  expiresAt        DateTime
-  usedAt           DateTime?
-  createdByUserId  String?
-  createdAt        DateTime  @default(now())
+  id              String    @id @default(cuid())
+  userId          String
+  token           String    @unique
+  expiresAt       DateTime
+  usedAt          DateTime?
+  createdByUserId String?
+  createdAt       DateTime  @default(now())
 
-  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Address {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   userId    String
   street    String
   city      String
   state     String
   zipCode   String
   country   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   deletedAt DateTime?
-  deleted   Boolean   @default(false) 
+  deleted   Boolean   @default(false)
 
-  user      User     @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id])
 }
 
 model Log {
@@ -193,10 +212,10 @@ model Log {
   userAgent    String?
   ip           String?
   requestBody  Json?
-  responseTime Int        // em milissegundos
+  responseTime Int // em milissegundos
   createdAt    DateTime   @default(now())
 
-  user         User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@index([userId])
   @@index([path])
@@ -204,15 +223,14 @@ model Log {
   @@index([createdAt])
 }
 
-
-/* 
+/**
  * ==========================================================
- *  CUPOM Models
+ * CUPOM Models
  * =========================================================
-  - CupomStatus: Status of the cupom (e.g., ACTIVE, INACTIVE, REDEEMED, EXPIRED)
-  - Cupom: Represents a cupom in the system with fields for code, discount, expiration date, and relationships to users
-  - User: Represents a user in the system with fields for personal information and relationships to addresses
-  - Address: Represents an address associated with a user
+ * - CupomStatus: Status of the cupom (e.g., ACTIVE, INACTIVE, REDEEMED, EXPIRED)
+ * - Cupom: Represents a cupom in the system with fields for code, discount, expiration date, and relationships to users
+ * - User: Represents a user in the system with fields for personal information and relationships to addresses
+ * - Address: Represents an address associated with a user
  */
 
 enum CoupomStatus {
@@ -222,25 +240,174 @@ enum CoupomStatus {
   EXPIRED
 }
 
-
-
-model Coupom {
-  id          String      @id @default(cuid())
-  code       String      @unique
-  discount   Float
-  expiresAt  DateTime
-  userId     String
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-
- // TODO   estudar possibilidade de relaciomentos
+enum DiscountType {
+  PERCENTAGE
+  FIXED
 }
 
-/*
- *  VOUCHER Models
+model Coupom {
+  id                String       @id @default(cuid())
+  code              String       @unique
+  discount          Float
+  discountType      DiscountType @default(PERCENTAGE)
+  expiresAt         DateTime
+  userId            String
+  status            CoupomStatus @default(ACTIVE)
+  usageLimit        Int? // Limite de uso total
+  front_publishable Boolean      @default(false) // Controla se o cupom aparece na tela inicial
+  description       String?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  deletedAt         DateTime?
+  deleted           Boolean      @default(false) // Flag para soft delete
+
+  // Relacionamento com a tabela de uso de cupons
+  usages CoupomUsage[]
+
+  // Relacionamento com o usuário que criou o cupom
+  user User? @relation(fields: [userId], references: [id])
+}
+
+/**
+ * ==========================================================
+ * COUPOM USAGE Model
  * =========================================================
-  - VoucherStatus: Status of the voucher (e.g., ACTIVE, INACTIVE, REDEEMED, EXPIRED)
-  - Voucher: Represents a voucher in the system with fields for code, discount, expiration date, and relationships to users
-  - User: Represents a user in the system with fields for personal information and relationships to addresses
-  - Address: Represents an address associated with a user
+ * - CoupomUsage: Registra o uso de cupons por usuários
+ */
+
+model CoupomUsage {
+  id       String   @id @default(cuid())
+  coupomId String
+  userId   String
+  orderId  String? // Referência opcional para o pedido onde o cupom foi usado
+  usedAt   DateTime @default(now())
+
+  // Relacionamentos
+  coupom Coupom @relation(fields: [coupomId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+  
+  @@unique([coupomId, userId, orderId])
+}
+
+/**
+ * ==========================================================
+ * CMS Models - Sistema de Gerenciamento de Conteúdo
+ * =========================================================
+ */
+
+enum PostStatus {
+  DRAFT     // Rascunho
+  PUBLISHED // Publicado
+  ARCHIVED  // Arquivado
+}
+
+model Post {
+  id          String     @id @default(cuid())
+  title       String
+  slug        String     @unique
+  description String?
+  resume      String     // Resumo curto do conteúdo
+  content     String     @db.Text // Conteúdo completo em HTML
+  userId      String     // Autor do post
+  metadata    Json?      // Metadados para SEO (título, descrição, palavras-chave)
+  status      PostStatus @default(DRAFT)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  updatedBy   String?    // Último usuário que atualizou o post
+  publishedAt DateTime?  // Data de publicação
+
+  // Relacionamentos
+  user       User          @relation(fields: [userId], references: [id])
+  categories PostCategory[]
+  tags       PostTag[]
+  media      PostMedia[]
+
+  @@index([slug])
+  @@index([status])
+  @@index([userId])
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relacionamentos
+  posts PostCategory[]
+
+  @@index([slug])
+}
+
+model Tag {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relacionamentos
+  posts PostTag[]
+
+  @@index([slug])
+}
+
+model PostCategory {
+  postId     String
+  categoryId String
+  createdAt  DateTime @default(now())
+
+  // Relacionamentos
+  post     Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([postId, categoryId])
+  @@index([postId])
+  @@index([categoryId])
+}
+
+model PostTag {
+  postId    String
+  tagId     String
+  createdAt DateTime @default(now())
+
+  // Relacionamentos
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([postId, tagId])
+  @@index([postId])
+  @@index([tagId])
+}
+
+model PostMedia {
+  id        String   @id @default(cuid())
+  postId    String
+  url       String   // Caminho para o arquivo de mídia
+  type      String   // Tipo de mídia (imagem, vídeo, documento, etc.)
+  title     String?  // Título opcional para a mídia
+  alt       String?  // Texto alternativo para acessibilidade
+  order     Int      @default(0) // Ordem de exibição
+  isMain    Boolean  @default(false) // Indica se é a mídia principal
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relacionamentos
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@index([isMain])
+}
+
+
+/**
+ * VOUCHER Models
+ * =========================================================
+ * - VoucherStatus: Status of the voucher (e.g., ACTIVE, INACTIVE, REDEEMED, EXPIRED)
+ * - Voucher: Represents a voucher in the system with fields for code, discount, expiration date, and relationships to users
+ * - User: Represents a user in the system with fields for personal information and relationships to addresses
+ * - Address: Represents an address associated with a user
  */

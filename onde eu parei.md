@@ -1,6 +1,14 @@
 # Onde Eu Parei - Projeto Seguro Viagem
 
-## Pendências para Amanhã (25/07/2024)
+## Pendências para Amanhã (26/07/2024)
+
+### Sistema de Posts
+- ✅ Correção de erros de tipagem no arquivo `posts.service.ts`
+- ✅ Substituição da propriedade inexistente `description` por `resume` nos DTOs
+- ✅ Correção dos campos do schema do Prisma para criação de mídias
+- ⏳ Executar o seed de posts para popular o banco de dados
+- ⏳ Testar o fluxo completo de criação e edição de posts
+- ⏳ Verificar a funcionalidade de upload de imagens após as correções
 
 ### Sistema de Email
 - ✅ Implementação básica do serviço de email com Nodemailer
@@ -16,12 +24,13 @@
 - ⏳ Verificar se os emails estão chegando corretamente
 
 ### Próximos Passos
-1. Configurar o Mailtrap como servidor SMTP para testes
-2. Implementar sistema de fila para processamento assíncrono de emails
-3. Testar o fluxo completo de convites (envio → recebimento → aceitação)
-4. Documentar a implementação do serviço de email
+1. Executar o seed de posts e verificar se os dados são inseridos corretamente
+2. Testar o sistema de upload de imagens para posts após as correções
+3. Configurar o Mailtrap como servidor SMTP para testes de email
+4. Implementar sistema de fila para processamento assíncrono de emails
+5. Testar o fluxo completo de convites (envio → recebimento → aceitação)
 
 ### Notas Importantes
-- O Ethereal funciona bem para testes locais, mas não envia emails reais
-- Para ambiente de produção, será necessário configurar um servidor SMTP real
-- Considerar implementar um sistema de retry para emails que falham no envio
+- O sistema de gerenciamento de mídia para posts está funcionando, mas precisa ser testado após as correções
+- Considerar refatorar o código para usar tipos mais específicos em vez de `any[]` para `mediaItems`
+- Verificar se as pastas de upload existem e têm as permissões corretas

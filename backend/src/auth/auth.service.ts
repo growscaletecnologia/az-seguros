@@ -97,8 +97,7 @@ export class AuthService {
 
   async login(user: User) {
     const payload = { sub: user.id, role: user.role }
-
-    const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' })
+    const accessToken = this.jwtService.sign(payload, { expiresIn: '7d' })
     const refreshToken = uuidv4()
 
     // salva no Redis

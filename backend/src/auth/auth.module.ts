@@ -15,7 +15,7 @@ import { SessionService } from './session.service'
     PassportModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET || 'supersecret',
-      signOptions: { expiresIn: '15m' },
+      signOptions: { expiresIn: '7d' },
     }),
     RedisModule,
     EmailModule,

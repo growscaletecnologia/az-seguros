@@ -8,10 +8,7 @@ import { InvitationController } from './controllers/invitation.controller'
 import { EmailModule } from '../email/email.module'
 
 @Module({
-  imports: [
-    forwardRef(() => RbacModule),
-    EmailModule
-  ],
+  imports: [forwardRef(() => RbacModule), EmailModule],
   controllers: [UsersController, InvitationController],
   providers: [UsersService, InvitationService, PrismaClient],
   exports: [UsersService, InvitationService],

@@ -38,9 +38,10 @@ export class UsersController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Delete(':id')
+  @Delete(':id/delete')
   @ApiOperation({ summary: 'Delete a user' })
   remove(@Param('id') id: string) {
+    console.log('chegou aqui', id)
     return this.usersService.remove(id)
   }
 

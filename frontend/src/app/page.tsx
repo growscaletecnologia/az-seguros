@@ -1,10 +1,12 @@
 "use client";
 
+import { useEffect } from "react";
 import { DateRangePicker } from "@/components/Inputs/CustomCalendar";
 import EmailField from "@/components/Inputs/EmailInput";
 import EmblaCarousel from "@/components/EmblaCarousel";
 import PhoneField from "@/components/Inputs/PhoneInput";
 import { PreRegisterForm } from "@/types/types";
+import { couponsService } from "@/services/api/coupons";
 import {
 	ArrowRight,
 	CheckCircle,
@@ -49,27 +51,47 @@ export default function HomePage() {
 	const router = useRouter()
 	const [coupomChecked, setCoupomChecked] = useState(false);
 	const [errors, setErrors] = useState<Partial<Record<keyof PreRegisterForm, boolean>>>({})
-	function smoothScrollTo(targetY: number, duration = 600) {
-		const startY = window.scrollY || document.documentElement.scrollTop;
-		const distance = targetY - startY;
-		if (distance === 0 || duration <= 0) {
-			window.scrollTo(0, targetY);
-			return;
-		}
-
-		const startTime = performance.now();
-		const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
-
-		function step(now: number) {
-			const elapsed = now - startTime;
-			const t = Math.min(1, elapsed / duration);
-			const y = startY + distance * easeOutCubic(t);
-			window.scrollTo(0, y);
-			if (t < 1) requestAnimationFrame(step);
-		}
-
-		requestAnimationFrame(step);
-	}
+	const [publishableCoupons, setPublishableCoupons] = useState<any[]>([]);
+	const [featuredCoupon, setFeaturedCoupon] = useState<any>(null);
+	const [loadingCoupons, setLoadingCoupons] = useState(true);
+	
+	// Carregar cupons publicáveis ao montar o componente
+	useEffect(() => {
+		const loadPublishableCoupons = async () => {
+			try {
+				const coupons = await couponsService.getPublicCoupons();
+				setPublishableCoupons(coupons);
+				
+				// Selecionar o cupom com maior desconto como destaque
+				if (coupons && coupons.length > 0) {
+					const bestCoupon = coupons.reduce((best, current) => {
+						// Para cupons percentuais, comparamos diretamente o valor do desconto
+						if (current.discountType === 'PERCENTAGE' && best.discountType === 'PERCENTAGE') {
+							return current.discount > best.discount ? current : best;
+						}
+						// Para cupons de valor fixo, precisaríamos de um contexto de valor total para comparar
+						// Por simplicidade, priorizamos percentuais sobre fixos
+						if (current.discountType === 'PERCENTAGE' && best.discountType === 'FIXED') {
+							return current;
+						}
+						// Se ambos são fixos, escolhemos o maior valor
+						if (current.discountType === 'FIXED' && best.discountType === 'FIXED') {
+							return current.discount > best.discount ? current : best;
+						}
+						return best;
+					}, coupons[0]);
+					
+					setFeaturedCoupon(bestCoupon);
+				}
+			} catch (error) {
+				console.error("Erro ao carregar cupons publicáveis:", error);
+			} finally {
+				setLoadingCoupons(false);
+			}
+		};
+		
+		loadPublishableCoupons();
+	}, []);
 	function handleSubmit(event: React.FormEvent) {
 		event.preventDefault();
 
@@ -127,38 +149,49 @@ export default function HomePage() {
 						</div>
 						
 						<div className="w-full sm:max-w-md">
-							{coupomChecked ? (
-								<div className="rounded-lg border-2 flex flex-row p-4 animate-wiggle gap-4">
-									<input
-										type="checkbox"
-										id="cupom"
-										className="w-5 h-5 rounded-2xl mt-1"
-										checked={coupomChecked}
-										onChange={() => {
-											setCoupomChecked(!coupomChecked)
-											setFormData((prev) => ({ ...prev, coupon: "" }))
-										}}
-									/>
-									<span className="text-lg font-bold">Cupom aplicado com sucesso!</span>
+							{loadingCoupons ? (
+								<div className="rounded-lg border-2 flex flex-row p-4 gap-4 animate-pulse">
+									<div className="w-5 h-5 bg-gray-300 rounded-full"></div>
+									<div className="h-5 w-32 bg-gray-300 rounded"></div>
 								</div>
-							) : (
-								<div className="rounded-lg border-2 relative flex flex-row p-4 mt-1 gap-2">
-									<input
-										type="checkbox"
-										id="cupom"
-										className="size-4 rounded-2xl mt-1"
-										checked={coupomChecked}
-										onChange={() => {
-											setCoupomChecked(!coupomChecked)
-											setFormData((prev) => ({ ...prev, coupon: "SEGURO25" }))
-										}}
-									/>
-									<span className="text-sm">Aplicar cupom</span>
-									<span className="text-yellow-300 mt-0.5 font-bold text-sm"> "SEGURO25"</span>
-									<span className="text-sm">para ganhar</span>
-									<span className="text-yellow-300 mt-0.5 font-bold text-sm"> 25% OFF</span>
-								</div>
-							)}
+							) : featuredCoupon ? (
+								coupomChecked ? (
+									<div className="rounded-lg border-2 flex flex-row p-4 animate-wiggle gap-4">
+										<input
+											type="checkbox"
+											id="cupom"
+											className="w-5 h-5 rounded-2xl mt-1"
+											checked={coupomChecked}
+											onChange={() => {
+												setCoupomChecked(!coupomChecked)
+												setFormData((prev) => ({ ...prev, coupon: "" }))
+											}}
+										/>
+										<span className="text-lg font-bold">Cupom aplicado com sucesso!</span>
+									</div>
+								) : (
+									<div className="rounded-lg border-2 relative flex flex-row p-4 mt-1 gap-2">
+										<input
+											type="checkbox"
+											id="cupom"
+											className="size-4 rounded-2xl mt-1"
+											checked={coupomChecked}
+											onChange={() => {
+												setCoupomChecked(!coupomChecked)
+												setFormData((prev) => ({ ...prev, coupon: featuredCoupon.code }))
+											}}
+										/>
+										<span className="text-sm">Aplicar cupom</span>
+										<span className="text-yellow-300 mt-0.5 font-bold text-sm"> "{featuredCoupon.code}"</span>
+										<span className="text-sm">para ganhar</span>
+										<span className="text-yellow-300 mt-0.5 font-bold text-sm"> 
+											{featuredCoupon.discountType === 'PERCENTAGE' 
+												? `${featuredCoupon.discount}% OFF` 
+												: `R$ ${featuredCoupon.discount.toFixed(2)} OFF`}
+										</span>
+									</div>
+								)
+							) : null}
 						</div>
 					</div>
 					

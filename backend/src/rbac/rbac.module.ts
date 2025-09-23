@@ -14,7 +14,7 @@ import { AuthModule } from '../auth/auth.module'
     RolesModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET || 'supersecret',
-      signOptions: { expiresIn: '15m' },
+      signOptions: { expiresIn: '7d' },
     }),
     forwardRef(() => AuthModule),
   ],

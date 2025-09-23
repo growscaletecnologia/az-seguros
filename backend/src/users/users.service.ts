@@ -69,6 +69,11 @@ export class UsersService {
   }
   // só admin pode apagar usuários(aidcionar softDelete)
   async remove(id: string) {
-    return `This action removes a #${id} user`
+    const foundedUser = await this.userRepository.listById(id)
+    if (!foundedUser) {
+      throw new BadRequestError('User not found')
+    }
+
+    return await this.userRepository.delete(id)
   }
 }

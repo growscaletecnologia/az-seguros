@@ -1,5 +1,38 @@
 # Atividades Realizadas - Projeto Seguro Viagem
 
+## Data: 📅 25/07/2024
+
+### Backend
+
+#### Correções no Sistema de Posts
+- Corrigidos erros de tipagem no arquivo `posts.service.ts`
+- Substituída a propriedade inexistente `description` por `resume` nos DTOs
+- Adicionada importação de `multer` para tipagem de `Express.Multer.File`
+- Corrigidos campos do schema do Prisma para criação de mídias (`filename` → `alt`, `mimetype` → `type`)
+- Corrigido campo `mainImage` para `mainImageUrl` nas operações de atualização do post
+- Adicionada tipagem explícita para `mediaItems: any[]` para evitar erros
+- Corrigido erro de variável no loop `for` (`for (const file of file)` → `for (const file of files)`)
+- Analisada a estrutura do sistema de gerenciamento de mídia para posts
+
+#### Implementação do Sistema de Cupons
+- Criado modelo `Coupon` no schema do Prisma com campos para código, desconto, validade e limites de uso
+- Implementado enum `CouponType` para diferenciar entre cupons percentuais e de valor fixo
+- Desenvolvido serviço `CouponsService` com métodos para criar, listar, buscar, atualizar e excluir cupons
+- Implementado controlador `CouponsController` com endpoints RESTful para gerenciamento de cupons
+- Adicionadas validações para garantir que:
+  - Códigos de cupom sejam únicos
+  - Valores de desconto estejam dentro de limites aceitáveis
+  - Datas de validade sejam futuras
+  - Limites de uso sejam números positivos
+- Criados DTOs com validações usando class-validator:
+  - `CreateCouponDto` para criação de novos cupons
+  - `UpdateCouponDto` para atualização parcial de cupons existentes
+- Implementada lógica para verificar a validade de cupons considerando:
+  - Data de expiração
+  - Número máximo de usos
+  - Status ativo/inativo
+- Adicionada documentação Swagger para todos os endpoints de cupons
+
 ## Data: 📅 24/07/2024
 
 ### Backend

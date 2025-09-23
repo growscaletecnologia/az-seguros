@@ -1,0 +1,515 @@
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common'
+import { PostStatus, User } from '@prisma/client'
+import { unlink } from 'fs/promises'
+import { join } from 'path'
+import { CreatePostDto } from './dto/create-post.dto'
+import { UpdatePostDto } from './dto/update-post.dto'
+import prisma from 'src/prisma/client'
+// Adicionando tipagem para Express.Multer.File
+import 'multer'
+
+@Injectable()
+export class PostsService {
+  async create(createPostDto: CreatePostDto, user: User) {
+    // Verificar se já existe um post com o mesmo slug
+    const existentPost = await prisma.post.findUnique({
+      where: {
+        slug: createPostDto.slug,
+      },
+    })
+
+    if (existentPost) {
+      throw new HttpException('Esse slug já está sendo usado, crie outro.', HttpStatus.CONFLICT)
+    }
+
+    // Criar o post com as relações
+    const post = await prisma.post.create({
+      data: {
+        title: createPostDto.title,
+        slug: createPostDto.slug,
+        content: createPostDto.content,
+        resume: createPostDto.resume,
+        description: createPostDto.resume, // Usando resume como description já que não existe no DTO
+        userId: user.id,
+        metadata: createPostDto.metadata as any,
+        status: createPostDto.status,
+        updatedBy: user.id,
+
+        // Conectar categorias
+        categories: {
+          create:
+            createPostDto.categoryIds?.map((categoryId) => ({
+              category: {
+                connect: { id: categoryId },
+              },
+            })) || [],
+        },
+
+        // Conectar tags
+        tags: {
+          create:
+            createPostDto.tagIds?.map((tagId) => ({
+              tag: {
+                connect: { id: tagId },
+              },
+            })) || [],
+        },
+      },
+      include: {
+        categories: {
+          include: {
+            category: true,
+          },
+        },
+        tags: {
+          include: {
+            tag: true,
+          },
+        },
+        media: true,
+      },
+    })
+
+    return { post }
+  }
+
+  async findAll(page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit
+    const total = await prisma.post.count()
+
+    if (total < limit) limit = total
+
+    const posts = await prisma.post.findMany({
+      include: {
+        categories: {
+          include: {
+            category: true,
+          },
+        },
+        tags: {
+          include: {
+            tag: true,
+          },
+        },
+        media: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+      skip,
+      take: limit,
+      orderBy: { updatedAt: 'desc' },
+    })
+
+    const nextPage = page < Math.ceil(total / limit) ? page + 1 : null
+
+    return { posts, total, nextPage }
+  }
+
+  async findAllByStatus(status: PostStatus, page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit
+
+    const total = await prisma.post.count({
+      where: { status },
+    })
+
+    if (total < limit) limit = total
+
+    const posts = await prisma.post.findMany({
+      where: {
+        status,
+      },
+      include: {
+        categories: {
+          include: {
+            category: true,
+          },
+        },
+        tags: {
+          include: {
+            tag: true,
+          },
+        },
+        media: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+      skip,
+      take: limit,
+      orderBy: { updatedAt: 'desc' },
+    })
+
+    const nextPage = page < Math.ceil(total / limit) ? page + 1 : null
+
+    return { posts, nextPage, total }
+  }
+
+  async findOne(id: string) {
+    const post = await prisma.post.findUnique({
+      where: { id },
+      include: {
+        media: true,
+        tags: {
+          include: {
+            tag: true,
+          },
+        },
+        categories: {
+          include: {
+            category: true,
+          },
+        },
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    })
+
+    if (!post) {
+      throw new NotFoundException('Post não encontrado')
+    }
+
+    return post
+  }
+
+  async findBySlug(slug: string) {
+    const post = await prisma.post.findUnique({
+      where: { slug },
+      include: {
+        media: true,
+        tags: {
+          include: {
+            tag: true,
+          },
+        },
+        categories: {
+          include: {
+            category: true,
+          },
+        },
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    })
+
+    if (!post) {
+      throw new NotFoundException('Post não encontrado')
+    }
+
+    return post
+  }
+
+  async update(id: string, updatePostDto: UpdatePostDto, userId: string) {
+    const post = await prisma.post.findUnique({
+      where: { id },
+      include: {
+        categories: true,
+        tags: true,
+      },
+    })
+
+    if (!post) {
+      throw new NotFoundException('Post não encontrado')
+    }
+
+    // Atualizar o post com transação para garantir consistência
+    return prisma.$transaction(async (prisma) => {
+      // Remover relações existentes se necessário
+      if (updatePostDto.categoryIds) {
+        await prisma.postCategory.deleteMany({
+          where: { postId: id },
+        })
+      }
+
+      if (updatePostDto.tagIds) {
+        await prisma.postTag.deleteMany({
+          where: { postId: id },
+        })
+      }
+
+      // Atualizar o post
+      const updated = await prisma.post.update({
+        where: { id },
+        data: {
+          title: updatePostDto.title,
+          slug: updatePostDto.slug,
+          content: updatePostDto.content,
+          resume: updatePostDto.resume,
+          description: updatePostDto.resume, // Usando resume como description já que não existe no DTO
+          metadata: updatePostDto.metadata as any,
+          status: updatePostDto.status,
+          updatedBy: userId,
+          updatedAt: new Date(),
+          publishedAt:
+            updatePostDto.status === PostStatus.PUBLISHED
+              ? post.publishedAt || new Date()
+              : post.publishedAt,
+
+          // Reconectar categorias se fornecidas
+          categories: updatePostDto.categoryIds
+            ? {
+                create: updatePostDto.categoryIds.map((categoryId) => ({
+                  category: {
+                    connect: { id: categoryId },
+                  },
+                })),
+              }
+            : undefined,
+
+          // Reconectar tags se fornecidas
+          tags: updatePostDto.tagIds
+            ? {
+                create: updatePostDto.tagIds.map((tagId) => ({
+                  tag: {
+                    connect: { id: tagId },
+                  },
+                })),
+              }
+            : undefined,
+        },
+        include: {
+          categories: {
+            include: {
+              category: true,
+            },
+          },
+          tags: {
+            include: {
+              tag: true,
+            },
+          },
+          media: true,
+        },
+      })
+
+      return updated
+    })
+  }
+
+  async remove(id: string): Promise<void> {
+    const post = await prisma.post.findUnique({
+      where: { id },
+      include: {
+        media: true,
+      },
+    })
+
+    if (!post) {
+      throw new NotFoundException('Post não encontrado')
+    }
+
+    // Remover todas as mídias associadas ao post
+    if (post.media && post.media.length > 0) {
+      for (const media of post.media) {
+        // Remover arquivo físico
+        try {
+          const uploadDirectory = join(process.cwd(), 'dist', 'public')
+          const prodDirectory = join(process.cwd(), 'public')
+
+          const filePath = join(uploadDirectory, media.url)
+          const filePathProd = join(prodDirectory, media.url)
+
+          await Promise.all([
+            unlink(filePath).catch((error) =>
+              console.error(`Erro ao deletar o arquivo: ${filePath}`, error),
+            ),
+            unlink(filePathProd).catch((error) =>
+              console.error(`Erro ao deletar o arquivo: ${filePathProd}`, error),
+            ),
+          ])
+        } catch (error) {
+          console.error(`Erro ao remover arquivo: ${error.message}`)
+        }
+      }
+    }
+
+    // Excluir o post e seus relacionamentos em uma transação
+    await prisma.$transaction(async (prisma) => {
+      // Excluir relacionamentos primeiro (as relações têm onDelete: Cascade, mas é bom ser explícito)
+      await prisma.postTag.deleteMany({
+        where: { postId: id },
+      })
+
+      await prisma.postCategory.deleteMany({
+        where: { postId: id },
+      })
+
+      await prisma.postMedia.deleteMany({
+        where: { postId: id },
+      })
+
+      // Finalmente excluir o post
+      await prisma.post.delete({
+        where: { id },
+      })
+    })
+  }
+
+  // Método de upload de imagem principal removido temporariamente para simplificação
+
+  /**
+   * Upload da imagem principal do post
+   * @param file Arquivo de imagem
+   * @param postId ID do post
+   * @returns Informações da mídia salva
+   */
+  async uploadMainImage(file: Express.Multer.File, postId: string) {
+    // Verificar se o post existe
+    const post = await prisma.post.findUnique({
+      where: { id: postId },
+    })
+
+    if (!post) {
+      throw new NotFoundException('Post não encontrado')
+    }
+
+    // Verificar se já existe uma imagem principal e removê-la como principal
+    const existingMainImage = await prisma.postMedia.findFirst({
+      where: {
+        postId,
+        isMain: true,
+      },
+    })
+
+    if (existingMainImage) {
+      await prisma.postMedia.update({
+        where: { id: existingMainImage.id },
+        data: { isMain: false },
+      })
+    }
+
+    const fileUrl = `/uploads/posts/${file.filename}`
+
+    // Criar nova mídia como principal
+    const media = await prisma.postMedia.create({
+      data: {
+        url: fileUrl,
+        type: file.mimetype,
+        alt: file.originalname,
+        // Removendo o campo size que não existe no schema
+        isMain: true,
+        post: {
+          connect: { id: postId },
+        },
+      },
+    })
+
+    // Atualizar o post com a URL da imagem principal
+    // O campo mainImageUrl não existe no schema, então não podemos usá-lo diretamente
+    await prisma.post.update({
+      where: { id: postId },
+      data: {
+        // Usando metadata para armazenar a URL da imagem principal
+        metadata: {
+          mainImageUrl: fileUrl,
+        },
+      },
+    })
+
+    return media
+  }
+  async uploadGallery(files: Array<Express.Multer.File>, postId: string) {
+    // Verificar se o post existe
+    const post = await prisma.post.findUnique({
+      where: { id: postId },
+    })
+
+    if (!post) {
+      throw new NotFoundException('Post não encontrado')
+    }
+
+    const mediaItems: any[] = []
+
+    // Salvar cada arquivo no banco de dados
+    for (const file of files) {
+      const fileUrl = `/uploads/posts/${file.filename}`
+
+      const media = await prisma.postMedia.create({
+        data: {
+          url: fileUrl,
+          type: file.mimetype,
+          alt: file.originalname,
+          // Removendo o campo size que não existe no schema
+          isMain: false,
+          post: {
+            connect: { id: postId },
+          },
+        },
+      })
+
+      mediaItems.push(media)
+    }
+
+    return mediaItems
+  }
+
+  /**
+   * Remove uma mídia do post
+   * @param id ID da mídia
+   */
+  async removeMedia(id: string): Promise<void> {
+    const media = await prisma.postMedia.findUnique({
+      where: { id },
+    })
+
+    if (!media) {
+      throw new NotFoundException('Mídia não encontrada')
+    }
+
+    // Remover arquivo físico
+    try {
+      const uploadDirectory = join(process.cwd(), 'dist', 'public')
+      const prodDirectory = join(process.cwd(), 'public')
+
+      const filePath = join(uploadDirectory, media.url)
+      const filePathProd = join(prodDirectory, media.url)
+
+      await Promise.all([
+        unlink(filePath).catch((error) =>
+          console.error(`Erro ao deletar o arquivo: ${filePath}`, error),
+        ),
+        unlink(filePathProd).catch((error) =>
+          console.error(`Erro ao deletar o arquivo: ${filePathProd}`, error),
+        ),
+      ])
+    } catch (error) {
+      console.error(`Erro ao remover arquivo: ${error.message}`)
+    }
+
+    // Se for a imagem principal, atualizar o post
+    if (media.isMain) {
+      await prisma.post.update({
+        where: { id: media.postId },
+        data: {
+          // Usando metadata para armazenar a URL da imagem principal
+          metadata: {
+            mainImageUrl: null,
+          },
+        },
+      })
+    }
+
+    // Remover registro do banco de dados
+    await prisma.postMedia.delete({
+      where: { id },
+    })
+  }
+}

@@ -5,7 +5,6 @@ import { BadRequestError, NotFoundError } from 'src/common/errors/http-errors'
 import * as bcrypt from 'bcrypt'
 import { v4 as uuidv4 } from 'uuid'
 import { EmailService } from 'src/email/email.service'
-import { generateInvitationEmailTemplate } from 'src/email/templates/invitation.template'
 
 @Injectable()
 export class InvitationService {
@@ -90,15 +89,15 @@ export class InvitationService {
     try {
       const baseUrl = process.env.FRONTEND_URL || 'http://localhost:3000'
       const acceptUrl = `${baseUrl}/auth/accept-invitation?token=${token}`
-      
+
       // Usar o novo sistema de templates
       await this.emailService.sendTemplate('invitation', {
         to: user.email,
         subject: 'Convite para AZ Seguros',
         context: {
           name: user.name || 'Usuário',
-          acceptUrl: acceptUrl
-        }
+          acceptUrl: acceptUrl,
+        },
       })
 
       this.logger.log(`Invitation email sent to ${user.email}`)
