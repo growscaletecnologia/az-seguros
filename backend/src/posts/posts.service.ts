@@ -11,66 +11,155 @@ import 'multer'
 @Injectable()
 export class PostsService {
   async create(createPostDto: CreatePostDto, user: User) {
-    // Verificar se já existe um post com o mesmo slug
-    const existentPost = await prisma.post.findUnique({
-      where: {
-        slug: createPostDto.slug,
-      },
-    })
+    try {
+      // Validação dos campos obrigatórios
+      if (!createPostDto.title) {
+        throw new HttpException('O título do post é obrigatório', HttpStatus.UNPROCESSABLE_ENTITY)
+      }
 
-    if (existentPost) {
-      throw new HttpException('Esse slug já está sendo usado, crie outro.', HttpStatus.CONFLICT)
+      if (!createPostDto.slug) {
+        throw new HttpException('O slug do post é obrigatório', HttpStatus.UNPROCESSABLE_ENTITY)
+      }
+
+      // Verificar se já existe um post com o mesmo slug
+      const existentPost = await prisma.post.findUnique({
+        where: {
+          slug: createPostDto.slug,
+        },
+      })
+
+      if (existentPost) {
+        throw new HttpException('Esse slug já está sendo usado, crie outro.', HttpStatus.CONFLICT)
+      }
+
+      // Garantir que categoryIds e tagIds sejam arrays válidos
+      const categoryIds = Array.isArray(createPostDto.categoryIds) ? createPostDto.categoryIds : []
+      const tagIds = Array.isArray(createPostDto.tagIds) ? createPostDto.tagIds : []
+
+      // Validar e sanitizar o conteúdo HTML
+      let content = createPostDto.content || ''
+      try {
+        // Remover possíveis escapes duplos no conteúdo HTML
+        content = content.replace(/\\"/g, '"').replace(/\\'/g, "'")
+      } catch (e) {
+        console.warn('Erro ao sanitizar conteúdo HTML:', e)
+        // Continua com o conteúdo original se houver erro
+      }
+
+      // Garantir que metadata seja um objeto válido
+      let metadata = {}
+      try {
+        if (typeof createPostDto.metadata === 'string') {
+          metadata = JSON.parse(createPostDto.metadata)
+        } else if (createPostDto.metadata && typeof createPostDto.metadata === 'object') {
+          metadata = createPostDto.metadata
+        } else {
+          metadata = {
+            title: createPostDto.title || '',
+            description: createPostDto.resume || '',
+            keywords: '',
+          }
+        }
+      } catch (e) {
+        console.warn('Erro ao processar metadata:', e)
+        metadata = {
+          title: createPostDto.title || '',
+          description: createPostDto.resume || '',
+          keywords: '',
+        }
+      }
+
+      // Criar o post com as relações
+      const post = await prisma.post.create({
+        data: {
+          // Usar userId diretamente já que o objeto user pode não ter todos os campos
+          userId: user?.id || user?.id, // Tenta usar userId do JWT ou id se disponível
+          title: createPostDto.title,
+          slug: createPostDto.slug,
+          content: content,
+          resume: createPostDto.resume || '',
+          description: createPostDto.resume || '', // Usando resume como description já que não existe no DTO
+          metadata: metadata as any,
+          status: createPostDto.status,
+          updatedBy: user?.id,
+
+          // Conectar categorias (apenas se houver IDs válidos)
+          categories:
+            categoryIds.length > 0
+              ? {
+                  create: categoryIds.map((categoryId) => ({
+                    category: {
+                      connect: { id: categoryId },
+                    },
+                  })),
+                }
+              : undefined,
+
+          // Conectar tags (apenas se houver IDs válidos)
+          tags:
+            tagIds.length > 0
+              ? {
+                  create: tagIds.map((tagId) => ({
+                    tag: {
+                      connect: { id: tagId },
+                    },
+                  })),
+                }
+              : undefined,
+        },
+        include: {
+          categories: {
+            include: {
+              category: true,
+            },
+          },
+          tags: {
+            include: {
+              tag: true,
+            },
+          },
+          media: true,
+        },
+      })
+
+      return { post }
+    } catch (error) {
+      console.error('Erro ao criar post:', error)
+
+      // Se já for uma HttpException, apenas repassa
+      if (error instanceof HttpException) {
+        throw error
+      }
+
+      // Erros de validação do Prisma (geralmente relacionados a campos obrigatórios ou tipos incorretos)
+      if (error.code === 'P2002') {
+        throw new HttpException(
+          `Campo único já existe: ${error.meta?.target || 'desconhecido'}`,
+          HttpStatus.UNPROCESSABLE_ENTITY,
+        )
+      }
+
+      if (error.code === 'P2003') {
+        throw new HttpException(
+          `Referência inválida: ${error.meta?.field_name || 'campo desconhecido'}`,
+          HttpStatus.UNPROCESSABLE_ENTITY,
+        )
+      }
+
+      // Erro de formato de dados
+      if (error.name === 'SyntaxError' || error.name === 'TypeError') {
+        throw new HttpException(
+          `Erro de formato nos dados: ${error.message}`,
+          HttpStatus.UNPROCESSABLE_ENTITY,
+        )
+      }
+
+      // Outros erros são tratados como 422 para evitar 500
+      throw new HttpException(
+        `Erro ao processar dados do post: ${error.message || 'Erro desconhecido'}`,
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      )
     }
-
-    // Criar o post com as relações
-    const post = await prisma.post.create({
-      data: {
-        title: createPostDto.title,
-        slug: createPostDto.slug,
-        content: createPostDto.content,
-        resume: createPostDto.resume,
-        description: createPostDto.resume, // Usando resume como description já que não existe no DTO
-        userId: user.id,
-        metadata: createPostDto.metadata as any,
-        status: createPostDto.status,
-        updatedBy: user.id,
-
-        // Conectar categorias
-        categories: {
-          create:
-            createPostDto.categoryIds?.map((categoryId) => ({
-              category: {
-                connect: { id: categoryId },
-              },
-            })) || [],
-        },
-
-        // Conectar tags
-        tags: {
-          create:
-            createPostDto.tagIds?.map((tagId) => ({
-              tag: {
-                connect: { id: tagId },
-              },
-            })) || [],
-        },
-      },
-      include: {
-        categories: {
-          include: {
-            category: true,
-          },
-        },
-        tags: {
-          include: {
-            tag: true,
-          },
-        },
-        media: true,
-      },
-    })
-
-    return { post }
   }
 
   async findAll(page: number = 1, limit: number = 10) {

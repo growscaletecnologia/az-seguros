@@ -1,8 +1,11 @@
 "use client";
 import {
+	BookImage,
+	BookKey,
 	ChevronDown,
 	ChevronRight,
 	FileText,
+	Fingerprint,
 	Globe,
 	LayoutDashboard,
 	LogOut,
@@ -10,6 +13,7 @@ import {
 	Settings,
 	ShoppingCart,
 	Tag,
+	UserRoundSearch,
 	Users,
 	X,
 } from "lucide-react";
@@ -40,21 +44,15 @@ const AdminSidebar = () => {
 		},
 		{
 			id: "usuarios",
-			label: "Gestão de Usuários",
+			label: "Usuários",
 			href: "/admin/usuarios",
+			icon: <UserRoundSearch className="h-5 w-5" />,
+		},
+		{
+			id: "clientes",
+			label: "Clientes",
+			href: "/admin/clientes",
 			icon: <Users className="h-5 w-5" />,
-		},
-		{
-			id: "rbac",
-			label: "Gerenciamento de Permissões de Acesso",
-			href: "/admin/rbac",
-			icon: <Settings className="h-5 w-5" />,
-		},
-		{
-			id: "blog",
-			label: "Blog",
-			href: "/admin/blog",
-			icon: <FileText className="h-5 w-5" />,
 		},
 		{
 			id: "cupons",
@@ -69,16 +67,28 @@ const AdminSidebar = () => {
 			icon: <ShoppingCart className="h-5 w-5" />,
 		},
 		{
+			id: "blog",
+			label: "Publicações (Blog)",
+			href: "/admin/blog",
+			icon: <BookImage className="h-5 w-5" />,
+		},
+		{
+			id: "rbac",
+			label: "Perfis de Acesso",
+			href: "/admin/rbac",
+			icon: <Fingerprint className="h-5 w-5" />,
+		},
+		{
+			id: "conteudos",
+			label: "Páginas do Sistema",
+			href: "/admin/conteudos",
+			icon: <BookKey className="h-5 w-5" />,
+		},
+		{
 			id: "integrations",
 			label: "Integrações",
 			href: "/admin/integrations",
 			icon: <Globe className="h-5 w-5" />,
-		},
-		{
-			id: "conteudos",
-			label: "Gestão de Páginas",
-			href: "/admin/conteudos",
-			icon: <Settings className="h-5 w-5" />,
 		},
 	];
 
@@ -125,9 +135,9 @@ const AdminSidebar = () => {
       `}
 			>
 				{/* Header */}
-				<div className="p-4 border-b border-gray-200">
+				<div className="p-2">
 					<div className="flex items-center justify-between">
-						{!isCollapsed && (
+						{/* {!isCollapsed && (
 							<div className="flex items-center space-x-2">
 								<div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
 									<span className="text-white font-bold text-sm">SP</span>
@@ -136,8 +146,8 @@ const AdminSidebar = () => {
 									Seguros Promo
 								</span>
 							</div>
-						)}
-						<button
+						)} */}
+						{/* <button
 							onClick={() => setIsCollapsed(!isCollapsed)}
 							className="hidden lg:block p-1 hover:bg-gray-100 rounded"
 						>
@@ -146,7 +156,7 @@ const AdminSidebar = () => {
 							) : (
 								<ChevronDown className="h-4 w-4" />
 							)}
-						</button>
+						</button> */}
 					</div>
 				</div>
 

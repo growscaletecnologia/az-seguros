@@ -1,38 +1,33 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { toast } from "sonner";
-import { Loader2, PlusCircle, Trash2, BarChart3, FileText } from "lucide-react";
 import AuthService from "@/lib/services/auth-service";
+import { BarChart3, FileText, Loader2, PlusCircle, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
 } from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { couponsService } from "@/services/api/coupons";
-import { Coupon, CouponUsage, UpdateCouponDto } from "@/types/coupons";
+import type { Coupon, CouponUsage, UpdateCouponDto } from "@/types/coupons";
 
 const CuponsPage = () => {
 	const [cupons, setCupons] = useState<Coupon[]>([]);
@@ -42,13 +37,16 @@ const CuponsPage = () => {
 	const [activeTab, setActiveTab] = useState("gerenciar");
 	const [couponUsages, setCouponUsages] = useState<CouponUsage[]>([]);
 	const [loadingUsages, setLoadingUsages] = useState(false);
-	const [selectedCouponForReport, setSelectedCouponForReport] = useState<string>("");
-	
+	const [selectedCouponForReport, setSelectedCouponForReport] =
+		useState<string>("");
+
 	const [novoCupom, setNovoCupom] = useState({
 		code: "",
 		discount: 0,
 		discountType: "PERCENTAGE",
-		expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 dias a partir de hoje
+		expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+			.toISOString()
+			.split("T")[0], // 30 dias a partir de hoje
 		usageLimit: 100,
 		front_publishable: false,
 		description: "",
@@ -91,7 +89,7 @@ const CuponsPage = () => {
 
 	const atualizarCupom = async () => {
 		if (!editingCoupon) return;
-		
+
 		try {
 			setLoading(true);
 			const updateData: UpdateCouponDto = {
@@ -103,7 +101,7 @@ const CuponsPage = () => {
 				front_publishable: novoCupom.front_publishable,
 				description: novoCupom.description,
 			};
-			
+
 			await couponsService.update(editingCoupon.id, updateData);
 			toast.success("Cupom atualizado com sucesso!");
 			setDialogOpen(false);
@@ -120,9 +118,11 @@ const CuponsPage = () => {
 	const toggleCupomStatus = async (cupom: Coupon) => {
 		try {
 			setLoading(true);
-			const newStatus = cupom.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+			const newStatus = cupom.status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
 			await couponsService.update(cupom.id, { status: newStatus });
-			toast.success(`Cupom ${newStatus === 'ACTIVE' ? 'ativado' : 'desativado'} com sucesso!`);
+			toast.success(
+				`Cupom ${newStatus === "ACTIVE" ? "ativado" : "desativado"} com sucesso!`,
+			);
 			loadCoupons();
 		} catch (error) {
 			toast.error("Erro ao alterar status do cupom");
@@ -147,13 +147,15 @@ const CuponsPage = () => {
 			}
 		}
 	};
-	
+
 	const resetForm = () => {
 		setNovoCupom({
 			code: "",
 			discount: 0,
 			discountType: "PERCENTAGE",
-			expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+			expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+				.toISOString()
+				.split("T")[0],
 			usageLimit: 100,
 			front_publishable: false,
 			description: "",
@@ -161,25 +163,25 @@ const CuponsPage = () => {
 		});
 		setEditingCoupon(null);
 	};
-	
+
 	const editarCupom = (cupom: Coupon) => {
 		setEditingCoupon(cupom);
 		setNovoCupom({
 			code: cupom.code,
 			discount: cupom.discount,
 			discountType: cupom.discountType,
-			expiresAt: new Date(cupom.expiresAt).toISOString().split('T')[0],
+			expiresAt: new Date(cupom.expiresAt).toISOString().split("T")[0],
 			usageLimit: cupom.usageLimit,
 			front_publishable: cupom.front_publishable,
 			description: cupom.description || "",
 		});
 		setDialogOpen(true);
 	};
-	
+
 	// Carregar relatório de uso de um cupom específico
 	const loadCouponUsageReport = async (couponId: string) => {
 		if (!couponId) return;
-		
+
 		try {
 			setLoadingUsages(true);
 			const coupon = await couponsService.getById(couponId);
@@ -200,10 +202,10 @@ const CuponsPage = () => {
 		<div className="p-6">
 			<div className="flex justify-between items-center mb-6">
 				<h1 className="text-2xl font-bold">Gerenciamento de Cupons</h1>
-				
+
 				<Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
 					<DialogTrigger asChild>
-						<Button 
+						<Button
 							onClick={() => {
 								resetForm();
 								setDialogOpen(true);
@@ -220,25 +222,30 @@ const CuponsPage = () => {
 								{editingCoupon ? "Editar Cupom" : "Criar Novo Cupom"}
 							</DialogTitle>
 						</DialogHeader>
-						
+
 						<div className="grid grid-cols-2 gap-4 py-4">
 							<div className="col-span-2">
 								<Label htmlFor="code">Código do Cupom</Label>
 								<Input
 									id="code"
 									value={novoCupom.code}
-									onChange={(e) => setNovoCupom({...novoCupom, code: e.target.value.toUpperCase()})}
+									onChange={(e) =>
+										setNovoCupom({
+											...novoCupom,
+											code: e.target.value.toUpperCase(),
+										})
+									}
 									placeholder="Ex: PROMO20"
 									className="mt-1"
 								/>
 							</div>
-							
+
 							<div>
 								<Label htmlFor="discountType">Tipo de Desconto</Label>
-								<Select 
-									value={novoCupom.discountType} 
-									onValueChange={(value: 'PERCENTAGE' | 'FIXED') => 
-										setNovoCupom({...novoCupom, discountType: value})
+								<Select
+									value={novoCupom.discountType}
+									onValueChange={(value: "PERCENTAGE" | "FIXED") =>
+										setNovoCupom({ ...novoCupom, discountType: value })
 									}
 								>
 									<SelectTrigger className="mt-1">
@@ -250,73 +257,92 @@ const CuponsPage = () => {
 									</SelectContent>
 								</Select>
 							</div>
-							
+
 							<div>
 								<Label htmlFor="discount">
-									Desconto ({novoCupom.discountType === 'PERCENTAGE' ? '%' : 'R$'})
+									Desconto (
+									{novoCupom.discountType === "PERCENTAGE" ? "%" : "R$"})
 								</Label>
 								<Input
 									id="discount"
 									type="number"
 									value={novoCupom.discount}
-									onChange={(e) => setNovoCupom({...novoCupom, discount: Number(e.target.value)})}
+									onChange={(e) =>
+										setNovoCupom({
+											...novoCupom,
+											discount: Number(e.target.value),
+										})
+									}
 									min="0"
-									max={novoCupom.discountType === 'PERCENTAGE' ? 100 : undefined}
+									max={
+										novoCupom.discountType === "PERCENTAGE" ? 100 : undefined
+									}
 									className="mt-1"
 								/>
 							</div>
-							
+
 							<div>
 								<Label htmlFor="expiresAt">Data de Expiração</Label>
 								<Input
 									id="expiresAt"
 									type="date"
 									value={novoCupom.expiresAt}
-									onChange={(e) => setNovoCupom({...novoCupom, expiresAt: e.target.value})}
+									onChange={(e) =>
+										setNovoCupom({ ...novoCupom, expiresAt: e.target.value })
+									}
 									className="mt-1"
 								/>
 							</div>
-							
+
 							<div>
 								<Label htmlFor="usageLimit">Limite de Uso</Label>
 								<Input
 									id="usageLimit"
 									type="number"
 									value={novoCupom.usageLimit}
-									onChange={(e) => setNovoCupom({...novoCupom, usageLimit: Number(e.target.value)})}
+									onChange={(e) =>
+										setNovoCupom({
+											...novoCupom,
+											usageLimit: Number(e.target.value),
+										})
+									}
 									min="1"
 									className="mt-1"
 								/>
 							</div>
-							
+
 							<div className="col-span-2">
 								<Label htmlFor="description">Descrição</Label>
 								<Input
 									id="description"
-									value={novoCupom.description || ''}
-									onChange={(e) => setNovoCupom({...novoCupom, description: e.target.value})}
+									value={novoCupom.description || ""}
+									onChange={(e) =>
+										setNovoCupom({ ...novoCupom, description: e.target.value })
+									}
 									placeholder="Descrição do cupom"
 									className="mt-1"
 								/>
 							</div>
-							
+
 							<div className="col-span-2 flex items-center space-x-2">
 								<Switch
 									id="front_publishable"
 									checked={novoCupom.front_publishable}
-									onCheckedChange={(checked) => setNovoCupom({...novoCupom, front_publishable: checked})}
+									onCheckedChange={(checked) =>
+										setNovoCupom({ ...novoCupom, front_publishable: checked })
+									}
 								/>
 								<Label htmlFor="front_publishable">
 									Exibir na tela inicial
 								</Label>
 							</div>
 						</div>
-						
+
 						<div className="flex justify-end gap-2">
 							<Button variant="outline" onClick={() => setDialogOpen(false)}>
 								Cancelar
 							</Button>
-							<Button 
+							<Button
 								onClick={editingCoupon ? atualizarCupom : criarCupom}
 								disabled={loading || !novoCupom.code || novoCupom.discount <= 0}
 							>
@@ -346,7 +372,9 @@ const CuponsPage = () => {
 										<th className="px-4 py-2 text-left">Desconto</th>
 										<th className="px-4 py-2 text-left">Expiração</th>
 										<th className="px-4 py-2 text-left">Uso</th>
-										<th className="px-4 py-2 text-left">Exibe na tela principal</th>
+										<th className="px-4 py-2 text-left">
+											Exibe na tela principal
+										</th>
 										<th className="px-4 py-2 text-left">Status</th>
 										<th className="px-4 py-2 text-left">Ações</th>
 									</tr>
@@ -354,7 +382,10 @@ const CuponsPage = () => {
 								<tbody>
 									{cupons.length === 0 ? (
 										<tr>
-											<td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+											<td
+												colSpan={7}
+												className="px-4 py-8 text-center text-gray-500"
+											>
 												Nenhum cupom encontrado
 											</td>
 										</tr>
@@ -396,18 +427,18 @@ const CuponsPage = () => {
 												<td className="px-4 py-2">
 													<span
 														className={`px-2 py-1 text-xs rounded ${
-															cupom.status === 'ACTIVE'
+															cupom.status === "ACTIVE"
 																? "bg-green-100 text-green-800"
-																: cupom.status === 'EXPIRED'
-																? "bg-yellow-100 text-yellow-800"
-																: "bg-red-100 text-red-800"
+																: cupom.status === "EXPIRED"
+																	? "bg-yellow-100 text-yellow-800"
+																	: "bg-red-100 text-red-800"
 														}`}
 													>
-														{cupom.status === 'ACTIVE' 
-															? "Ativo" 
-															: cupom.status === 'EXPIRED'
-															? "Expirado"
-															: "Inativo"}
+														{cupom.status === "ACTIVE"
+															? "Ativo"
+															: cupom.status === "EXPIRED"
+																? "Expirado"
+																: "Inativo"}
 													</span>
 												</td>
 												<td className="px-4 py-2">
@@ -423,9 +454,15 @@ const CuponsPage = () => {
 															variant="outline"
 															size="sm"
 															onClick={() => toggleCupomStatus(cupom)}
-															className={cupom.status === 'ACTIVE' ? "text-yellow-600" : "text-green-600"}
+															className={
+																cupom.status === "ACTIVE"
+																	? "text-yellow-600"
+																	: "text-green-600"
+															}
 														>
-															{cupom.status === 'ACTIVE' ? "Desativar" : "Ativar"}
+															{cupom.status === "ACTIVE"
+																? "Desativar"
+																: "Ativar"}
 														</Button>
 														<Button
 															variant="outline"

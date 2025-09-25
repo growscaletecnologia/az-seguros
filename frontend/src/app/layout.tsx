@@ -20,6 +20,13 @@ export default function RootLayout({
 }) {
 	return (
 		<html lang="pt-BR">
+			{/* <head>
+				<script
+					src="/path/or/uri/to/tinymce.min.js"
+					referrerpolicy="origin"
+					crossorigin="anonymous"
+				></script>
+			</head> */}
 			<body className={inter.className}>
 				<Header />
 				<main className="min-h-screen pt-16">{children}</main>

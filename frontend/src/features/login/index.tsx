@@ -34,9 +34,7 @@ export default function Login() {
 
 	return (
 		<div>
-			<div
-				className="min-h-svh w-full relative overflow-hidden bg-gradient-to-br from-sky-600 via-blue-300 to-purple-400"
-			>
+			<div className="min-h-svh w-full relative overflow-hidden bg-gradient-to-br from-sky-600 via-blue-300 to-purple-400">
 				<Button
 					variant="secondary"
 					className="flex hover:bg-default hover:text-default relative left-6 top-6 shadow-sm w-14 h-14 items-center justify-center rounded-full  z-10"

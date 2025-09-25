@@ -1,183 +1,206 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { usersService, User, CreateUserDto, UpdateUserDto } from "@/services/api/users";
-import { toast } from "sonner";
-import { userRbacService } from "@/services/api/rbac";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { InviteUserForm } from "@/components/rbac/invite-user-form";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card";
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/ui/dialog";
+import { userRbacService } from "@/services/api/rbac";
+import {
+	CreateUserDto,
+	type UpdateUserDto,
+	type User,
+	usersService,
+} from "@/services/api/users";
+import React, { useState, useEffect } from "react";
+import { toast } from "sonner";
 
 interface Usuario {
-  id: string;
-  nome: string;
-  email: string;
-  role: string;
-  permissoes: {
-    ver: boolean;
-    editar: boolean;
-    criar: boolean;
-    excluir: boolean;
-  };
-  ativo: boolean;
-  dataCriacao: string;
+	id: string;
+	nome: string;
+	email: string;
+	role: string;
+	permissoes: {
+		ver: boolean;
+		editar: boolean;
+		criar: boolean;
+		excluir: boolean;
+	};
+	ativo: boolean;
+	dataCriacao: string;
 }
 
 // Função para converter usuário da API para o formato da interface
 const mapApiUserToUsuario = (user: User): Usuario => {
-  // Determinar permissões com base nos dados do usuário
-  const permissoes = {
-    ver: false,
-    editar: false,
-    criar: false,
-    excluir: false
-  };
+	// Determinar permissões com base nos dados do usuário
+	const permissoes = {
+		ver: false,
+		editar: false,
+		criar: false,
+		excluir: false,
+	};
 
-  // Se o usuário tem permissões diretas, verificamos elas
-  if (user.userPermissions) {
-    user.userPermissions.forEach(up => {
-      if (up.permission) {
-        if (up.permission.action === 'read' && up.allow) permissoes.ver = true;
-        if (up.permission.action === 'update' && up.allow) permissoes.editar = true;
-        if (up.permission.action === 'create' && up.allow) permissoes.criar = true;
-        if (up.permission.action === 'delete' && up.allow) permissoes.excluir = true;
-      }
-    });
-  }
+	// Se o usuário tem permissões diretas, verificamos elas
+	if (user.userPermissions) {
+		user.userPermissions.forEach((up) => {
+			if (up.permission) {
+				if (up.permission.action === "read" && up.allow) permissoes.ver = true;
+				if (up.permission.action === "update" && up.allow)
+					permissoes.editar = true;
+				if (up.permission.action === "create" && up.allow)
+					permissoes.criar = true;
+				if (up.permission.action === "delete" && up.allow)
+					permissoes.excluir = true;
+			}
+		});
+	}
 
-  return {
-    id: user.id,
-    nome: user.name || '',
-    email: user.email,
-    role: user.role.toLowerCase(),
-    permissoes,
-    ativo: user.status === 'ACTIVE',
-    dataCriacao: new Date().toISOString() // A API não retorna data de criação
-  };
+	return {
+		id: user.id,
+		nome: user.name || "",
+		email: user.email,
+		role: user.role.toLowerCase(),
+		permissoes,
+		ativo: user.status === "ACTIVE",
+		dataCriacao: new Date().toISOString(), // A API não retorna data de criação
+	};
 };
 
 const UsuariosPage = () => {
-  const [usuarios, setUsuarios] = useState<Usuario[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [isInviteOpen, setIsInviteOpen] = useState(false);
+	const [usuarios, setUsuarios] = useState<Usuario[]>([]);
+	const [loading, setLoading] = useState(true);
+	const [isInviteOpen, setIsInviteOpen] = useState(false);
 
-  const [editandoUsuario, setEditandoUsuario] = useState<Usuario | null>(null);
+	const [editandoUsuario, setEditandoUsuario] = useState<Usuario | null>(null);
 
-  // Carregar usuários da API
-  const carregarUsuarios = async () => {
-    try {
-      setLoading(true);
-      const data = await usersService.getAll();
-      const usuariosMapeados = data.map(mapApiUserToUsuario);
-      setUsuarios(usuariosMapeados);
-    } catch (error) {
-      console.error("Erro ao carregar usuários:", error);
-      toast.error("Erro ao carregar usuários");
-    } finally {
-      setLoading(false);
-    }
-  };
+	// Carregar usuários da API
+	const carregarUsuarios = async () => {
+		try {
+			setLoading(true);
+			const data = await usersService.getAll();
+			const usuariosMapeados = data.map(mapApiUserToUsuario);
+			setUsuarios(usuariosMapeados);
+		} catch (error) {
+			console.error("Erro ao carregar usuários:", error);
+			toast.error("Erro ao carregar usuários");
+		} finally {
+			setLoading(false);
+		}
+	};
 
-  useEffect(() => {
-    carregarUsuarios();
-  }, []);
+	useEffect(() => {
+		carregarUsuarios();
+	}, []);
 
-  const permissoesPadrao = {
-    ADMIN: { ver: true, editar: true, criar: true, excluir: true },
-    MANAGER: { ver: true, editar: true, criar: true, excluir: false },
-    CUSTOMER: { ver: true, editar: false, criar: false, excluir: false },
-  };
+	const permissoesPadrao = {
+		ADMIN: { ver: true, editar: true, criar: true, excluir: true },
+		MANAGER: { ver: true, editar: true, criar: true, excluir: false },
+		CUSTOMER: { ver: true, editar: false, criar: false, excluir: false },
+	};
 
-  const atualizarUsuario = async () => {
-    if (!editandoUsuario) return;
-    
-    try {
-      const updateUserDto: UpdateUserDto = {
-        name: editandoUsuario.nome,
-        email: editandoUsuario.email,
-        role: editandoUsuario.role.toUpperCase() as 'ADMIN' | 'MANAGER' | 'CUSTOMER',
-        status: editandoUsuario.ativo ? 'ACTIVE' : 'INACTIVE'
-      };
-      
-      await usersService.update(editandoUsuario.id, updateUserDto);
-      toast.success("Usuário atualizado com sucesso!");
-      carregarUsuarios();
-      setEditandoUsuario(null);
-    } catch (error) {
-      console.error("Erro ao atualizar usuário:", error);
-      toast.error("Erro ao atualizar usuário");
-    }
-  };
+	const atualizarUsuario = async () => {
+		if (!editandoUsuario) return;
 
-  const excluirUsuario = async (id: string) => {
-    try {
-      await usersService.remove(id);
-      toast.success("Usuário excluído com sucesso!");
-      carregarUsuarios();
-    } catch (error) {
-      console.error("Erro ao excluir usuário:", error);
-      toast.error("Erro ao excluir usuário");
-    }
-  };
+		try {
+			const updateUserDto: UpdateUserDto = {
+				name: editandoUsuario.nome,
+				email: editandoUsuario.email,
+				role: editandoUsuario.role.toUpperCase() as
+					| "ADMIN"
+					| "MANAGER"
+					| "CUSTOMER",
+				status: editandoUsuario.ativo ? "ACTIVE" : "INACTIVE",
+			};
 
-  // Função antiga removida para evitar duplicação
-  // A função criarUsuario já foi implementada acima com integração à API
+			await usersService.update(editandoUsuario.id, updateUserDto);
+			toast.success("Usuário atualizado com sucesso!");
+			carregarUsuarios();
+			setEditandoUsuario(null);
+		} catch (error) {
+			console.error("Erro ao atualizar usuário:", error);
+			toast.error("Erro ao atualizar usuário");
+		}
+	};
 
-  const editarUsuario = (usuario: Usuario) => {
-    setEditandoUsuario({ ...usuario });
-  };
+	const excluirUsuario = async (id: string) => {
+		try {
+			await usersService.remove(id);
+			toast.success("Usuário excluído com sucesso!");
+			carregarUsuarios();
+		} catch (error) {
+			console.error("Erro ao excluir usuário:", error);
+			toast.error("Erro ao excluir usuário");
+		}
+	};
 
-  const salvarEdicao = async () => {
-    if (editandoUsuario) {
-      await atualizarUsuario();
-    }
-  };
+	// Função antiga removida para evitar duplicação
+	// A função criarUsuario já foi implementada acima com integração à API
 
-  const toggleUsuario = async (id: string) => {
-    const usuario = usuarios.find(u => u.id === id);
-    if (!usuario) return;
-    
-    try {
-      const updateUserDto: UpdateUserDto = {
-        name: usuario.nome,
-        email: usuario.email,
-        role: usuario.role.toUpperCase() as 'ADMIN' | 'MANAGER' | 'CUSTOMER',
-        status: usuario.ativo ? 'INACTIVE' : 'ACTIVE'
-      };
-      
-      await usersService.update(id, updateUserDto);
-      toast.success(`Usuário ${usuario.ativo ? 'desativado' : 'ativado'} com sucesso!`);
-      carregarUsuarios();
-    } catch (error) {
-      console.error("Erro ao alterar status do usuário:", error);
-      toast.error("Erro ao alterar status do usuário");
-    }
-  };
+	const editarUsuario = (usuario: Usuario) => {
+		setEditandoUsuario({ ...usuario });
+	};
 
-  const atualizarRole = (
-    role: string,
-    isEditing = false,
-  ) => {
-    const permissoes = permissoesPadrao[role as keyof typeof permissoesPadrao] || 
-                      permissoesPadrao.CUSTOMER;
-    
-    if (isEditing && editandoUsuario) {
-      setEditandoUsuario({ ...editandoUsuario, role, permissoes });
-    }
-  };
+	const salvarEdicao = async () => {
+		if (editandoUsuario) {
+			await atualizarUsuario();
+		}
+	};
 
-  const atualizarPermissao = (
-    permissao: keyof Usuario["permissoes"],
-    valor: boolean,
-    isEditing = false,
-  ) => {
-    if (isEditing && editandoUsuario) {
-      setEditandoUsuario({
-        ...editandoUsuario,
-        permissoes: { ...editandoUsuario.permissoes, [permissao]: valor },
-      });
-    }
-  };
+	const toggleUsuario = async (id: string) => {
+		const usuario = usuarios.find((u) => u.id === id);
+		if (!usuario) return;
+
+		try {
+			const updateUserDto: UpdateUserDto = {
+				name: usuario.nome,
+				email: usuario.email,
+				role: usuario.role.toUpperCase() as "ADMIN" | "MANAGER" | "CUSTOMER",
+				status: usuario.ativo ? "INACTIVE" : "ACTIVE",
+			};
+
+			await usersService.update(id, updateUserDto);
+			toast.success(
+				`Usuário ${usuario.ativo ? "desativado" : "ativado"} com sucesso!`,
+			);
+			carregarUsuarios();
+		} catch (error) {
+			console.error("Erro ao alterar status do usuário:", error);
+			toast.error("Erro ao alterar status do usuário");
+		}
+	};
+
+	const atualizarRole = (role: string, isEditing = false) => {
+		const permissoes =
+			permissoesPadrao[role as keyof typeof permissoesPadrao] ||
+			permissoesPadrao.CUSTOMER;
+
+		if (isEditing && editandoUsuario) {
+			setEditandoUsuario({ ...editandoUsuario, role, permissoes });
+		}
+	};
+
+	const atualizarPermissao = (
+		permissao: keyof Usuario["permissoes"],
+		valor: boolean,
+		isEditing = false,
+	) => {
+		if (isEditing && editandoUsuario) {
+			setEditandoUsuario({
+				...editandoUsuario,
+				permissoes: { ...editandoUsuario.permissoes, [permissao]: valor },
+			});
+		}
+	};
 
 	return (
 		<div className="container py-6">
@@ -194,10 +217,12 @@ const UsuariosPage = () => {
 							</DialogHeader>
 							<Card>
 								<CardContent className="pt-4">
-									<InviteUserForm onSuccess={() => {
-										toast.success("Convite enviado com sucesso!");
-										carregarUsuarios();
-									}} />
+									<InviteUserForm
+										onSuccess={() => {
+											toast.success("Convite enviado com sucesso!");
+											carregarUsuarios();
+										}}
+									/>
 								</CardContent>
 							</Card>
 						</DialogContent>
@@ -206,7 +231,10 @@ const UsuariosPage = () => {
 			</div>
 
 			{/* Modal para edição de usuário */}
-			<Dialog open={!!editandoUsuario} onOpenChange={(open) => !open && setEditandoUsuario(null)}>
+			<Dialog
+				open={!!editandoUsuario}
+				onOpenChange={(open) => !open && setEditandoUsuario(null)}
+			>
 				<DialogContent className="sm:max-w-[600px]">
 					<DialogHeader>
 						<DialogTitle>Editar Usuário</DialogTitle>
@@ -217,7 +245,9 @@ const UsuariosPage = () => {
 								<>
 									<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
 										<div>
-											<label className="block text-sm font-medium mb-2">Nome</label>
+											<label className="block text-sm font-medium mb-2">
+												Nome
+											</label>
 											<input
 												type="text"
 												className="w-full p-2 border rounded"
@@ -232,7 +262,9 @@ const UsuariosPage = () => {
 										</div>
 
 										<div>
-											<label className="block text-sm font-medium mb-2">Email</label>
+											<label className="block text-sm font-medium mb-2">
+												Email
+											</label>
 											<input
 												type="email"
 												className="w-full p-2 border rounded"
@@ -248,21 +280,25 @@ const UsuariosPage = () => {
 									</div>
 
 									<div className="mb-4">
-										<label className="block text-sm font-medium mb-2">Role</label>
+										<label className="block text-sm font-medium mb-2">
+											Role
+										</label>
 										<div className="flex space-x-4">
-											{(["admin", "gerente", "cliente"] as const).map((role) => (
-												<label key={role} className="flex items-center">
-													<input
-														type="radio"
-														name="role"
-														value={role}
-														checked={editandoUsuario.role === role}
-														onChange={() => atualizarRole(role, true)}
-														className="mr-2"
-													/>
-													{role.charAt(0).toUpperCase() + role.slice(1)}
-												</label>
-											))}
+											{(["admin", "gerente", "cliente"] as const).map(
+												(role) => (
+													<label key={role} className="flex items-center">
+														<input
+															type="radio"
+															name="role"
+															value={role}
+															checked={editandoUsuario.role === role}
+															onChange={() => atualizarRole(role, true)}
+															className="mr-2"
+														/>
+														{role.charAt(0).toUpperCase() + role.slice(1)}
+													</label>
+												),
+											)}
 										</div>
 									</div>
 
@@ -286,7 +322,8 @@ const UsuariosPage = () => {
 															}
 															className="mr-2"
 														/>
-														{permissao.charAt(0).toUpperCase() + permissao.slice(1)}
+														{permissao.charAt(0).toUpperCase() +
+															permissao.slice(1)}
 													</label>
 												),
 											)}

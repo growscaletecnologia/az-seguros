@@ -31,7 +31,7 @@ import {
 	X,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { DateRange } from "react-day-picker";
+import type { DateRange } from "react-day-picker";
 
 /* ============================== */
 /*           MOCK DATA            */
@@ -55,214 +55,217 @@ type Plan = {
 	faixaEtaria?: string;
 	aumentoIdade?: string;
 
-  topCard?: boolean // chave que vai separar destaque
+	topCard?: boolean; // chave que vai separar destaque
 };
 const coberturaDescriptions: Record<string, string> = {
-  "Despesa Médica Hospitalar Total": "Valor máximo coberto em despesas médicas e hospitalares.",
-  "Cobertura Médica para Prática de Esportes": "Atendimento para acidentes ocorridos durante a prática esportiva.",
-  "Cobertura Médica para Gestante": "Custos relacionados a complicações durante a gestação.",
-  "Cobertura Odontológica": "Tratamento odontológico emergencial durante a viagem.",
-  "Bagagem": "Indenização em caso de perda ou extravio de bagagem.",
-}
+	"Despesa Médica Hospitalar Total":
+		"Valor máximo coberto em despesas médicas e hospitalares.",
+	"Cobertura Médica para Prática de Esportes":
+		"Atendimento para acidentes ocorridos durante a prática esportiva.",
+	"Cobertura Médica para Gestante":
+		"Custos relacionados a complicações durante a gestação.",
+	"Cobertura Odontológica":
+		"Tratamento odontológico emergencial durante a viagem.",
+	Bagagem: "Indenização em caso de perda ou extravio de bagagem.",
+};
 
 const mockPlans: Plan[] = [
-  {
-    id: 1,
-    seguradora: "Assist Card",
-    plano: "AC 60 Europa",
-    preco: 89.9,
-    precoOriginal: 99.9,
-    precoCartao: 127.6,
-    coberturaMedica: 60000,
-    coberturaBagagem: 1200,
-    coberturaCancelamento: 5000,
-    coberturaPandemia: false,
-    coberturaPraticaEsportiva: true,
-    avaliacoes: 4.8,
-    totalAvaliacoes: 1247,
-    destaque: "Mais Vendido",
-    topCard: true,
-    beneficios: [
-      "Telemedicina 24h",
-      "Cancelamento de viagem",
-      "Prática de esportes",
-      "Atendimento em português",
-    ],
-    faixaEtaria: "Faixa etária: 0 a 70 anos",
-    aumentoIdade: "R$ 179,80 maiores de 64 anos",
-  },
-  {
-    id: 2,
-    seguradora: "Travel Ace",
-    plano: "TA 40 Especial",
-    preco: 67.5,
-    precoOriginal: 75.0,
-    precoCartao: 95.0,
-    coberturaMedica: 40000,
-    coberturaBagagem: 800,
-    coberturaCancelamento: 3000,
-    coberturaPandemia: false,
-    coberturaPraticaEsportiva: false,
-    avaliacoes: 4.6,
-    totalAvaliacoes: 892,
-    destaque: "Melhor Preço",
-    topCard: true,
-    beneficios: [
-      "Atendimento em português",
-      "Cancelamento de viagem",
-	  " Assistência jurídica",
-      "Regresso sanitário",
-      "Cobertura odontológica",
-    ],
-    faixaEtaria: "Faixa etária: 0 a 75 anos",
-    aumentoIdade: "R$ 252,48 maiores de 64 anos",
-  },
-  {
-    id: 3,
-    seguradora: "GTA",
-    plano: "GTA 75 Euromax",
-    preco: 125.8,
-    precoOriginal: 140.0,
-    precoCartao: 149.0,
-    coberturaMedica: 75000,
-    coberturaBagagem: 1500,
-    coberturaCancelamento: 8000,
-    coberturaPandemia: false,
-    coberturaPraticaEsportiva: true,
-    avaliacoes: 4.9,
-    totalAvaliacoes: 2156,
-    destaque: "Premium",
-    topCard: true,
-    beneficios: [
-      "Atendimento médico hospitalar",
-      "Cancelamento de viagem",
-      "Prática de esportes",
-      "Cobertura odontológica",
-    ],
-    faixaEtaria: "Faixa etária: 0 a 80 anos",
-    aumentoIdade: "R$ 251,60 maiores de 64 anos",
-  },
-  {
-    id: 4,
-    seguradora: "Vital Card",
-    plano: "VC 30 Basic",
-    preco: 45.9,
-    precoOriginal: 52.0,
-    precoCartao: 55.0,
-    coberturaMedica: 30000,
-    coberturaBagagem: 600,
-    coberturaCancelamento: 2000,
-    coberturaPandemia: false,
-    coberturaPraticaEsportiva: false,
-    avaliacoes: 4.4,
-    totalAvaliacoes: 567,
-    destaque: "Econômico",
-    beneficios: [
-      "Atendimento 24h",
-      "Cancelamento de viagem",
-      "Regresso sanitário",
-    ],
-    faixaEtaria: "Faixa etária: 0 a 70 anos",
-    aumentoIdade: "R$ 137,70 maiores de 64 anos",
-  },
-  {
-    id: 5,
-    seguradora: "Intermac",
-    plano: "I60 Europa",
-    preco: 98.7,
-    precoOriginal: 110.0,
-    precoCartao: 115.0,
-    coberturaMedica: 60000,
-    coberturaBagagem: 1000,
-    coberturaCancelamento: 6000,
-    coberturaPandemia: false,
-    coberturaPraticaEsportiva: true,
-    avaliacoes: 4.7,
-    totalAvaliacoes: 1034,
-    destaque: "",
-    beneficios: [
-      "Telemedicina",
-      "Cancelamento de viagem",
-      "Prática de esportes",
-      "Fisioterapia",
-    ],
-    faixaEtaria: "Faixa etária: 0 a 75 anos",
-    aumentoIdade: "R$ 252,48 maiores de 64 anos",
-  },
-  {
-    id: 6,
-    seguradora: "Universal Assistance",
-    plano: "UA 50 Classic",
-    preco: 72.3,
-    precoOriginal: 82.0,
-    precoCartao: 89.9,
-    coberturaMedica: 50000,
-    coberturaBagagem: 900,
-    coberturaCancelamento: 4000,
-    coberturaPandemia: false,
-    coberturaPraticaEsportiva: false,
-    avaliacoes: 4.5,
-    totalAvaliacoes: 678,
-    destaque: "",
-    beneficios: [
-      "Atendimento 24h",
-      "Transporte médico",
-      "Regresso sanitário",
-      "Cobertura odontológica",
-    ],
-    faixaEtaria: "Faixa etária: 0 a 75 anos",
-    aumentoIdade: "R$ 199,90 maiores de 64 anos",
-  },
-  {
-    id: 7,
-    seguradora: "Omint",
-    plano: "Omint Global",
-    preco: 145.5,
-    precoOriginal: 160.0,
-    precoCartao: 170.0,
-    coberturaMedica: 100000,
-    coberturaBagagem: 2000,
-    coberturaCancelamento: 10000,
-    coberturaPandemia: false,
-    coberturaPraticaEsportiva: true,
-    avaliacoes: 4.9,
-    totalAvaliacoes: 312,
-    destaque: "",
-    beneficios: [
-      "Atendimento hospitalar premium",
-      "Assistência jurídica",
-      "Cancelamento de viagem",
-      "Prática de esportes",
-    ],
-    faixaEtaria: "Faixa etária: 0 a 85 anos",
-    aumentoIdade: "R$ 320,00 maiores de 70 anos",
-  },
-  {
-    id: 8,
-    seguradora: "SulAmérica",
-    plano: "Prestige 100",
-    preco: 199.9,
-    precoOriginal: 220.0,
-    precoCartao: 230.0,
-    coberturaMedica: 100000,
-    coberturaBagagem: 2500,
-    coberturaCancelamento: 12000,
-    coberturaPandemia: false,
-    coberturaPraticaEsportiva: true,
-    avaliacoes: 4.8,
-    totalAvaliacoes: 980,
-    destaque: "",
-    beneficios: [
-      "Atendimento hospitalar completo",
-      "Cancelamento de viagem",
-      "Prática de esportes",
-      "Atendimento odontológico",
-    ],
-    faixaEtaria: "Faixa etária: 0 a 85 anos",
-    aumentoIdade: "R$ 380,00 maiores de 70 anos",
-  },
-]
-
+	{
+		id: 1,
+		seguradora: "Assist Card",
+		plano: "AC 60 Europa",
+		preco: 89.9,
+		precoOriginal: 99.9,
+		precoCartao: 127.6,
+		coberturaMedica: 60000,
+		coberturaBagagem: 1200,
+		coberturaCancelamento: 5000,
+		coberturaPandemia: false,
+		coberturaPraticaEsportiva: true,
+		avaliacoes: 4.8,
+		totalAvaliacoes: 1247,
+		destaque: "Mais Vendido",
+		topCard: true,
+		beneficios: [
+			"Telemedicina 24h",
+			"Cancelamento de viagem",
+			"Prática de esportes",
+			"Atendimento em português",
+		],
+		faixaEtaria: "Faixa etária: 0 a 70 anos",
+		aumentoIdade: "R$ 179,80 maiores de 64 anos",
+	},
+	{
+		id: 2,
+		seguradora: "Travel Ace",
+		plano: "TA 40 Especial",
+		preco: 67.5,
+		precoOriginal: 75.0,
+		precoCartao: 95.0,
+		coberturaMedica: 40000,
+		coberturaBagagem: 800,
+		coberturaCancelamento: 3000,
+		coberturaPandemia: false,
+		coberturaPraticaEsportiva: false,
+		avaliacoes: 4.6,
+		totalAvaliacoes: 892,
+		destaque: "Melhor Preço",
+		topCard: true,
+		beneficios: [
+			"Atendimento em português",
+			"Cancelamento de viagem",
+			" Assistência jurídica",
+			"Regresso sanitário",
+			"Cobertura odontológica",
+		],
+		faixaEtaria: "Faixa etária: 0 a 75 anos",
+		aumentoIdade: "R$ 252,48 maiores de 64 anos",
+	},
+	{
+		id: 3,
+		seguradora: "GTA",
+		plano: "GTA 75 Euromax",
+		preco: 125.8,
+		precoOriginal: 140.0,
+		precoCartao: 149.0,
+		coberturaMedica: 75000,
+		coberturaBagagem: 1500,
+		coberturaCancelamento: 8000,
+		coberturaPandemia: false,
+		coberturaPraticaEsportiva: true,
+		avaliacoes: 4.9,
+		totalAvaliacoes: 2156,
+		destaque: "Premium",
+		topCard: true,
+		beneficios: [
+			"Atendimento médico hospitalar",
+			"Cancelamento de viagem",
+			"Prática de esportes",
+			"Cobertura odontológica",
+		],
+		faixaEtaria: "Faixa etária: 0 a 80 anos",
+		aumentoIdade: "R$ 251,60 maiores de 64 anos",
+	},
+	{
+		id: 4,
+		seguradora: "Vital Card",
+		plano: "VC 30 Basic",
+		preco: 45.9,
+		precoOriginal: 52.0,
+		precoCartao: 55.0,
+		coberturaMedica: 30000,
+		coberturaBagagem: 600,
+		coberturaCancelamento: 2000,
+		coberturaPandemia: false,
+		coberturaPraticaEsportiva: false,
+		avaliacoes: 4.4,
+		totalAvaliacoes: 567,
+		destaque: "Econômico",
+		beneficios: [
+			"Atendimento 24h",
+			"Cancelamento de viagem",
+			"Regresso sanitário",
+		],
+		faixaEtaria: "Faixa etária: 0 a 70 anos",
+		aumentoIdade: "R$ 137,70 maiores de 64 anos",
+	},
+	{
+		id: 5,
+		seguradora: "Intermac",
+		plano: "I60 Europa",
+		preco: 98.7,
+		precoOriginal: 110.0,
+		precoCartao: 115.0,
+		coberturaMedica: 60000,
+		coberturaBagagem: 1000,
+		coberturaCancelamento: 6000,
+		coberturaPandemia: false,
+		coberturaPraticaEsportiva: true,
+		avaliacoes: 4.7,
+		totalAvaliacoes: 1034,
+		destaque: "",
+		beneficios: [
+			"Telemedicina",
+			"Cancelamento de viagem",
+			"Prática de esportes",
+			"Fisioterapia",
+		],
+		faixaEtaria: "Faixa etária: 0 a 75 anos",
+		aumentoIdade: "R$ 252,48 maiores de 64 anos",
+	},
+	{
+		id: 6,
+		seguradora: "Universal Assistance",
+		plano: "UA 50 Classic",
+		preco: 72.3,
+		precoOriginal: 82.0,
+		precoCartao: 89.9,
+		coberturaMedica: 50000,
+		coberturaBagagem: 900,
+		coberturaCancelamento: 4000,
+		coberturaPandemia: false,
+		coberturaPraticaEsportiva: false,
+		avaliacoes: 4.5,
+		totalAvaliacoes: 678,
+		destaque: "",
+		beneficios: [
+			"Atendimento 24h",
+			"Transporte médico",
+			"Regresso sanitário",
+			"Cobertura odontológica",
+		],
+		faixaEtaria: "Faixa etária: 0 a 75 anos",
+		aumentoIdade: "R$ 199,90 maiores de 64 anos",
+	},
+	{
+		id: 7,
+		seguradora: "Omint",
+		plano: "Omint Global",
+		preco: 145.5,
+		precoOriginal: 160.0,
+		precoCartao: 170.0,
+		coberturaMedica: 100000,
+		coberturaBagagem: 2000,
+		coberturaCancelamento: 10000,
+		coberturaPandemia: false,
+		coberturaPraticaEsportiva: true,
+		avaliacoes: 4.9,
+		totalAvaliacoes: 312,
+		destaque: "",
+		beneficios: [
+			"Atendimento hospitalar premium",
+			"Assistência jurídica",
+			"Cancelamento de viagem",
+			"Prática de esportes",
+		],
+		faixaEtaria: "Faixa etária: 0 a 85 anos",
+		aumentoIdade: "R$ 320,00 maiores de 70 anos",
+	},
+	{
+		id: 8,
+		seguradora: "SulAmérica",
+		plano: "Prestige 100",
+		preco: 199.9,
+		precoOriginal: 220.0,
+		precoCartao: 230.0,
+		coberturaMedica: 100000,
+		coberturaBagagem: 2500,
+		coberturaCancelamento: 12000,
+		coberturaPandemia: false,
+		coberturaPraticaEsportiva: true,
+		avaliacoes: 4.8,
+		totalAvaliacoes: 980,
+		destaque: "",
+		beneficios: [
+			"Atendimento hospitalar completo",
+			"Cancelamento de viagem",
+			"Prática de esportes",
+			"Atendimento odontológico",
+		],
+		faixaEtaria: "Faixa etária: 0 a 85 anos",
+		aumentoIdade: "R$ 380,00 maiores de 70 anos",
+	},
+];
 
 /* Benefícios detalhados por plano (mock configurável). */
 type BenefitItem = { titulo: string; valor?: string; extra?: string };
@@ -398,7 +401,7 @@ function FiltersModal({
 	};
 }) {
 	if (!isOpen) return null;
-	
+
 	// helpers toggle
 	const toggleNumber = (key: keyof FilterState, value: number) => {
 		setState((s) => {
@@ -552,7 +555,6 @@ function PlanDetailsModal({
 	plan: Plan;
 	onClose: () => void;
 }) {
-	
 	const items = benefitsByPlan[plan.id] ?? [];
 	return (
 		<div className="fixed inset-0 z-50 flex items-start justify-center p-4 bg-black/50">
@@ -639,7 +641,6 @@ function PlanDetailsModal({
 							USD {plan.coberturaCancelamento.toLocaleString()}
 						</p>
 					</div>
-					
 				</div>
 
 				<div className="px-6 pb-6">
@@ -673,9 +674,7 @@ function AccordionRow({
 }) {
 	const [open, setOpen] = useState(false);
 
-
 	return (
-    
 		<div className="border-b last:border-b-0">
 			<button
 				onClick={() => setOpen((v) => !v)}
@@ -709,51 +708,47 @@ function AccordionRow({
 /*         LISTAGEM + MODAL       */
 /* ============================== */
 interface searchForm {
-  destination: string | undefined;
-  range: DateRange | undefined;
+	destination: string | undefined;
+	range: DateRange | undefined;
 }
 export default function PlanosPage() {
 	const [selectedPlans, setSelectedPlans] = useState<number[]>([]);
 	const [showComparison, setShowComparison] = useState(false);
 	const [viewPlanId, setViewPlanId] = useState<number | null>(null);
-  const {  formData } = usePreRegisterForm()
-  const data = formData
- 	const topPlans = mockPlans.filter((p) => p.topCard)
-	const otherPlans = mockPlans.filter((p) => !p.topCard)
-  const minhaDataI = new Date(formData?.range?.from || "");
+	const { formData } = usePreRegisterForm();
+	const data = formData;
+	const topPlans = mockPlans.filter((p) => p.topCard);
+	const otherPlans = mockPlans.filter((p) => !p.topCard);
+	const minhaDataI = new Date(formData?.range?.from || "");
 
-  const diaI = String(minhaDataI.getDate()).padStart(2, '0');
-  const mesI = String(minhaDataI.getMonth() + 1).padStart(2, '0'); // Mês é 0-indexado
-  const anoI = minhaDataI.getFullYear();
+	const diaI = String(minhaDataI.getDate()).padStart(2, "0");
+	const mesI = String(minhaDataI.getMonth() + 1).padStart(2, "0"); // Mês é 0-indexado
+	const anoI = minhaDataI.getFullYear();
 
+	const dataI = `${diaI}/${mesI}/${anoI}`;
 
+	const minhaDataF = new Date(formData?.range?.to || "");
+	minhaDataF.setDate(minhaDataF.getDate() + 16); // Adiciona 16 dias
 
-  const dataI = `${diaI}/${mesI}/${anoI}`;
+	const diaF = String(minhaDataF.getDate()).padStart(2, "0");
+	const mesF = String(minhaDataF.getMonth() + 1).padStart(2, "0"); // Mês é 0-indexado
+	const anoF = minhaDataF.getFullYear();
 
-  const minhaDataF = new Date(formData?.range?.to || "");
-  minhaDataF.setDate(minhaDataF.getDate() + 16); // Adiciona 16 dias
-
-  const diaF = String(minhaDataF.getDate()).padStart(2, '0');
-  const mesF = String(minhaDataF.getMonth() + 1).padStart(2, '0'); // Mês é 0-indexado
-  const anoF = minhaDataF.getFullYear();
-
-  const dataF = `${diaF}/${mesF}/${anoF}`;
+	const dataF = `${diaF}/${mesF}/${anoF}`;
 	// NOVO: estado do modal de filtros
 	const [isFilterOpen, setIsFilterOpen] = useState(false);
 	const [filters, setFilters] = useState<FilterState>(initialFilters);
-  const [form, setForm ] = useState<searchForm>({
-    destination: formData?.destination,
-    range: formData?.range,
+	const [form, setForm] = useState<searchForm>({
+		destination: formData?.destination,
+		range: formData?.range,
+	});
 
-  })
-
-  useEffect(() => {
-    setForm({
-      destination: formData?.destination,
-      range: formData?.range,
-    })
-  }, [formData])
-
+	useEffect(() => {
+		setForm({
+			destination: formData?.destination,
+			range: formData?.range,
+		});
+	}, [formData]);
 
 	// Opções dinâmicas a partir do mock
 	const options = useMemo(() => {
@@ -846,141 +841,142 @@ export default function PlanosPage() {
 							</div>
 							<div className="flex items-center space-x-2 text-sm text-gray-600">
 								<Calendar className="h-4 w-4" />
-								<span>{data ? `${dataI} - ${dataF}` : "Selecione as datas"}</span>
+								<span>
+									{data ? `${dataI} - ${dataF}` : "Selecione as datas"}
+								</span>
 							</div>
 							<div className="flex items-center space-x-2 text-sm text-gray-600">
 								<Users className="h-4 w-4" />
-								<span>{data ? `${data.passengers} passageiro${Number(data?.passengers) > 1 ? "s" : ""}` : "Selecione o número de passageiros"}</span>
+								<span>
+									{data
+										? `${data.passengers} passageiro${Number(data?.passengers) > 1 ? "s" : ""}`
+										: "Selecione o número de passageiros"}
+								</span>
 							</div>
-
 						</div>
-          
-          
-       
 					</div>
 				</div>
 			</div>
-         	<div className="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow" >
-             
-              <div className="text-sm bg-blue-300 text-gray-700 flex items-center justify-center gap-2">
-             
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
-                      <DestinationSelect
-                        data={form?.destination || ""}
-                        setData={(value) =>
-                          setForm((prev) => ({ ...prev, destination: value }))
-                        }
-                      />
-                      
-                      <div className="col-span-1 md:col-span-2 lg:col-span-2">
-                        <DateRangePicker
-                          onChange={(value)=>{
-                            setForm((prev) => ({ ...prev, range: value }))
-                          }}
-                          minDate={new Date()}
-                          months={2}
-                          range={form.range}
-                
-                        />
-                        
-                      </div>
+			<div className="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow">
+				<div className="text-sm bg-blue-300 text-gray-700 flex items-center justify-center gap-2">
+					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
+						<DestinationSelect
+							data={form?.destination || ""}
+							setData={(value) =>
+								setForm((prev) => ({ ...prev, destination: value }))
+							}
+						/>
 
-                    <Button 
-                    className="inline-flex items-center h-[52px] gap-2 px-4 py-2 rounded-lg bg-blue-700 text-white hover:bg-blue-800"         
-                
-                    >
-                        <SearchIcon className="h-4 w-4" />
-                        Buscar 
-                    </Button>
-                  </div>
-            </div>
-                  </div>                             
+						<div className="col-span-1 md:col-span-2 lg:col-span-2">
+							<DateRangePicker
+								onChange={(value) => {
+									setForm((prev) => ({ ...prev, range: value }));
+								}}
+								minDate={new Date()}
+								months={2}
+								range={form.range}
+							/>
+						</div>
+
+						<Button className="inline-flex items-center h-[52px] gap-2 px-4 py-2 rounded-lg bg-blue-700 text-white hover:bg-blue-800">
+							<SearchIcon className="h-4 w-4" />
+							Buscar
+						</Button>
+					</div>
+				</div>
+			</div>
 			{/* Conteúdo */}
 			<div className="max-w-7xl mx-auto px-4 sm:px-6  py-8">
 				<div className="grid grid-cols-1 lg:grid-cols-1 gap-8">
 					{/* Coluna lateral antiga pode permanecer ou ser removida; deixei só a listagem principal. */}
 					<div className="flex flex-col gap-2 jusrify-center">
 						<div className="flex items-center gap-2 justify-center w-full mb-4">
-						  		<h1 className="text-3xl font-semibold">Encontre os melhores planos para sua viagem!</h1>
+							<h1 className="text-3xl font-semibold">
+								Encontre os melhores planos para sua viagem!
+							</h1>
 						</div>
-						
-							{/* TOP Cards */}
+
+						{/* TOP Cards */}
 						<div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-							{topPlans.map(plan => (
-								<div key={plan.id} className="bg-white shadow-lg rounded-2xl p-6 border border-gray-200  transform transition duration-300 hover:scale-105 hover:shadow-xl">
-								{/* Plano e Seguradora */}
-								<h3 className="text-lg font-bold mb-2">{plan.plano}</h3>
-								<p className="text-sm text-gray-600">{plan.seguradora}</p>
+							{topPlans.map((plan) => (
+								<div
+									key={plan.id}
+									className="bg-white shadow-lg rounded-2xl p-6 border border-gray-200  transform transition duration-300 hover:scale-105 hover:shadow-xl"
+								>
+									{/* Plano e Seguradora */}
+									<h3 className="text-lg font-bold mb-2">{plan.plano}</h3>
+									<p className="text-sm text-gray-600">{plan.seguradora}</p>
 
-								{/* Preço */}
-								<div className="mt-4">
-									{plan.precoOriginal > plan.preco && (
-									<p className="line-through text-gray-400 text-sm">
-										{plan.precoOriginal.toLocaleString("pt-BR", {
-										style: "currency",
-										currency: "BRL",
-										})}
-									</p>
-									)}
-									<div className="flex items-baseline space-x-1">
-										<p className="text-2xl font-bold text-blue-600">
-										{plan.preco.toLocaleString("pt-BR", {
-											style: "currency",
-											currency: "BRL",
-										})}
+									{/* Preço */}
+									<div className="mt-4">
+										{plan.precoOriginal > plan.preco && (
+											<p className="line-through text-gray-400 text-sm">
+												{plan.precoOriginal.toLocaleString("pt-BR", {
+													style: "currency",
+													currency: "BRL",
+												})}
+											</p>
+										)}
+										<div className="flex items-baseline space-x-1">
+											<p className="text-2xl font-bold text-blue-600">
+												{plan.preco.toLocaleString("pt-BR", {
+													style: "currency",
+													currency: "BRL",
+												})}
+											</p>
+											<p>/por pessoa no Pix</p>
+										</div>
+										<p className="text-sm text-gray-600">
+											ou em até 12x no cartão
 										</p>
-										<p>/por pessoa no Pix</p>
 									</div>
-									<p className="text-sm text-gray-600">
-									ou em até 12x no cartão 
-									</p>
-								</div>
 
-								{/* Benefícios */}
-								<ul className="mt-4 space-y-1 text-sm text-gray-700">
-									{plan.beneficios.map((b, i) => (
-									<li key={i}>• {b}</li>
-									))}
-								</ul>
+									{/* Benefícios */}
+									<ul className="mt-4 space-y-1 text-sm text-gray-700">
+										{plan.beneficios.map((b, i) => (
+											<li key={i}>• {b}</li>
+										))}
+									</ul>
 
-								{/* Ações */}
-								<div className="mt-6 space-y-2">
-									<button  className="w-full bg-blue-600  hover:cursor-pointer hover:animate-pulse text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2">
-															<span>Selecionar Plano</span>
-															<ArrowRight className="h-4 w-4" />
-														</button>
-									
-															<button
-																onClick={() => {handleSelectPlan(plan.id)
-																	if (!selectedPlans.includes(plan.id) && selectedPlans.length >= 5) {
-																		setShowComparison(true)
-																	}
-																}}
-																className={`flex-1 py-2 px-4 rounded-lg w-full hover:cursor-pointer border transition-colors flex items-center justify-center space-x-1 ${
-																	selectedPlans.includes(plan.id)
-																		? "bg-blue-50 border-blue-500 text-blue-700"
-																		: "border-gray-300 text-gray-700 hover:bg-gray-50"
-																}`}
-																disabled={
-																	!selectedPlans.includes(plan.id) &&
-																	selectedPlans.length >= 4
-																}
-															>
-																<GitCompare className="h-4 w-4" />
-																<span className="text-sm">
-																	{selectedPlans.includes(plan.id)
-																		? "Selecionado"
-																		: "Comparar"}
-																</span>
-															</button>
-														
-								</div>
-													
+									{/* Ações */}
+									<div className="mt-6 space-y-2">
+										<button className="w-full bg-blue-600  hover:cursor-pointer hover:animate-pulse text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2">
+											<span>Selecionar Plano</span>
+											<ArrowRight className="h-4 w-4" />
+										</button>
+
+										<button
+											onClick={() => {
+												handleSelectPlan(plan.id);
+												if (
+													!selectedPlans.includes(plan.id) &&
+													selectedPlans.length >= 5
+												) {
+													setShowComparison(true);
+												}
+											}}
+											className={`flex-1 py-2 px-4 rounded-lg w-full hover:cursor-pointer border transition-colors flex items-center justify-center space-x-1 ${
+												selectedPlans.includes(plan.id)
+													? "bg-blue-50 border-blue-500 text-blue-700"
+													: "border-gray-300 text-gray-700 hover:bg-gray-50"
+											}`}
+											disabled={
+												!selectedPlans.includes(plan.id) &&
+												selectedPlans.length >= 4
+											}
+										>
+											<GitCompare className="h-4 w-4" />
+											<span className="text-sm">
+												{selectedPlans.includes(plan.id)
+													? "Selecionado"
+													: "Comparar"}
+											</span>
+										</button>
+									</div>
 								</div>
 							))}
 						</div>
-						
-						
+
 						{/* Barra de ações */}
 						<div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
 							<div className="flex items-center gap-3">
@@ -1002,8 +998,6 @@ export default function PlanosPage() {
 								<option>Ordenar por: Melhor avaliação</option>
 							</select>
 						</div>
-
-					
 
 						{/* Cards */}
 						<div className="space-y-4">
@@ -1120,66 +1114,70 @@ export default function PlanosPage() {
 													{plan.precoOriginal > plan.preco && (
 														<p className="text-sm text-gray-500 line-through">
 															{plan.precoOriginal.toLocaleString("pt-BR", {
-                                style: "currency",
-                                currency: "BRL",
-                              })}
+																style: "currency",
+																currency: "BRL",
+															})}
 														</p>
 													)}
 
-                          	
-													<div className= "flex flex-row gap-2 items-end justify-end ">
-                            <p className="text-3xl font-bold text-blue-600">
-                              {plan.preco.toLocaleString("pt-BR", {
-                                                          style: "currency",
-                                                          currency: "BRL",
-                                                        })}
-                            </p>
-                            <p className="text-sm font-semibold text-gray-600"> / Por pessoa no PIX</p>
-                          </div>
-													<p className="text-sm mt-2 font-semibold text-gray-600">ou  em até 12x sem juros no cartão
-                          </p>
+													<div className="flex flex-row gap-2 items-end justify-end ">
+														<p className="text-3xl font-bold text-blue-600">
+															{plan.preco.toLocaleString("pt-BR", {
+																style: "currency",
+																currency: "BRL",
+															})}
+														</p>
+														<p className="text-sm font-semibold text-gray-600">
+															{" "}
+															/ Por pessoa no PIX
+														</p>
+													</div>
+													<p className="text-sm mt-2 font-semibold text-gray-600">
+														ou em até 12x sem juros no cartão
+													</p>
 												</div>
 
 												<div className="space-y-3">
-													<button  className="w-full bg-blue-600  hover:cursor-pointer hover:animate-pulse text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2">
+													<button className="w-full bg-blue-600  hover:cursor-pointer hover:animate-pulse text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2">
 														<span>Selecionar Plano</span>
 														<ArrowRight className="h-4 w-4" />
 													</button>
 
-													
-														<button
-															onClick={() => {handleSelectPlan(plan.id)
-																if (!selectedPlans.includes(plan.id) && selectedPlans.length >= 5) {
-																	setShowComparison(true) 
-																}
-															}}
-															className={`flex-1 py-2 px-4 rounded-lg w-full hover:cursor-pointer border transition-colors flex items-center justify-center space-x-1 ${
-																selectedPlans.includes(plan.id)
-																	? "bg-blue-50 border-blue-500 text-blue-700"
-																	: "border-gray-300 text-gray-700 hover:bg-gray-50"
-															}`}
-															disabled={
+													<button
+														onClick={() => {
+															handleSelectPlan(plan.id);
+															if (
 																!selectedPlans.includes(plan.id) &&
-																selectedPlans.length >= 4
+																selectedPlans.length >= 5
+															) {
+																setShowComparison(true);
 															}
-														>
-															<GitCompare className="h-4 w-4" />
-															<span className="text-sm">
-																{selectedPlans.includes(plan.id)
-																	? "Selecionado"
-																	: "Comparar"}
-															</span>
-														</button>
+														}}
+														className={`flex-1 py-2 px-4 rounded-lg w-full hover:cursor-pointer border transition-colors flex items-center justify-center space-x-1 ${
+															selectedPlans.includes(plan.id)
+																? "bg-blue-50 border-blue-500 text-blue-700"
+																: "border-gray-300 text-gray-700 hover:bg-gray-50"
+														}`}
+														disabled={
+															!selectedPlans.includes(plan.id) &&
+															selectedPlans.length >= 4
+														}
+													>
+														<GitCompare className="h-4 w-4" />
+														<span className="text-sm">
+															{selectedPlans.includes(plan.id)
+																? "Selecionado"
+																: "Comparar"}
+														</span>
+													</button>
 
-														<button
-															onClick={() => setViewPlanId(plan.id)}
-															className="flex-1 py-2 px-4 w-full rounded-lg text-sm hover:cursor-pointer  border transition-colors flex items-center justify-center space-x-1"
-															aria-label="Ver detalhes"
-														>
-														
-															Ver todas as coberturas
-														</button>
-													
+													<button
+														onClick={() => setViewPlanId(plan.id)}
+														className="flex-1 py-2 px-4 w-full rounded-lg text-sm hover:cursor-pointer  border transition-colors flex items-center justify-center space-x-1"
+														aria-label="Ver detalhes"
+													>
+														Ver todas as coberturas
+													</button>
 												</div>
 											</div>
 										</div>
@@ -1187,45 +1185,53 @@ export default function PlanosPage() {
 								</div>
 							))}
 						</div>
-						
+
 						{/* Barra flutuante de comparação */}
 						{selectedPlans.length > 1 && (
-						<div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t shadow-lg">
-							<div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
-							{/* Planos selecionados */}
-							<div className="flex items-center gap-4 overflow-x-auto">
-								{getSelectedPlans().map((plan) => (
-								<div key={plan.id} className="flex items-center gap-2 border rounded-lg px-3 py-2">
-									<span className="text-sm font-medium">{plan.seguradora}</span>
-									<span className="text-xs text-gray-500 truncate">{plan.plano}</span>
+							<div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t shadow-lg">
+								<div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
+									{/* Planos selecionados */}
+									<div className="flex items-center gap-4 overflow-x-auto">
+										{getSelectedPlans().map((plan) => (
+											<div
+												key={plan.id}
+												className="flex items-center gap-2 border rounded-lg px-3 py-2"
+											>
+												<span className="text-sm font-medium">
+													{plan.seguradora}
+												</span>
+												<span className="text-xs text-gray-500 truncate">
+													{plan.plano}
+												</span>
+												<button
+													onClick={() =>
+														setSelectedPlans((cur) =>
+															cur.filter((id) => id !== plan.id),
+														)
+													}
+													className="ml-2 text-red-500 hover:text-red-700"
+												>
+													<X className="h-4 w-4" />
+												</button>
+											</div>
+										))}
+									</div>
+
+									{/* Botão comparar */}
 									<button
-									onClick={() =>
-										setSelectedPlans((cur) => cur.filter((id) => id !== plan.id))
-									}
-									className="ml-2 text-red-500 hover:text-red-700"
+										onClick={() => setShowComparison(true)}
+										className="flex-shrink-0 bg-blue-700 hover:bg-blue-800 text-white font-semibold px-6 py-3 rounded-lg"
 									>
-									<X className="h-4 w-4" />
+										Comparar {selectedPlans.length} planos
 									</button>
 								</div>
-								))}
 							</div>
-
-							{/* Botão comparar */}
-							<button
-								onClick={() => setShowComparison(true)}
-								className="flex-shrink-0 bg-blue-700 hover:bg-blue-800 text-white font-semibold px-6 py-3 rounded-lg"
-							>
-								Comparar {selectedPlans.length} planos
-							</button>
-							</div>
-						</div>
 						)}
-
 
 						{/* Modal de Comparação (mantido) */}
 						{showComparison && (
 							<div className="fixed inset-0 bg-black/50 z-99	 flex items-center justify-center p-4">
-								<div className="bg-white rounded-lg w-full max-w-7xl max-h-[92vh] overflow-hidden">
+								<div className="bg-white rounded-lg w-full  max-w-7xl max-h-[92vh] pb-4 overflow-y-auto">
 									<div className="p-6 border-b flex items-center justify-between">
 										<div className="flex items-center gap-3">
 											<button
@@ -1247,7 +1253,7 @@ export default function PlanosPage() {
 										</button>
 									</div>
 
-									<div className="px-6 pt-6 overflow-x-auto">
+									<div className="px-6 pt-6 overflow-x-auto ">
 										<div
 											className={`grid gap-4`}
 											style={{
@@ -1344,17 +1350,19 @@ export default function PlanosPage() {
 																	gridTemplateColumns: `220px repeat(${getSelectedPlans().length}, minmax(260px,1fr))`,
 																}}
 															>
-																<div className="px-4 py-3 font-medium text-gray-800 relative group cursor-help">
-																{titulo}
+																<div className="px-4 py-3 font-medium text-gray-800 relative group cursor-default">
+																	{titulo}
 
-																{/* Tooltip */}
-																{coberturaDescriptions[titulo] && (
-																	<div className="absolute top-1/2 left-full ml-2 -translate-y-1/2
+																	{/* Tooltip */}
+																	{coberturaDescriptions[titulo] && (
+																		<div
+																			className="absolute top-1/2 left-full ml-2 -translate-y-1/2
 																	hidden group-hover:block bg-gray-300 text-gray-800 text-xs
-																	px-3 py-1 rounded-lg  shadow-md whitespace-nowrap border z-[9999]">
-																	{coberturaDescriptions[titulo]}
-																	</div>
-																)}
+																	px-3 py-1 rounded-lg  shadow-md whitespace-nowrap border z-[9999]"
+																		>
+																			{coberturaDescriptions[titulo]}
+																		</div>
+																	)}
 																</div>
 																{getSelectedPlans().map((plan) => (
 																	<div

@@ -1,12 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
+import EmblaCarousel from "@/components/EmblaCarousel";
 import { DateRangePicker } from "@/components/Inputs/CustomCalendar";
 import EmailField from "@/components/Inputs/EmailInput";
-import EmblaCarousel from "@/components/EmblaCarousel";
 import PhoneField from "@/components/Inputs/PhoneInput";
-import { PreRegisterForm } from "@/types/types";
 import { couponsService } from "@/services/api/coupons";
+import type { PreRegisterForm } from "@/types/types";
 import {
 	ArrowRight,
 	CheckCircle,
@@ -21,9 +20,9 @@ import {
 	Star,
 	User,
 	Users,
-	
 } from "lucide-react";
-import { useRouter } from "next/navigation"
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -31,11 +30,15 @@ import { useState } from "react";
 
 import DestinationSelect from "@/components/Inputs/DestinationSelect";
 import PassengersSelect from "@/components/Inputs/PassengersSelect,";
+import {
+	HoverCard,
+	HoverCardContent,
+	HoverCardTrigger,
+} from "@/components/ui/hover-card";
 import { usePreRegisterForm } from "@/hooks/useRegisterStore";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 
 export default function HomePage() {
-	const { formData:dados, setForm } = usePreRegisterForm()
+	const { formData: dados, setForm } = usePreRegisterForm();
 	const [formData, setFormData] = useState<PreRegisterForm>({
 		name: "",
 		email: "",
@@ -45,42 +48,53 @@ export default function HomePage() {
 		destination: "BA",
 		step: 1,
 		coupon: "",
-		term:false
-	})
-	
-	const router = useRouter()
+		term: false,
+	});
+
+	const router = useRouter();
 	const [coupomChecked, setCoupomChecked] = useState(false);
-	const [errors, setErrors] = useState<Partial<Record<keyof PreRegisterForm, boolean>>>({})
+	const [errors, setErrors] = useState<
+		Partial<Record<keyof PreRegisterForm, boolean>>
+	>({});
 	const [publishableCoupons, setPublishableCoupons] = useState<any[]>([]);
 	const [featuredCoupon, setFeaturedCoupon] = useState<any>(null);
 	const [loadingCoupons, setLoadingCoupons] = useState(true);
-	
+
 	// Carregar cupons publicáveis ao montar o componente
 	useEffect(() => {
 		const loadPublishableCoupons = async () => {
 			try {
 				const coupons = await couponsService.getPublicCoupons();
 				setPublishableCoupons(coupons);
-				
+
 				// Selecionar o cupom com maior desconto como destaque
 				if (coupons && coupons.length > 0) {
 					const bestCoupon = coupons.reduce((best, current) => {
 						// Para cupons percentuais, comparamos diretamente o valor do desconto
-						if (current.discountType === 'PERCENTAGE' && best.discountType === 'PERCENTAGE') {
+						if (
+							current.discountType === "PERCENTAGE" &&
+							best.discountType === "PERCENTAGE"
+						) {
 							return current.discount > best.discount ? current : best;
 						}
 						// Para cupons de valor fixo, precisaríamos de um contexto de valor total para comparar
 						// Por simplicidade, priorizamos percentuais sobre fixos
-						if (current.discountType === 'PERCENTAGE' && best.discountType === 'FIXED') {
+						if (
+							current.discountType === "PERCENTAGE" &&
+							best.discountType === "FIXED"
+						) {
 							return current;
 						}
 						// Se ambos são fixos, escolhemos o maior valor
-						if (current.discountType === 'FIXED' && best.discountType === 'FIXED') {
+						if (
+							current.discountType === "FIXED" &&
+							best.discountType === "FIXED"
+						) {
 							return current.discount > best.discount ? current : best;
 						}
 						return best;
 					}, coupons[0]);
-					
+
 					setFeaturedCoupon(bestCoupon);
 				}
 			} catch (error) {
@@ -89,31 +103,38 @@ export default function HomePage() {
 				setLoadingCoupons(false);
 			}
 		};
-		
+
 		loadPublishableCoupons();
 	}, []);
 	function handleSubmit(event: React.FormEvent) {
 		event.preventDefault();
 
-		const requiredFields: (keyof PreRegisterForm)[] = ["name", "email", "phone", "range", "destination", "term"]
-    	const newErrors: Partial<Record<keyof PreRegisterForm, boolean>> = {}
+		const requiredFields: (keyof PreRegisterForm)[] = [
+			"name",
+			"email",
+			"phone",
+			"range",
+			"destination",
+			"term",
+		];
+		const newErrors: Partial<Record<keyof PreRegisterForm, boolean>> = {};
 
 		requiredFields.forEach((field) => {
-		if (!formData[field] || (field === "range" && !formData.range?.from)) {
-			newErrors[field] = true
-		}
-		})
+			if (!formData[field] || (field === "range" && !formData.range?.from)) {
+				newErrors[field] = true;
+			}
+		});
 
 		if (Object.keys(newErrors).length > 0) {
-		setErrors(newErrors)
-		return
+			setErrors(newErrors);
+			return;
 		}
 
-		const finalForm = { ...formData, coupon: coupomChecked ? "SEGURO25" : "" }
-		
-		setForm(finalForm)
-		router.push("/planos")
-		console.log("Form submitted:", finalForm)
+		const finalForm = { ...formData, coupon: coupomChecked ? "SEGURO25" : "" };
+
+		setForm(finalForm);
+		router.push("/planos");
+		console.log("Form submitted:", finalForm);
 	}
 	return (
 		<div className="bg-white">
@@ -132,8 +153,8 @@ export default function HomePage() {
 								<span className="text-yellow-400"> Segurança Total</span>
 							</h1>
 							<p className="text-xl lg:text-2xl text-blue-50">
-								Compare preços, encontre o melhor seguro de viagem e contrate
-								em minutos. Proteção completa para suas aventuras pelo mundo.
+								Compare preços, encontre o melhor seguro de viagem e contrate em
+								minutos. Proteção completa para suas aventuras pelo mundo.
 							</p>
 						</div>
 
@@ -147,7 +168,7 @@ export default function HomePage() {
 								<span>Suporte 24h</span>
 							</div>
 						</div>
-						
+
 						<div className="w-full sm:max-w-md">
 							{loadingCoupons ? (
 								<div className="rounded-lg border-2 flex flex-row p-4 gap-4 animate-pulse">
@@ -163,11 +184,13 @@ export default function HomePage() {
 											className="w-5 h-5 rounded-2xl mt-1"
 											checked={coupomChecked}
 											onChange={() => {
-												setCoupomChecked(!coupomChecked)
-												setFormData((prev) => ({ ...prev, coupon: "" }))
+												setCoupomChecked(!coupomChecked);
+												setFormData((prev) => ({ ...prev, coupon: "" }));
 											}}
 										/>
-										<span className="text-lg font-bold">Cupom aplicado com sucesso!</span>
+										<span className="text-lg font-bold">
+											Cupom aplicado com sucesso!
+										</span>
 									</div>
 								) : (
 									<div className="rounded-lg border-2 relative flex flex-row p-4 mt-1 gap-2">
@@ -177,16 +200,22 @@ export default function HomePage() {
 											className="size-4 rounded-2xl mt-1"
 											checked={coupomChecked}
 											onChange={() => {
-												setCoupomChecked(!coupomChecked)
-												setFormData((prev) => ({ ...prev, coupon: featuredCoupon.code }))
+												setCoupomChecked(!coupomChecked);
+												setFormData((prev) => ({
+													...prev,
+													coupon: featuredCoupon.code,
+												}));
 											}}
 										/>
 										<span className="text-sm">Aplicar cupom</span>
-										<span className="text-yellow-300 mt-0.5 font-bold text-sm"> "{featuredCoupon.code}"</span>
+										<span className="text-yellow-300 mt-0.5 font-bold text-sm">
+											{" "}
+											"{featuredCoupon.code}"
+										</span>
 										<span className="text-sm">para ganhar</span>
-										<span className="text-yellow-300 mt-0.5 font-bold text-sm"> 
-											{featuredCoupon.discountType === 'PERCENTAGE' 
-												? `${featuredCoupon.discount}% OFF` 
+										<span className="text-yellow-300 mt-0.5 font-bold text-sm">
+											{featuredCoupon.discountType === "PERCENTAGE"
+												? `${featuredCoupon.discount}% OFF`
 												: `R$ ${featuredCoupon.discount.toFixed(2)} OFF`}
 										</span>
 									</div>
@@ -194,7 +223,7 @@ export default function HomePage() {
 							) : null}
 						</div>
 					</div>
-					
+
 					{/* Lado direito - Formulário */}
 					<div className="w-full md:w-6/12">
 						<form onSubmit={handleSubmit}>
@@ -210,43 +239,57 @@ export default function HomePage() {
 												setFormData((prev) => ({ ...prev, destination: value }))
 											}
 										/>
-										  {errors.destination && <p className="text-red-500 text-sm">Selecione um destino</p>}
+										{errors.destination && (
+											<p className="text-red-500 text-sm">
+												Selecione um destino
+											</p>
+										)}
 										<div className="col-span-1 md:col-span-2 lg:col-span-2">
 											<DateRangePicker
-												onChange={(value)=>{
-													setFormData((prev) => ({ ...prev, range: value }))
+												onChange={(value) => {
+													setFormData((prev) => ({ ...prev, range: value }));
 												}}
 												minDate={new Date()}
 												months={2}
 												range={formData.range}
-							
 											/>
-											 {errors.range && <p className="text-red-500 text-sm">Informe as datas da viagem</p>}
+											{errors.range && (
+												<p className="text-red-500 text-sm">
+													Informe as datas da viagem
+												</p>
+											)}
 										</div>
-										 <div
+										<div
 											className={`flex items-center h-[52px] w-full px-3 rounded-lg bg-white/20 border ${
-											errors.name ? "border-red-500" : "border-white/30"
+												errors.name ? "border-red-500" : "border-white/30"
 											} text-white focus-within:ring-2 focus-within:ring-yellow-400`}
 										>
 											<User className="h-5 w-5 mr-2 opacity-80" />
 											<input
 												type="text"
 												placeholder="Nome completo"
-									 			className="w-full bg-transparent border-0 placeholder-white/70 text-white focus:ring-0 focus:outline-none"
+												className="w-full bg-transparent border-0 placeholder-white/70 text-white focus:ring-0 focus:outline-none"
 												value={formData.name}
 												onChange={(e) =>
-													setFormData((prev) => ({ ...prev, name: e.target.value }))
+													setFormData((prev) => ({
+														...prev,
+														name: e.target.value,
+													}))
 												}
 											/>
 										</div>
 										<div>
 											<EmailField
-													email={formData.email}
-													setEmail={(value) =>
-														setFormData((prev) => ({ ...prev, email: value }))
-													}
+												email={formData.email}
+												setEmail={(value) =>
+													setFormData((prev) => ({ ...prev, email: value }))
+												}
 											/>
-											 {errors.email && <p className="text-red-500 text-sm">Informe um email válido</p>}
+											{errors.email && (
+												<p className="text-red-500 text-sm">
+													Informe um email válido
+												</p>
+											)}
 										</div>
 										<div>
 											<PhoneField
@@ -255,10 +298,14 @@ export default function HomePage() {
 													setFormData((prev) => ({ ...prev, phone: value }))
 												}
 											/>
-											 {errors.phone && <p className="text-red-500 text-sm">Informe um telefone válido</p>}
+											{errors.phone && (
+												<p className="text-red-500 text-sm">
+													Informe um telefone válido
+												</p>
+											)}
 										</div>
 									</div>
-							
+
 									<div className="flex flex-row justify-between items-center gap-4 mt-4">
 										<PassengersSelect
 											data={formData.passengers}
@@ -266,56 +313,55 @@ export default function HomePage() {
 												setFormData((prev) => ({ ...prev, passengers: value }))
 											}
 										/>
-							
-							
-							
+
 										{/* Botão */}
 										<div className="w-full">
-												<button type="submit" className="w-full bg-yellow-400 h-[52px] text-blue-900 py-1 rounded-lg font-bold hover:bg-yellow-300 transition-colors">
-													Encontrar Seguro viagem
-												</button>
+											<button
+												type="submit"
+												className="w-full bg-yellow-400 h-[52px] text-blue-900 py-1 rounded-lg font-bold hover:bg-yellow-300 transition-colors"
+											>
+												Encontrar Seguro viagem
+											</button>
 										</div>
 									</div>
-										<div className=" relative flex flex-row px-1 gap-4 mt-4">
-										
-											<input
-												type="checkbox"
-												id="cupom"
-												className="w-5 h-5 rounded-2xl mt-1"
-												checked={formData.term}
-												onChange={() => {
-													setFormData((prev) => ({ ...prev, term: !prev.term }))
-												}}
-											/>
-										
-											
-																		<HoverCard>
-										<HoverCardTrigger>
-											<span
-											className={`text-lg hover:cursor-pointer transition-colors ${
-												errors.term  ? "text-red-500 font-semibold" : "text-white"
-											}`}
-											>
-											Confirmo que o passageiro ainda não iniciou a viagem.
-											</span>
-										</HoverCardTrigger>
-										<HoverCardContent className="flex flex-row gap-2">
-											<div className="flex flex-col gap-1">
-											Este campo é obrigatório para confirmar que a viagem ainda não foi iniciada.
-											<b>Atenção: não é permitido renovar caso o passageiro já esteja em viagem.</b>
-											</div>
-										</HoverCardContent>
+									<div className=" relative flex flex-row px-1 gap-4 mt-4">
+										<input
+											type="checkbox"
+											id="cupom"
+											className="w-5 h-5 rounded-2xl mt-1"
+											checked={formData.term}
+											onChange={() => {
+												setFormData((prev) => ({ ...prev, term: !prev.term }));
+											}}
+										/>
+
+										<HoverCard>
+											<HoverCardTrigger>
+												<span
+													className={`text-lg hover:cursor-pointer transition-colors ${
+														errors.term
+															? "text-red-500 font-semibold"
+															: "text-white"
+													}`}
+												>
+													Confirmo que o passageiro ainda não iniciou a viagem.
+												</span>
+											</HoverCardTrigger>
+											<HoverCardContent className="flex flex-row gap-2">
+												<div className="flex flex-col gap-1">
+													Este campo é obrigatório para confirmar que a viagem
+													ainda não foi iniciada.
+													<b>
+														Atenção: não é permitido renovar caso o passageiro
+														já esteja em viagem.
+													</b>
+												</div>
+											</HoverCardContent>
 										</HoverCard>
-										</div>
+									</div>
 								</div>
-							
 							</div>
-								
 						</form>
-
-					
-
-						
 					</div>
 				</div>
 			</section>

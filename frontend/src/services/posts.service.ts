@@ -1,19 +1,48 @@
 import { api } from '@/lib/api';
 
-export interface PostCategory {
+export interface Category {
   id: string;
   name: string;
+  slug: string;
+  description: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PostCategory {
+  postId: string;
+  categoryId: string;
+  createdAt: string;
+  category: Category;
+}
+
+export interface Tag {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface PostTag {
-  id: string;
-  name: string;
+  postId: string;
+  tagId: string;
+  createdAt: string;
+  tag: Tag;
 }
 
 export interface PostMedia {
   id: string;
+  postId: string;
   url: string;
+  type: string;
+  title: string;
+  alt: string;
+  order: number;
   isMain: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface PostMetadata {
@@ -22,20 +51,36 @@ export interface PostMetadata {
   keywords: string;
 }
 
+export interface PostUser {
+  id: string;
+  name: string;
+  email: string;
+}
+
 export interface Post {
   id: string;
   title: string;
   slug: string;
-  content: string;
+  description: string;
   resume: string;
+  content: string;
+  userId: string;
+  metadata: PostMetadata;
   status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
   createdAt: string;
   updatedAt: string;
+  updatedBy: string | null;
   publishedAt?: string;
   categories: PostCategory[];
   tags: PostTag[];
   media: PostMedia[];
-  metadata: PostMetadata;
+  user: PostUser;
+}
+
+export interface PostsResponse {
+  posts: Post[];
+  total: number;
+  nextPage: number | null;
 }
 
 export interface CreatePostDTO {
@@ -71,7 +116,7 @@ export const postsService = {
   /**
    * Busca todos os posts com filtros opcionais
    */
-  async getPosts(filters: PostsFilter = {}) {
+  async getPosts(filters: PostsFilter = {}): Promise<PostsResponse> {
     const { data } = await api.get('/posts', { params: filters });
     return data;
   },
@@ -96,8 +141,29 @@ export const postsService = {
    * Cria um novo post
    */
   async createPost(post: CreatePostDTO) {
-    const { data } = await api.post('/posts', post);
-    return data;
+    try {
+      const { data } = await api.post('/posts', post);
+      return data;
+    } catch (error: any) {
+      // Extrai a mensagem de erro da resposta da API
+      const errorMessage = error.response?.data?.message || 
+                          'Erro ao criar post. Verifique os dados e tente novamente.';
+      
+      // Adiciona informações de debug ao console
+      console.error('Erro ao criar post:', {
+        status: error.response?.status,
+        message: errorMessage,
+        details: error.response?.data
+      });
+      
+      // Rejeita a promise com o erro tratado
+      throw {
+        message: errorMessage,
+        status: error.response?.status || 500,
+        response: error.response,
+        originalError: error
+      };
+    }
   },
 
   /**
@@ -160,16 +226,18 @@ export const postsService = {
    * Busca todas as categorias de posts
    */
   async getCategories() {
-    const { data } = await api.get('/categories');
-    return data;
+    const { data } = await api.get('/categories/all');
+    // Garantir que retorne um array de categorias
+    return data.categories || [];
   },
 
   /**
    * Busca todas as tags de posts
    */
   async getTags() {
-    const { data } = await api.get('/tags');
-    return data;
+    const { data } = await api.get('/tags/all');
+    // Garantir que retorne um array de tags
+    return data.tags || [];
   }
 };
 

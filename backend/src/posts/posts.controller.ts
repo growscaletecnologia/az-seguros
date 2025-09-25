@@ -49,6 +49,13 @@ export class PostsController {
   @Post()
   @HttpCode(201)
   create(@Body() createPostDto: CreatePostDto, @LoggedUser() user: User) {
+    // Log para debug do objeto user recebido do decorator @LoggedUser()
+    console.log('DEBUG - User recebido no controller:', {
+      id: user?.id,
+      email: user?.email,
+      name: user?.name,
+      userExists: !!user,
+    })
     return this.postsService.create(createPostDto, user)
   }
 

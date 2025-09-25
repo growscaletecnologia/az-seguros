@@ -1,10 +1,10 @@
 "use client";
 
-import React from "react";
-import { EmblaOptionsType } from "embla-carousel";
-import useEmblaCarousel from "embla-carousel-react";
+import type { EmblaOptionsType } from "embla-carousel";
 import Autoplay from "embla-carousel-autoplay";
+import useEmblaCarousel from "embla-carousel-react";
 import Image from "next/image";
+import type React from "react";
 
 type PropType = {
 	options?: EmblaOptionsType;

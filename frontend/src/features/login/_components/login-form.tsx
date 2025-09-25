@@ -77,7 +77,10 @@ export function LoginForm({
 			<div>
 				<h2 className="text-2xl mb-4 font-medium">Entrar na sua conta</h2>
 			</div>
-			<form onSubmit={handleSubmit(onSubmit)} className="flex flex-col w-full gap-6">
+			<form
+				onSubmit={handleSubmit(onSubmit)}
+				className="flex flex-col w-full gap-6"
+			>
 				<div className="flex flex-col gap-4 w-full">
 					<div>
 						<Input
@@ -87,7 +90,9 @@ export function LoginForm({
 							{...register("email")}
 						/>
 						{errors.email && (
-							<p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+							<p className="text-red-500 text-sm mt-1">
+								{errors.email.message}
+							</p>
 						)}
 					</div>
 					<div>
@@ -98,7 +103,9 @@ export function LoginForm({
 							{...register("password")}
 						/>
 						{errors.password && (
-							<p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+							<p className="text-red-500 text-sm mt-1">
+								{errors.password.message}
+							</p>
 						)}
 					</div>
 				</div>
@@ -111,9 +118,9 @@ export function LoginForm({
 					>
 						{isLoading ? "Entrando..." : "Entrar"}
 					</Button>
-					<Button 
-						variant="secondary" 
-						className="w-full" 
+					<Button
+						variant="secondary"
+						className="w-full"
 						type="button"
 						onClick={goToBackStep}
 					>
