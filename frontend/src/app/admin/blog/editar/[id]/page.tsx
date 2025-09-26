@@ -1,6 +1,7 @@
 "use client";
 
 import { TinyMCEEditor } from "@/components/Inputs/TinyMCEEditor";
+import RichTextEditor from "@/components/Inputs/RichTextEditor";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -17,6 +18,7 @@ import {
 } from "@/services/posts.service";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import JoditEditorComponent from "@/components/Inputs/JoditEditor";
 
 /**
  * Página de edição de posts existentes
@@ -222,12 +224,16 @@ export default function EditarBlogPostPage({
 						<CardTitle>Conteúdo</CardTitle>
 					</CardHeader>
 					<CardContent>
-						<TinyMCEEditor
+						{/* <TinyMCEEditor
 							value={post.content}
 							onChange={(value) => handleChange("content", value)}
 							height={500}
 							label="Conteúdo do Post"
-						/>
+						/> */}
+							<JoditEditorComponent
+								onChange={(value) => handleChange("content", value)}
+								value={post.content || ""}
+							></JoditEditorComponent>
 					</CardContent>
 				</Card>
 

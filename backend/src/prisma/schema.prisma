@@ -404,6 +404,43 @@ model PostMedia {
 
 
 /**
+ * SYSTEM PAGES Model
+ * =========================================================
+ * - SystemPage: Representa páginas administrativas do sistema como FAQ, Termos de Uso, Políticas e Ajuda
+ */
+
+enum SystemPageType {
+  FAQ
+  TERMS
+  POLICIES
+  HELP
+  OTHER
+}
+
+enum SystemPageStatus {
+  DRAFT     // Rascunho
+  PUBLISHED // Publicado
+  ARCHIVED  // Arquivado
+}
+
+model SystemPage {
+  id          String           @id @default(cuid())
+  title       String
+  slug        String           @unique
+  content     String           @db.Text // Conteúdo completo em HTML
+  type        SystemPageType   // Tipo da página (FAQ, TERMS, POLICIES, HELP, OTHER)
+  status      SystemPageStatus @default(DRAFT)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  updatedBy   String?          // Usuário que atualizou a página
+  publishedAt DateTime?        // Data de publicação
+
+  @@index([slug])
+  @@index([type])
+  @@index([status])
+}
+
+/**
  * VOUCHER Models
  * =========================================================
  * - VoucherStatus: Status of the voucher (e.g., ACTIVE, INACTIVE, REDEEMED, EXPIRED)

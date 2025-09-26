@@ -79,38 +79,38 @@ export default function BlogPage() {
   };
 
   return (
-    <div className="container mx-auto py-12">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold mb-4">Blog</h1>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+    <div className="container mx-auto py-6 sm:py-8 md:py-12 px-4 sm:px-6">
+      <div className="text-center mb-6 sm:mb-8 md:mb-12">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 sm:mb-4">Blog</h1>
+        <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
           Confira as últimas notícias, dicas e informações sobre seguros de viagem
         </p>
       </div>
 
-      <div className="flex justify-center mb-8">
+      <div className="flex justify-center mb-6 sm:mb-8">
         <div className="w-full max-w-md flex gap-2">
           <Input
             placeholder="Pesquisar no blog..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="flex-1"
+            className="flex-1 h-10"
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
           />
-          <Button onClick={handleSearch}>Buscar</Button>
+          <Button onClick={handleSearch} className="h-10">Buscar</Button>
         </div>
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-12">
-          <p className="text-lg">Carregando posts...</p>
+        <div className="flex justify-center py-6 sm:py-8 md:py-12">
+          <p className="text-base sm:text-lg">Carregando posts...</p>
         </div>
       ) : posts.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-lg">Nenhum post encontrado.</p>
+        <div className="text-center py-6 sm:py-8 md:py-12">
+          <p className="text-base sm:text-lg">Nenhum post encontrado.</p>
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {posts.map((post) => {
               const mainImageUrl = getMainImageUrl(post);
               const categories = post.categories.map(pc => pc.category);
@@ -125,20 +125,20 @@ export default function BlogPage() {
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    <CardHeader>
-                      <div className="flex flex-wrap gap-2 mb-2">
-                        {categories.slice(0, 3).map((category) => (
-                          <Badge key={category.id} variant="outline">
+                    <CardHeader className="p-3 sm:p-4 md:p-6">
+                      <div className="flex flex-wrap gap-1 sm:gap-2 mb-1 sm:mb-2">
+                        {categories.slice(0, 2).map((category) => (
+                          <Badge key={category.id} variant="outline" className="text-xs sm:text-sm">
                             {category.name}
                           </Badge>
                         ))}
                       </div>
-                      <CardTitle className="line-clamp-2">{post.title}</CardTitle>
-                      <CardDescription className="line-clamp-3">
+                      <CardTitle className="line-clamp-2 text-base sm:text-lg md:text-xl">{post.title}</CardTitle>
+                      <CardDescription className="line-clamp-2 sm:line-clamp-3 text-xs sm:text-sm">
                         {post.resume || post.description}
                       </CardDescription>
                     </CardHeader>
-                    <CardFooter className="mt-auto pt-4 text-sm text-muted-foreground">
+                    <CardFooter className="mt-auto pt-2 sm:pt-4 p-3 sm:p-4 md:p-6 text-xs sm:text-sm text-muted-foreground">
                       {formatDate(post.publishedAt || post.createdAt)}
                     </CardFooter>
                   </Card>

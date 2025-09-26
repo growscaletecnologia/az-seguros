@@ -9,10 +9,12 @@ import {
 	TrendingUp,
 	Users,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 const AdminDashboard = () => {
 	// Dados mock para o dashboard
+	const router = useRouter();
 	const stats = [
 		{
 			title: "Total de Usuários",
@@ -177,21 +179,21 @@ const AdminDashboard = () => {
 					</div>
 					<div className="p-6">
 						<div className="grid grid-cols-2 gap-4">
-							<button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+							<button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50  cursor-pointer transition-colors">
 								<Users className="h-8 w-8 text-blue-600 mx-auto mb-2" />
 								<p className="text-sm font-medium text-gray-900">
 									Novo Usuário
 								</p>
 							</button>
-							<button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+							<button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50  cursor-pointer transition-colors">
 								<FileText className="h-8 w-8 text-green-600 mx-auto mb-2" />
 								<p className="text-sm font-medium text-gray-900">Novo Post</p>
 							</button>
-							<button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+							<button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer  transition-colors">
 								<ShoppingCart className="h-8 w-8 text-purple-600 mx-auto mb-2" />
 								<p className="text-sm font-medium text-gray-900">Ver Pedidos</p>
 							</button>
-							<button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+							<button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
 								<TrendingUp className="h-8 w-8 text-orange-600 mx-auto mb-2" />
 								<p className="text-sm font-medium text-gray-900">Relatórios</p>
 							</button>
@@ -200,26 +202,7 @@ const AdminDashboard = () => {
 				</div>
 			</div>
 
-			{/* Additional Info */}
-			<div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-				<h3 className="text-lg font-semibold text-gray-900 mb-4">
-					Resumo do Sistema
-				</h3>
-				<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-					<div className="text-center">
-						<div className="text-2xl font-bold text-blue-600">12</div>
-						<div className="text-sm text-gray-600">Módulos Ativos</div>
-					</div>
-					<div className="text-center">
-						<div className="text-2xl font-bold text-green-600">98.5%</div>
-						<div className="text-sm text-gray-600">Uptime</div>
-					</div>
-					<div className="text-center">
-						<div className="text-2xl font-bold text-purple-600">5.2GB</div>
-						<div className="text-sm text-gray-600">Armazenamento Usado</div>
-					</div>
-				</div>
-			</div>
+
 		</div>
 	);
 };

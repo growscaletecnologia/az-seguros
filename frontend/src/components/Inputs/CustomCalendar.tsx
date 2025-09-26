@@ -104,7 +104,7 @@ export function DateRangePicker({
 						mode="range"
 						selected={range}
 						onSelect={handleSelect}
-						numberOfMonths={months}
+						numberOfMonths={2}
 						defaultMonth={range?.from}
 						disabled={(date) => isBefore(date, minDate)}
 						classNames={{

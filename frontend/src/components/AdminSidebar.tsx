@@ -1,5 +1,6 @@
 "use client";
 import {
+	Activity,
 	BookImage,
 	BookKey,
 	ChevronDown,
@@ -60,12 +61,12 @@ const AdminSidebar = () => {
 			href: "/admin/cupons",
 			icon: <Tag className="h-5 w-5" />,
 		},
-		{
-			id: "pedidos",
-			label: "Área de Pedidos",
-			href: "/admin/pedidos",
-			icon: <ShoppingCart className="h-5 w-5" />,
-		},
+		// {
+		// 	id: "pedidos",
+		// 	label: "Área de Pedidos",
+		// 	href: "/admin/pedidos",
+		// 	icon: <ShoppingCart className="h-5 w-5" />,
+		// },
 		{
 			id: "blog",
 			label: "Publicações (Blog)",
@@ -84,11 +85,18 @@ const AdminSidebar = () => {
 			href: "/admin/conteudos",
 			icon: <BookKey className="h-5 w-5" />,
 		},
+		// {
+		// 	id: "integrations",
+		// 	label: "Integrações",
+		// 	href: "/admin/integrations",
+		// 	icon: <Globe className="h-5 w-5" />,
+		// },
+
 		{
-			id: "integrations",
-			label: "Integrações",
-			href: "/admin/integrations",
-			icon: <Globe className="h-5 w-5" />,
+			id: "activities",
+			label: "Atividades do Sistema",
+			href: "/admin/activities",
+			icon: <Activity className="h-5 w-5" />,
 		},
 	];
 

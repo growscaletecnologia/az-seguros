@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common'
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common'
 import { CouponsService } from './coupons.service'
 import { CreateCouponDto } from './dto/create-coupon.dto'
 import { UpdateCouponDto } from './dto/update-coupon.dto'
@@ -36,11 +36,11 @@ export class CouponsController {
   }
 
   @Get('public')
-  @ApiOperation({ summary: 'Listar cupons publicáveis na tela inicial' })
-  @ApiResponse({ status: 200, description: 'Lista de cupons públicos retornada com sucesso' })
+  @ApiOperation({ summary: 'Listar cupons publicáveis e ativos na tela inicial' })
+  @ApiResponse({ status: 200, description: 'Lista de cupons públicos ativos retornada com sucesso' })
   async findPublicCoupons() {
     const allCoupons = await this.couponsService.findAll()
-    return allCoupons.filter((coupon) => coupon.front_publishable)
+    return allCoupons.filter((coupon) => coupon.front_publishable && coupon.status === 'ACTIVE')
   }
 
   @Get(':id')
@@ -63,11 +63,11 @@ export class CouponsController {
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
-  @ApiOperation({ summary: 'Remover um cupom (soft delete)' })
+  @ApiOperation({ summary: 'Remover um cupom (exclusão permanente ou soft delete)' })
   @ApiResponse({ status: 200, description: 'Cupom removido com sucesso' })
   @ApiResponse({ status: 404, description: 'Cupom não encontrado' })
-  remove(@Param('id') id: string) {
-    return this.couponsService.remove(id)
+  remove(@Param('id') id: string, @Query('obliterate') obliterate?: string) {
+    return this.couponsService.remove(id, obliterate === 'true');
   }
 
   @Post(':id/use')

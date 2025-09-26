@@ -14,7 +14,7 @@ export interface Coupon {
 	usageLimit: number;
 	front_publishable: boolean;
 	description?: string;
-	status: "ACTIVE" | "INACTIVE" | "EXPIRED";
+	status:  "ACTIVE" |   "INACTIVE" |    "REDEEMED" |    "EXPIRED";
 	deleted: boolean;
 	deletedAt?: string;
 	createdAt: string;
@@ -46,6 +46,7 @@ export interface CreateCouponDto {
 	front_publishable: boolean;
 	description?: string;
 	userId?: string;
+	status?: "ACTIVE" | "INACTIVE" | "REDEEMED" | "EXPIRED";
 }
 
 /**
@@ -59,5 +60,5 @@ export interface UpdateCouponDto {
 	usageLimit?: number;
 	front_publishable?: boolean;
 	description?: string;
-	status?: "ACTIVE" | "INACTIVE";
+	status?: "ACTIVE" | "INACTIVE" | "REDEEMED" | "EXPIRED";
 }
