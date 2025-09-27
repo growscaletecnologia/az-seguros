@@ -10,7 +10,7 @@ import { UsersService } from '../users/users.service'
 import { RedisService } from '../redis/redis.service'
 import { v4 as uuidv4 } from 'uuid'
 import { EmailService } from 'src/email/email.service'
-import { User } from 'generated/prisma'
+import { User } from 'src/generated/prisma'
 
 @Injectable()
 export class AuthService {
