@@ -175,15 +175,16 @@ export class SystemPagesService {
     }
 
     // Se estamos publicando uma página e ela não estava publicada antes
-    if (updateSystemPageDto.status === SystemPageStatus.PUBLISHED && 
-        systemPage.status !== SystemPageStatus.PUBLISHED) {
-      
+    if (
+      updateSystemPageDto.status === SystemPageStatus.PUBLISHED &&
+      systemPage.status !== SystemPageStatus.PUBLISHED
+    ) {
       // Verificar se já existe uma página publicada do mesmo tipo
       const publishedPage = await prisma.systemPage.findFirst({
         where: {
           type: updateSystemPageDto.type || systemPage.type,
           status: SystemPageStatus.PUBLISHED,
-          id: { not: id } // Excluir a página atual
+          id: { not: id }, // Excluir a página atual
         },
       })
 

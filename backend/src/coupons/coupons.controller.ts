@@ -37,7 +37,10 @@ export class CouponsController {
 
   @Get('public')
   @ApiOperation({ summary: 'Listar cupons publicáveis e ativos na tela inicial' })
-  @ApiResponse({ status: 200, description: 'Lista de cupons públicos ativos retornada com sucesso' })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de cupons públicos ativos retornada com sucesso',
+  })
   async findPublicCoupons() {
     const allCoupons = await this.couponsService.findAll()
     return allCoupons.filter((coupon) => coupon.front_publishable && coupon.status === 'ACTIVE')
@@ -67,7 +70,7 @@ export class CouponsController {
   @ApiResponse({ status: 200, description: 'Cupom removido com sucesso' })
   @ApiResponse({ status: 404, description: 'Cupom não encontrado' })
   remove(@Param('id') id: string, @Query('obliterate') obliterate?: string) {
-    return this.couponsService.remove(id, obliterate === 'true');
+    return this.couponsService.remove(id, obliterate === 'true')
   }
 
   @Post(':id/use')

@@ -13,7 +13,9 @@ import { TagsModule } from './tags/tags.module'
 import { LogsModule } from './logs/logs.module'
 import { SystemPagesModule } from './system-pages/system-pages.module'
 
-import { LoggerMiddleware } from './logs/logger.middleware'
+import { LoggerMiddleware } from './middleware/logger'
+import { SettingsModule } from './modules/settings/settings.module'
+import { AvaliationsModule } from './avaliations/avaliations.module'
 
 @Module({
   imports: [
@@ -28,6 +30,8 @@ import { LoggerMiddleware } from './logs/logger.middleware'
     TagsModule,
     LogsModule,
     SystemPagesModule,
+    SettingsModule,
+    AvaliationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
