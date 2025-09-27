@@ -454,12 +454,12 @@ const UsuariosPage = () => {
 											>
 												{usuario.ativo ? "Desativar" : "Ativar"}
 											</button>
-											<button
+											{/* <button
 												onClick={() => excluirUsuario(usuario.id)}
 												className="bg-red-500 text-white px-3 py-1 text-xs rounded hover:bg-red-600"
 											>
 												Excluir
-											</button>
+											</button> */}
 										</div>
 									</td>
 								</tr>
