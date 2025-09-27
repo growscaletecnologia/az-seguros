@@ -1,7 +1,7 @@
 "use client";
 
 import { TinyMCEEditor } from "@/components/Inputs/TinyMCEEditor";
-import RichTextEditor from "@/components/Inputs/RichTextEditor";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -19,10 +19,12 @@ import {
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import JoditEditorComponent from "@/components/Inputs/JoditEditor";
+import { toast } from "sonner";
 
 /**
  * Página de edição de posts existentes
  */
+// Temporariamente modificado para evitar erro de build com React.use(params)
 export default function EditarBlogPostPage({
 	params,
 }: { params: { id: string } }) {
@@ -35,9 +37,8 @@ export default function EditarBlogPostPage({
 	const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 	const [selectedTags, setSelectedTags] = useState<string[]>([]);
 	
-	// Desembrulha o objeto params usando React.use()
-	const resolvedParams = React.use(params);
-	const postId = resolvedParams.id;
+	// Acessa o ID diretamente dos parâmetros sem usar React.use
+	const postId = params.id;
 
 	// Carrega o post e dados relacionados
 	useEffect(() => {

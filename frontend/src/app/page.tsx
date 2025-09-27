@@ -36,6 +36,36 @@ import {
 	HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { usePreRegisterForm } from "@/hooks/useRegisterStore";
+import { AvaliacoesCarousel } from "@/components/avaliations/AvaliacoesCarousel";
+
+/**
+ * Função para realizar rolagem suave até uma posição específica na página
+ * @param position Posição Y para onde rolar (em pixels)
+ * @param duration Duração da animação em milissegundos
+ */
+function smoothScrollTo(position: number, duration: number) {
+  const startPosition = window.scrollY;
+  const distance = position - startPosition;
+  let startTime: number | null = null;
+
+  function animation(currentTime: number) {
+    if (startTime === null) startTime = currentTime;
+    const timeElapsed = currentTime - startTime;
+    const run = easeInOutQuad(timeElapsed, startPosition, distance, duration);
+    window.scrollTo(0, run);
+    if (timeElapsed < duration) requestAnimationFrame(animation);
+  }
+
+  // Função de easing para suavizar o movimento
+  function easeInOutQuad(t: number, b: number, c: number, d: number) {
+    t /= d / 2;
+    if (t < 1) return c / 2 * t * t + b;
+    t--;
+    return -c / 2 * (t * (t - 2) - 1) + b;
+  }
+
+  requestAnimationFrame(animation);
+}
 
 export default function HomePage() {
 	const { formData: dados, setForm } = usePreRegisterForm();
@@ -367,11 +397,11 @@ export default function HomePage() {
 			{/* Seção Seguros Temáticos */}
 			<section className="py-10 sm:py-16 bg-gray-50">
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-					<div className="text-center mb-8 sm:mb-12">
+					{/* <div className="text-center mb-8 sm:mb-12">
 						<h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2 sm:mb-4">
 							Confira seguros de viagem para suas necessidades
 						</h2>
-					</div>
+					</div> */}
 
 					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
 						{/* Card 1 */}
@@ -632,81 +662,9 @@ export default function HomePage() {
 						</h2>
 					</div>
 
-					<div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-						<div className="bg-white rounded-lg p-6 shadow-lg">
-							<div className="flex items-center mb-4">
-								{[...Array(5)].map((_, i) => (
-									<Star
-										key={i}
-										className="h-5 w-5 text-yellow-400 fill-current"
-									/>
-								))}
-							</div>
-							<p className="text-gray-600 mb-4">
-								&quot;Excelente atendimento! Tive um problema médico na Europa e
-								fui atendido rapidamente. Recomendo para todos os
-								viajantes.&quot;
-							</p>
-							<div className="flex items-center">
-								<div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-									<span className="text-blue-600 font-bold">MR</span>
-								</div>
-								<div>
-									<p className="font-semibold text-gray-900">Maria Rosa</p>
-									<p className="text-sm text-gray-600">Viagem para Paris</p>
-								</div>
-							</div>
-						</div>
-
-						<div className="bg-white rounded-lg p-6 shadow-lg">
-							<div className="flex items-center mb-4">
-								{[...Array(5)].map((_, i) => (
-									<Star
-										key={i}
-										className="h-5 w-5 text-yellow-400 fill-current"
-									/>
-								))}
-							</div>
-							<p className="text-gray-600 mb-4">
-								&quot;Processo super fácil e rápido. Comparei vários planos e
-								encontrei o melhor preço. Viajei tranquilo sabendo que estava
-								protegido.&quot;
-							</p>
-							<div className="flex items-center">
-								<div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
-									<span className="text-green-600 font-bold">JS</span>
-								</div>
-								<div>
-									<p className="font-semibold text-gray-900">João Silva</p>
-									<p className="text-sm text-gray-600">Viagem para Japão</p>
-								</div>
-							</div>
-						</div>
-
-						<div className="bg-white rounded-lg p-6 shadow-lg">
-							<div className="flex items-center mb-4">
-								{[...Array(5)].map((_, i) => (
-									<Star
-										key={i}
-										className="h-5 w-5 text-yellow-400 fill-current"
-									/>
-								))}
-							</div>
-							<p className="text-gray-600 mb-4">
-								&quot;Suporte 24h realmente funciona! Precisei de ajuda durante
-								a madrugada e fui atendida imediatamente. Empresa
-								confiável!&quot;
-							</p>
-							<div className="flex items-center">
-								<div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-									<span className="text-blue-600 font-bold">AC</span>
-								</div>
-								<div>
-									<p className="font-semibold text-gray-900">Ana Costa</p>
-									<p className="text-sm text-gray-600">Viagem para EUA</p>
-								</div>
-							</div>
-						</div>
+					{/* Carrossel de avaliações */}
+					<div className="mb-8">
+						<AvaliacoesCarousel limit={9} showOnlyActive={true} autoplay={true} delayMs={5000} />
 					</div>
 				</div>
 			</section>

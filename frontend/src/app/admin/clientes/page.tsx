@@ -114,7 +114,6 @@ const ClientesPage = () => {
 	const toggleCliente = async (id: string) => {
 		const cliente = clientes.find((c) => c.id === id);
 		if (!cliente) return;
-
 		try {
 			const updateUserDto: UpdateUserDto = {
 				name: cliente.nome,
@@ -334,12 +333,12 @@ const ClientesPage = () => {
 													>
 														{cliente.ativo ? "Desativar" : "Ativar"}
 													</button>
-													<button
+													{/* <button
 														onClick={() => excluirCliente(cliente.id)}
 														className="bg-red-500 text-white px-3 py-1 text-xs rounded hover:bg-red-600"
 													>
 														Excluir
-													</button>
+													</button> */}
 												</div>
 											</td>
 										</tr>

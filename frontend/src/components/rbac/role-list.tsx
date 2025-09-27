@@ -85,7 +85,7 @@ export function RoleList() {
 	return (
 		<div className="space-y-4">
 			<div className="flex justify-between items-center">
-				<h2 className="text-2xl font-bold">Papéis (Roles)</h2>
+				<h2 className="text-2xl font-bold">Tipos de Acesso</h2>
 				<Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
 					<DialogTrigger asChild>
 						<Button>

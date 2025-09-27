@@ -11,6 +11,7 @@ import {
 	LayoutDashboard,
 	LogOut,
 	Menu,
+	MessageSquareQuote,
 	Settings,
 	ShoppingCart,
 	Tag,
@@ -74,6 +75,12 @@ const AdminSidebar = () => {
 			icon: <BookImage className="h-5 w-5" />,
 		},
 		{
+			id: "avaliacoes",
+			label: "Avaliações",
+			href: "/admin/avaliacoes",
+			icon: <MessageSquareQuote className="h-5 w-5" />,
+		},
+		{
 			id: "rbac",
 			label: "Perfis de Acesso",
 			href: "/admin/rbac",
@@ -81,10 +88,11 @@ const AdminSidebar = () => {
 		},
 		{
 			id: "conteudos",
-			label: "Páginas do Sistema",
+			label: "Gestão do Sistema",
 			href: "/admin/conteudos",
 			icon: <BookKey className="h-5 w-5" />,
 		},
+	
 		// {
 		// 	id: "integrations",
 		// 	label: "Integrações",
@@ -95,8 +103,14 @@ const AdminSidebar = () => {
 		{
 			id: "activities",
 			label: "Atividades do Sistema",
-			href: "/admin/activities",
+			href: "/admin/logs",
 			icon: <Activity className="h-5 w-5" />,
+		},
+		{
+			id: "configuracoes",
+			label: "Configurações",
+			href: "/admin/configuracoes",
+			icon: <Settings className="h-5 w-5" />,
 		},
 	];
 

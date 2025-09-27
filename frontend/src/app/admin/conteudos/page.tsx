@@ -1,5 +1,9 @@
 "use client";
 
+// Configurações para evitar pré-renderização no servidor
+export const dynamic = "force-dynamic";
+export const runtime = "edge";
+
 import { Button } from "@/components/ui/button";
 import { CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -12,10 +16,12 @@ import {
   SystemPageStatus,
   SystemPagesService
 } from "@/services/systemPages";
+import { settingsService } from "@/services/settings.service";
 import JoditEditorComponent from "@/components/Inputs/JoditEditor";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
+import { Separator } from "@radix-ui/react-dropdown-menu";
 
 // Interface para os conteúdos legados
 interface Conteudo {
@@ -220,7 +226,7 @@ const ConteudosPage = () => {
 		switch (type) {
 			case "TERMS":
 				return "bg-orange-100 text-orange-800";
-			case "PRIVACY":
+			case "POLICIES":
 				return "bg-red-100 text-red-800";
 			case "FAQ":
 				return "bg-blue-100 text-blue-800";
@@ -274,9 +280,49 @@ const ConteudosPage = () => {
 
 	// ------------------ STATE HEADER & FOOTER ------------------
 	const [headerFooter, setHeaderFooter] = useState({
-		headerCode: "<!-- Código Google Tag Manager Header -->",
-		footerCode: "<!-- Código Google Tag Manager Footer -->",
+		headerCode: "",
+		footerCode: "",
 	});
+	const [isLoadingGtm, setIsLoadingGtm] = useState(true);
+	const [isSavingGtm, setIsSavingGtm] = useState(false);
+	
+	// Carregar configurações do GTM
+	useEffect(() => {
+		const loadGtmSettings = async () => {
+			try {
+				setIsLoadingGtm(true);
+				const settings = await settingsService.getGtmSettings();
+				setHeaderFooter({
+					headerCode: settings.gtm_head_code || "",
+					footerCode: settings.gtm_body_code || "",
+				});
+			} catch (error) {
+				console.error("Erro ao carregar configurações GTM:", error);
+				toast.error("Erro ao carregar configurações do Google Tag Manager");
+			} finally {
+				setIsLoadingGtm(false);
+			}
+		};
+		
+		loadGtmSettings();
+	}, []);
+	
+	// Salvar configurações do GTM
+	const saveGtmSettings = async () => {
+		try {
+			setIsSavingGtm(true);
+			await settingsService.updateGtmSettings({
+				gtm_head_code: headerFooter.headerCode,
+				gtm_body_code: headerFooter.footerCode,
+			});
+			toast.success("Configurações do Google Tag Manager salvas com sucesso");
+		} catch (error) {
+			console.error("Erro ao salvar configurações GTM:", error);
+			toast.error("Erro ao salvar configurações do Google Tag Manager");
+		} finally {
+			setIsSavingGtm(false);
+		}
+	};
 
 	// ------------------ STATE AVALIAÇÕES ------------------
 	const [avaliacoes, setAvaliacoes] = useState([
@@ -300,8 +346,7 @@ const ConteudosPage = () => {
 				<TabsList className="mb-6">
 					<TabsTrigger value="conteudos">Conteúdos</TabsTrigger>
 					<TabsTrigger value="section">Seção: Por que escolher</TabsTrigger>
-					<TabsTrigger value="headerFooter">Header & Footer</TabsTrigger>
-					<TabsTrigger value="avaliacoes">Avaliações</TabsTrigger>
+					{/* 	 */}
 				</TabsList>
 
 				{/* Aba Conteúdos */}
@@ -309,7 +354,7 @@ const ConteudosPage = () => {
 					<div className="bg-white p-6 rounded-lg shadow">
 						<div className="flex justify-between items-center mb-6">
 							<h2 className="text-xl font-semibold">Páginas do Sistema</h2>
-							<Button 
+							<Button
 								onClick={() => setEditingPage({
 									id: '',
 									title: '',
@@ -587,40 +632,68 @@ const ConteudosPage = () => {
 				{/* Aba Header/Footer */}
 				<TabsContent value="headerFooter">
 					<div className="bg-white p-6 rounded-lg shadow space-y-6">
-						<h2 className="text-xl font-semibold mb-4">Header & Footer</h2>
-						<div>
-							<label className="block text-sm font-medium mb-2">
-								Código Header
-							</label>
-							<Textarea
-								className="h-32"
-								value={headerFooter.headerCode}
-								onChange={(e) =>
-									setHeaderFooter({
-										...headerFooter,
-										headerCode: e.target.value,
-									})
-								}
-							/>
-						</div>
-						<div>
-							<label className="block text-sm font-medium mb-2">
-								Código Footer
-							</label>
-							<Textarea
-								className="h-32"
-								value={headerFooter.footerCode}
-								onChange={(e) =>
-									setHeaderFooter({
-										...headerFooter,
-										footerCode: e.target.value,
-									})
-								}
-							/>
-						</div>
-						<Button className="bg-blue-600 text-white hover:bg-blue-700">
-							Salvar Alterações
-						</Button>
+						<h2 className="text-xl font-semibold mb-4">Google Tag Manager</h2>
+						
+						{isLoadingGtm ? (
+							<div className="flex justify-center p-8">
+								<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-700"></div>
+							</div>
+						) : (
+							<>
+								<div>
+									<label className="block text-sm font-medium mb-2">
+										Código para o &lt;head&gt;
+									</label>
+									<Textarea
+										className="h-32 bg-white border-gray-300 font-mono"
+										value={headerFooter.headerCode}
+										onChange={(e) =>
+											setHeaderFooter({
+												...headerFooter,
+												headerCode: e.target.value,
+											})
+										}
+										placeholder="<!-- Google Tag Manager -->"
+									/>
+									<p className="text-xs text-gray-500 mt-1">
+										Cole o código do GTM que deve ser inserido na seção &lt;head&gt; do site.
+									</p>
+								</div>
+								<div>
+									<label className="block text-sm font-medium mb-2">
+										Código para o &lt;body&gt;
+									</label>
+									<Textarea
+										className="h-32 bg-white border-gray-300 font-mono"
+										value={headerFooter.footerCode}
+										onChange={(e) =>
+											setHeaderFooter({
+												...headerFooter,
+												footerCode: e.target.value,
+											})
+										}
+										placeholder="<!-- Google Tag Manager (noscript) -->"
+									/>
+									<p className="text-xs text-gray-500 mt-1">
+										Cole o código do GTM que deve ser inserido logo após a abertura da tag &lt;body&gt;.
+									</p>
+								</div>
+								<Button 
+									className="bg-blue-600 text-white hover:bg-blue-700"
+									onClick={saveGtmSettings}
+									disabled={isSavingGtm}
+								>
+									{isSavingGtm ? (
+										<>
+											<span className="animate-spin mr-2">⏳</span>
+											Salvando...
+										</>
+									) : (
+										"Salvar Alterações"
+									)}
+								</Button>
+							</>
+						)}
 					</div>
 				</TabsContent>
 

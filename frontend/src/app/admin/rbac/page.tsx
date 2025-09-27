@@ -1,3 +1,5 @@
+"use client";
+
 import { InviteUserForm } from "@/components/rbac/invite-user-form";
 import { PermissionList } from "@/components/rbac/permission-list";
 import { RoleList } from "@/components/rbac/role-list";
@@ -9,6 +11,10 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+// Configurações para evitar pré-renderização no servidor
+export const dynamic = "force-dynamic";
+export const runtime = "edge";
 
 /**
  * Página de administração do sistema RBAC

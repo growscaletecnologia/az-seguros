@@ -89,4 +89,12 @@ export const usersService = {
 	remove: async (id: string): Promise<void> => {
 		await api.delete(`/users/${id}`);
 	},
+
+	/**
+	 * Alterna o status de um usuário
+	 */
+	toggleStatus: async (id: string): Promise<User> => {
+		const response = await api.patch(`/users/${id}/toggle-status`);
+		return response.data;
+	},
 };

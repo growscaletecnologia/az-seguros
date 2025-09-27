@@ -211,9 +211,9 @@ const UsuariosPage = () => {
 				<h1 className="text-3xl font-bold">Gestão de Usuários do Sistema</h1>
 				<div className="flex gap-2">
 					<Dialog>
-						<DialogTrigger asChild>
+						{/* <DialogTrigger asChild>
 							<Button variant="outline">Convidar Usuário</Button>
-						</DialogTrigger>
+						</DialogTrigger> */}
 						<DialogContent className="sm:max-w-[600px]">
 							<DialogHeader>
 								<DialogTitle>Convidar Novo Usuário</DialogTitle>

@@ -1,9 +1,11 @@
 "use client";
 
+// Adicionando configuração para evitar pré-renderização no servidor
+export const dynamic = "force-dynamic";
+export const runtime = "edge";
+
 import JoditEditorComponent from "@/components/Inputs/JoditEditor";
-import RichTextEditor from "@/components/Inputs/RichTextEditor";
 import { TinyMCEEditor } from "@/components/Inputs/TinyMCEEditor";
-import TiptapEditor from "@/components/Inputs/TiptapEditor";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";

@@ -40,11 +40,14 @@ export default function BlogPage() {
       setLoading(true);
       const response = await postsService.getPosts({
         ...filter,
+        status: "PUBLISHED", // Garantir que apenas posts publicados sejam exibidos
         search: search.length > 2 ? search : undefined,
       });
-      setPosts(response.posts);
-      setTotalPosts(response.total || 0);
-      setTotalPages(Math.ceil(response.total / filter.limit!));
+      // Filtro adicional para garantir que apenas posts com status PUBLISHED sejam exibidos
+      const publishedPosts = response.posts.filter(post => post.status === "PUBLISHED");
+      setPosts(publishedPosts);
+      setTotalPosts(publishedPosts.length || 0);
+      setTotalPages(Math.ceil(publishedPosts.length / filter.limit!));
     } catch (error) {
       console.error("Erro ao carregar posts:", error);
     } finally {
@@ -119,9 +122,9 @@ export default function BlogPage() {
                 <Link href={`/blog/${post.slug}`} key={post.id}>
                   <Card className="h-full flex flex-col hover:shadow-lg transition-shadow duration-300">
                     <div className="aspect-video relative overflow-hidden">
-                      <img 
-                        src={mainImageUrl} 
-                        alt={post.title} 
+                      <img
+                        src={mainImageUrl}
+                        alt={post.title}
                         className="w-full h-full object-cover"
                       />
                     </div>
