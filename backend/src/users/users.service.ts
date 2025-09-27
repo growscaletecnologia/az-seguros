@@ -43,6 +43,16 @@ export class UsersService {
     const user = await this.userRepository.verifyEmail(id)
     return { id: user.id, email: user.email, emailVerifiedAt: user.emailVerifiedAt }
   }
+  // async toggleUserStatus(id: string) {
+  //   const user = await this.userRepository.listById(id)
+  //   if (!user) {
+  //     throw new BadRequestError('User not found')
+  //   }
+
+  //   const newStatus = user.status === UserStatus.ACTIVE ? UserStatus.INACTIVE : UserStatus.ACTIVE
+
+  //   return await this.userRepository.update(id, { status: newStatus })
+  // }
 
   async findAll() {
     return await this.userRepository.listAll()

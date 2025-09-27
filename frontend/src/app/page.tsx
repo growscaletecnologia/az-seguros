@@ -36,6 +36,36 @@ import {
 	HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { usePreRegisterForm } from "@/hooks/useRegisterStore";
+import { AvaliacoesCarousel } from "@/components/avaliations/AvaliacoesCarousel";
+
+/**
+ * Função para realizar rolagem suave até uma posição específica na página
+ * @param position Posição Y para onde rolar (em pixels)
+ * @param duration Duração da animação em milissegundos
+ */
+function smoothScrollTo(position: number, duration: number) {
+  const startPosition = window.scrollY;
+  const distance = position - startPosition;
+  let startTime: number | null = null;
+
+  function animation(currentTime: number) {
+    if (startTime === null) startTime = currentTime;
+    const timeElapsed = currentTime - startTime;
+    const run = easeInOutQuad(timeElapsed, startPosition, distance, duration);
+    window.scrollTo(0, run);
+    if (timeElapsed < duration) requestAnimationFrame(animation);
+  }
+
+  // Função de easing para suavizar o movimento
+  function easeInOutQuad(t: number, b: number, c: number, d: number) {
+    t /= d / 2;
+    if (t < 1) return c / 2 * t * t + b;
+    t--;
+    return -c / 2 * (t * (t - 2) - 1) + b;
+  }
+
+  requestAnimationFrame(animation);
+}
 
 export default function HomePage() {
 	const { formData: dados, setForm } = usePreRegisterForm();
@@ -139,61 +169,56 @@ export default function HomePage() {
 	return (
 		<div className="bg-white">
 			{/* Hero Section */}
-			<section className="relative h-[650px] flex flex-auto bg-gradient-to-br from-blue-700 via-blue-400 to-blue-600 text-white bg-[url('/banners/hero_promo.png')] bg-cover bg-no-repeat">
+			<section className="relative min-h-[750px] md:h-[650px] flex flex-auto bg-gradient-to-br from-blue-700 via-blue-400 to-blue-600 text-white bg-[url('/banners/hero_promo.png')] bg-cover bg-no-repeat">
 				<div className="absolute inset-0 bg-black/20"></div>
 				<div
 					id="top"
 					className="container mx-auto flex flex-col md:flex-row items-center justify-between relative px-4 w-full sm:px-6 lg:px-8 py-8 md:py-12"
 				>
 					{/* Lado esquerdo - Texto e descrição */}
-					<div className="w-full md:w-5/12 mb-8 md:mb-0 space-y-6">
-						<div className="space-y-4">
-							<h1 className="text-3xl lg:text-5xl font-bold leading-tight">
+					<div className="w-full md:w-5/12 mb-8 md:mb-0 space-y-4 md:space-y-6">
+						<div className="space-y-3 md:space-y-4">
+							<h1 className="text-2xl sm:text-3xl lg:text-5xl font-bold leading-tight">
 								Viaje com
 								<span className="text-yellow-400"> Segurança Total</span>
 							</h1>
-							<p className="text-xl lg:text-2xl text-blue-50">
+							<p className="text-lg sm:text-xl lg:text-2xl text-blue-50">
 								Compare preços, encontre o melhor seguro de viagem e contrate em
 								minutos. Proteção completa para suas aventuras pelo mundo.
 							</p>
 						</div>
 
-						<div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
+						<div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
 							<div className="flex items-center space-x-2">
 								<CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0" />
-								<span>Melhor Preço Garantido</span>
+								<span className="text-sm sm:text-base">Melhor Preço Garantido</span>
 							</div>
 							<div className="flex items-center space-x-2">
 								<CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0" />
-								<span>Suporte 24h</span>
+								<span className="text-sm sm:text-base">Suporte 24h</span>
 							</div>
 						</div>
 
 						<div className="w-full sm:max-w-md">
-							{loadingCoupons ? (
-								<div className="rounded-lg border-2 flex flex-row p-4 gap-4 animate-pulse">
-									<div className="w-5 h-5 bg-gray-300 rounded-full"></div>
-									<div className="h-5 w-32 bg-gray-300 rounded"></div>
-								</div>
-							) : featuredCoupon ? (
+							{featuredCoupon ? (
 								coupomChecked ? (
-									<div className="rounded-lg border-2 flex flex-row p-4 animate-wiggle gap-4">
+									<div className="rounded-lg border-2 flex flex-row p-3 sm:p-4 animate-wiggle gap-2 sm:gap-4">
 										<input
 											type="checkbox"
 											id="cupom"
-											className="w-5 h-5 rounded-2xl mt-1"
+											className="w-4 h-4 sm:w-5 sm:h-5 rounded-2xl mt-1"
 											checked={coupomChecked}
 											onChange={() => {
 												setCoupomChecked(!coupomChecked);
 												setFormData((prev) => ({ ...prev, coupon: "" }));
 											}}
 										/>
-										<span className="text-lg font-bold">
+										<span className="text-base sm:text-lg font-bold">
 											Cupom aplicado com sucesso!
 										</span>
 									</div>
 								) : (
-									<div className="rounded-lg border-2 relative flex flex-row p-4 mt-1 gap-2">
+									<div className="rounded-lg border-2 relative flex flex-row p-3 sm:p-4 mt-1 gap-1 sm:gap-2">
 										<input
 											type="checkbox"
 											id="cupom"
@@ -228,11 +253,11 @@ export default function HomePage() {
 					<div className="w-full md:w-6/12">
 						<form onSubmit={handleSubmit}>
 							<div className="relative">
-								<div className="relative z-10 bg-gradient-to-br from-transparent via-transparent to-blue-100/50 backdrop-blur-md rounded-2xl p-4 border border-white/20">
-									<h3 className="text-2xl font-bold mb-4">
+								<div className="relative z-10 bg-gradient-to-br from-transparent via-transparent to-blue-100/50 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-white/20">
+									<h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">
 										Realize uma cotação de Seguro de Viagem para seu destino
 									</h3>
-									<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+									<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
 										<DestinationSelect
 											data={formData.destination}
 											setData={(value) =>
@@ -240,7 +265,7 @@ export default function HomePage() {
 											}
 										/>
 										{errors.destination && (
-											<p className="text-red-500 text-sm">
+											<p className="text-red-500 text-xs sm:text-sm">
 												Selecione um destino
 											</p>
 										)}
@@ -250,25 +275,25 @@ export default function HomePage() {
 													setFormData((prev) => ({ ...prev, range: value }));
 												}}
 												minDate={new Date()}
-												months={2}
+												months={1}
 												range={formData.range}
 											/>
 											{errors.range && (
-												<p className="text-red-500 text-sm">
+												<p className="text-red-500 text-xs sm:text-sm">
 													Informe as datas da viagem
 												</p>
 											)}
 										</div>
 										<div
-											className={`flex items-center h-[52px] w-full px-3 rounded-lg bg-white/20 border ${
+											className={`flex items-center h-[45px] sm:h-[52px] w-full px-3 rounded-lg bg-white/20 border ${
 												errors.name ? "border-red-500" : "border-white/30"
 											} text-white focus-within:ring-2 focus-within:ring-yellow-400`}
 										>
-											<User className="h-5 w-5 mr-2 opacity-80" />
+											<User className="h-4 w-4 sm:h-5 sm:w-5 mr-2 opacity-80" />
 											<input
 												type="text"
 												placeholder="Nome completo"
-												className="w-full bg-transparent border-0 placeholder-white/70 text-white focus:ring-0 focus:outline-none"
+												className="w-full bg-transparent border-0 placeholder-white/70 text-white focus:ring-0 focus:outline-none text-sm sm:text-base"
 												value={formData.name}
 												onChange={(e) =>
 													setFormData((prev) => ({
@@ -286,7 +311,7 @@ export default function HomePage() {
 												}
 											/>
 											{errors.email && (
-												<p className="text-red-500 text-sm">
+												<p className="text-red-500 text-xs sm:text-sm">
 													Informe um email válido
 												</p>
 											)}
@@ -299,14 +324,14 @@ export default function HomePage() {
 												}
 											/>
 											{errors.phone && (
-												<p className="text-red-500 text-sm">
+												<p className="text-red-500 text-xs sm:text-sm">
 													Informe um telefone válido
 												</p>
 											)}
 										</div>
 									</div>
 
-									<div className="flex flex-row justify-between items-center gap-4 mt-4">
+									<div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4 mt-3 sm:mt-4">
 										<PassengersSelect
 											data={formData.passengers}
 											setData={(value) =>
@@ -315,10 +340,10 @@ export default function HomePage() {
 										/>
 
 										{/* Botão */}
-										<div className="w-full">
+										<div className="w-full mt-2 sm:mt-0">
 											<button
 												type="submit"
-												className="w-full bg-yellow-400 h-[52px] text-blue-900 py-1 rounded-lg font-bold hover:bg-yellow-300 transition-colors"
+												className="w-full bg-yellow-400 h-[45px] sm:h-[52px] text-blue-900 py-1 rounded-lg font-bold hover:bg-yellow-300 transition-colors text-sm sm:text-base"
 											>
 												Encontrar Seguro viagem
 											</button>
@@ -370,15 +395,15 @@ export default function HomePage() {
 			</div>
 
 			{/* Seção Seguros Temáticos */}
-			<section className="py-16 bg-gray-50">
+			<section className="py-10 sm:py-16 bg-gray-50">
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-					<div className="text-center mb-12">
-						<h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+					{/* <div className="text-center mb-8 sm:mb-12">
+						<h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2 sm:mb-4">
 							Confira seguros de viagem para suas necessidades
 						</h2>
-					</div>
+					</div> */}
 
-					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
 						{/* Card 1 */}
 						<div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
 							<Image
@@ -386,13 +411,13 @@ export default function HomePage() {
 								alt="Seguro Viagem Marítimo"
 								width={400}
 								height={250}
-								className="w-full h-48 object-cover"
+								className="w-full h-40 sm:h-48 object-cover"
 							/>
-							<div className="p-4">
-								<h3 className="text-lg font-semibold text-gray-900 mb-2">
+							<div className="p-3 sm:p-4">
+								<h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-1 sm:mb-2">
 									Seguro Viagem Marítimo
 								</h3>
-								<p className="text-gray-600 mb-4">
+								<p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4">
 									Proteção contra imprevistos em alto mar, incluindo assistência
 									a bordo e emergências durante cruzeiros.
 								</p>
@@ -637,81 +662,9 @@ export default function HomePage() {
 						</h2>
 					</div>
 
-					<div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-						<div className="bg-white rounded-lg p-6 shadow-lg">
-							<div className="flex items-center mb-4">
-								{[...Array(5)].map((_, i) => (
-									<Star
-										key={i}
-										className="h-5 w-5 text-yellow-400 fill-current"
-									/>
-								))}
-							</div>
-							<p className="text-gray-600 mb-4">
-								&quot;Excelente atendimento! Tive um problema médico na Europa e
-								fui atendido rapidamente. Recomendo para todos os
-								viajantes.&quot;
-							</p>
-							<div className="flex items-center">
-								<div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-									<span className="text-blue-600 font-bold">MR</span>
-								</div>
-								<div>
-									<p className="font-semibold text-gray-900">Maria Rosa</p>
-									<p className="text-sm text-gray-600">Viagem para Paris</p>
-								</div>
-							</div>
-						</div>
-
-						<div className="bg-white rounded-lg p-6 shadow-lg">
-							<div className="flex items-center mb-4">
-								{[...Array(5)].map((_, i) => (
-									<Star
-										key={i}
-										className="h-5 w-5 text-yellow-400 fill-current"
-									/>
-								))}
-							</div>
-							<p className="text-gray-600 mb-4">
-								&quot;Processo super fácil e rápido. Comparei vários planos e
-								encontrei o melhor preço. Viajei tranquilo sabendo que estava
-								protegido.&quot;
-							</p>
-							<div className="flex items-center">
-								<div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
-									<span className="text-green-600 font-bold">JS</span>
-								</div>
-								<div>
-									<p className="font-semibold text-gray-900">João Silva</p>
-									<p className="text-sm text-gray-600">Viagem para Japão</p>
-								</div>
-							</div>
-						</div>
-
-						<div className="bg-white rounded-lg p-6 shadow-lg">
-							<div className="flex items-center mb-4">
-								{[...Array(5)].map((_, i) => (
-									<Star
-										key={i}
-										className="h-5 w-5 text-yellow-400 fill-current"
-									/>
-								))}
-							</div>
-							<p className="text-gray-600 mb-4">
-								&quot;Suporte 24h realmente funciona! Precisei de ajuda durante
-								a madrugada e fui atendida imediatamente. Empresa
-								confiável!&quot;
-							</p>
-							<div className="flex items-center">
-								<div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-									<span className="text-blue-600 font-bold">AC</span>
-								</div>
-								<div>
-									<p className="font-semibold text-gray-900">Ana Costa</p>
-									<p className="text-sm text-gray-600">Viagem para EUA</p>
-								</div>
-							</div>
-						</div>
+					{/* Carrossel de avaliações */}
+					<div className="mb-8">
+						<AvaliacoesCarousel limit={9} showOnlyActive={true} autoplay={true} delayMs={5000} />
 					</div>
 				</div>
 			</section>

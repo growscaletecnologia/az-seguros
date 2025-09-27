@@ -30,6 +30,13 @@ export class UsersController {
     return this.usersService.findOne(id)
   }
 
+  // @UseGuards(JwtAuthGuard)
+  // @Patch(':id/toggle-status')
+  // @ApiOperation({ summary: 'toggle a User Status' })
+  // toggle(@Param('id') id: string) {
+  //   return this.usersService.toggleUserStatus(id)
+  // }
+
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
   @ApiOperation({ summary: 'Update a user' })

@@ -342,7 +342,7 @@ export default function CotacaoPage() {
 												</Link>{" "}
 												e{" "}
 												<Link
-													href="/privacidade"
+													href="/politicas"
 													className="text-blue-600 hover:underline"
 												>
 													política de privacidade

@@ -404,6 +404,43 @@ model PostMedia {
 
 
 /**
+ * SYSTEM PAGES Model
+ * =========================================================
+ * - SystemPage: Representa páginas administrativas do sistema como FAQ, Termos de Uso, Políticas e Ajuda
+ */
+
+enum SystemPageType {
+  FAQ
+  TERMS
+  POLICIES
+  HELP
+  OTHER
+}
+
+enum SystemPageStatus {
+  DRAFT     // Rascunho
+  PUBLISHED // Publicado
+  ARCHIVED  // Arquivado
+}
+
+model SystemPage {
+  id          String           @id @default(cuid())
+  title       String
+  slug        String           @unique
+  content     String           @db.Text // Conteúdo completo em HTML
+  type        SystemPageType   // Tipo da página (FAQ, TERMS, POLICIES, HELP, OTHER)
+  status      SystemPageStatus @default(DRAFT)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  updatedBy   String?          // Usuário que atualizou a página
+  publishedAt DateTime?        // Data de publicação
+
+  @@index([slug])
+  @@index([type])
+  @@index([status])
+}
+
+/**
  * VOUCHER Models
  * =========================================================
  * - VoucherStatus: Status of the voucher (e.g., ACTIVE, INACTIVE, REDEEMED, EXPIRED)
@@ -411,3 +448,41 @@ model PostMedia {
  * - User: Represents a user in the system with fields for personal information and relationships to addresses
  * - Address: Represents an address associated with a user
  */
+
+/**
+ * SETTINGS Model
+ * =========================================================
+ * - Settings: Armazena configurações do sistema, incluindo códigos de rastreamento e scripts
+ */
+
+model Settings {
+  id            String   @id @default(cuid())
+  key           String   @unique
+  value         String   @db.Text
+  description   String?
+  gtm_head_code String?  @db.Text
+  gtm_body_code String?  @db.Text
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+/**
+ * AVALIATION Model
+ * =========================================================
+ * - Avaliation: Armazena avaliações dos usuários sobre o sistema/serviço
+ */
+
+model Avaliation {
+  id        String   @id @default(cuid())
+  name      String   // Nome do usuário que fez a avaliação
+  rating    Int      // Avaliação de 1 a 5 estrelas
+  comment   String   @db.Text // Comentário da avaliação
+  location  String?  // Local/destino da viagem (opcional)
+  avatar    String?  // Iniciais ou URL para avatar do usuário
+  active    Boolean  @default(true) // Controla se a avaliação está visível
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([rating])
+  @@index([active])
+}

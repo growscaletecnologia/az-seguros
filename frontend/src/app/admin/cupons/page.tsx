@@ -51,6 +51,7 @@ const CuponsPage = () => {
 		front_publishable: false,
 		description: "",
 		userId: AuthService.getUser()?.id,
+		status: "ACTIVE"
 	});
 
 	// Carregar cupons ao iniciar
@@ -100,6 +101,7 @@ const CuponsPage = () => {
 				usageLimit: novoCupom.usageLimit,
 				front_publishable: novoCupom.front_publishable,
 				description: novoCupom.description,
+				status: novoCupom.status,
 			};
 
 			await couponsService.update(editingCoupon.id, updateData);
@@ -174,6 +176,8 @@ const CuponsPage = () => {
 			usageLimit: cupom.usageLimit,
 			front_publishable: cupom.front_publishable,
 			description: cupom.description || "",
+			status: cupom.status || "ACTIVE",
+			userId: AuthService.getUser()?.id,
 		});
 		setDialogOpen(true);
 	};
@@ -225,18 +229,22 @@ const CuponsPage = () => {
 
 						<div className="grid grid-cols-2 gap-4 py-4">
 							<div className="col-span-2">
-								<Label htmlFor="code">Código do Cupom</Label>
+								<Label htmlFor="code">Código do Cupom (máx. 20 caracteres, sem espaços)</Label>
 								<Input
 									id="code"
 									value={novoCupom.code}
-									onChange={(e) =>
-										setNovoCupom({
-											...novoCupom,
-											code: e.target.value.toUpperCase(),
-										})
-									}
+									onChange={(e) => {
+										const value = e.target.value.toUpperCase().replace(/\s+/g, '');
+										if (value.length <= 20) {
+											setNovoCupom({
+												...novoCupom,
+												code: value,
+											});
+										}
+									}}
 									placeholder="Ex: PROMO20"
 									className="mt-1"
+									maxLength={20}
 								/>
 							</div>
 
@@ -258,6 +266,23 @@ const CuponsPage = () => {
 								</Select>
 							</div>
 
+							<div>
+								<Label htmlFor="status">Status do Cupom</Label>
+								<Select
+									value={novoCupom.status}
+									onValueChange={(value: "ACTIVE" | "INACTIVE") =>
+										setNovoCupom({ ...novoCupom, status: value })
+									}
+								>
+									<SelectTrigger className="mt-1">
+										<SelectValue placeholder="Selecione o status" />
+									</SelectTrigger>
+									<SelectContent>
+										<SelectItem value="ACTIVE">Ativo</SelectItem>
+										<SelectItem value="INACTIVE">Inativo</SelectItem>
+									</SelectContent>
+								</Select>
+							</div>
 							<div>
 								<Label htmlFor="discount">
 									Desconto (
@@ -287,10 +312,21 @@ const CuponsPage = () => {
 									id="expiresAt"
 									type="date"
 									value={novoCupom.expiresAt}
-									onChange={(e) =>
-										setNovoCupom({ ...novoCupom, expiresAt: e.target.value })
-									}
+									onChange={(e) => {
+										const selectedDate = new Date(e.target.value);
+										const today = new Date();
+										today.setHours(0, 0, 0, 0);
+										
+										// Só valida data mínima se for criação de novo cupom
+										if (!editingCoupon && selectedDate < today) {
+											toast.error("A data de expiração não pode ser menor que a data atual");
+											return;
+										}
+										
+										setNovoCupom({ ...novoCupom, expiresAt: e.target.value });
+									}}
 									className="mt-1"
+									min={!editingCoupon ? new Date().toISOString().split('T')[0] : undefined}
 								/>
 							</div>
 
@@ -354,11 +390,11 @@ const CuponsPage = () => {
 				</Dialog>
 			</div>
 
-			<Card>
+			<Card className="p-2" >
 				<CardHeader>
-					<CardTitle>Cupons Existentes</CardTitle>
+					<CardTitle className="text-lg font-bold">Cupons Existentes</CardTitle>
 				</CardHeader>
-				<CardContent>
+				<CardContent className="bg-white/80 rounded-lg">
 					{loading && !cupons.length ? (
 						<div className="flex justify-center py-8">
 							<Loader2 className="h-8 w-8 animate-spin text-gray-400" />

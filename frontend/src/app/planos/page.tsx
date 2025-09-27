@@ -824,33 +824,33 @@ export default function PlanosPage() {
 		<div className="bg-gray-50 min-h-screen">
 			{/* Header */}
 			<div className="bg-white shadow-sm border-b">
-				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-					<div className="flex flex-auto lg:items-center lg:justify-between gap-4">
-						<div className="text-center lg:text-left ">
-							<h1 className="text-3xl font-bold text-gray-900">
+				<div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6">
+					<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+						<div className="text-center sm:text-left">
+							<h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
 								Compare Planos de Seguro
 							</h1>
-							<p className="text-gray-600 mt-2">
+							<p className="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">
 								Encontre o seguro de viagem perfeito para sua próxima aventura
 							</p>
 						</div>
-						<div className="flex  items-center space-x-4">
-							<div className="flex items-center space-x-2 text-sm text-gray-600">
-								<MapPin className="h-4 w-4" />
-								<span>{data ? data.destination : "Selecione um destino"}</span>
+						<div className="flex flex-wrap justify-center sm:justify-end gap-3 sm:gap-4 mt-3 sm:mt-0">
+							<div className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm text-gray-600">
+								<MapPin className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+								<span className="truncate max-w-[120px] sm:max-w-none">{data ? data.destination : "Selecione um destino"}</span>
 							</div>
-							<div className="flex items-center space-x-2 text-sm text-gray-600">
-								<Calendar className="h-4 w-4" />
+							<div className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm text-gray-600">
+								<Calendar className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
 								<span>
 									{data ? `${dataI} - ${dataF}` : "Selecione as datas"}
 								</span>
 							</div>
-							<div className="flex items-center space-x-2 text-sm text-gray-600">
-								<Users className="h-4 w-4" />
+							<div className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm text-gray-600">
+								<Users className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
 								<span>
 									{data
 										? `${data.passengers} passageiro${Number(data?.passengers) > 1 ? "s" : ""}`
-										: "Selecione o número de passageiros"}
+										: "Passageiros"}
 								</span>
 							</div>
 						</div>
@@ -858,8 +858,8 @@ export default function PlanosPage() {
 				</div>
 			</div>
 			<div className="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow">
-				<div className="text-sm bg-blue-300 text-gray-700 flex items-center justify-center gap-2">
-					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
+				<div className="text-sm bg-blue-300 text-gray-700 flex items-center justify-center">
+					<div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 p-3 sm:p-4">
 						<DestinationSelect
 							data={form?.destination || ""}
 							setData={(value) =>
@@ -873,14 +873,14 @@ export default function PlanosPage() {
 									setForm((prev) => ({ ...prev, range: value }));
 								}}
 								minDate={new Date()}
-								months={2}
+								months={1}
 								range={form.range}
 							/>
 						</div>
 
-						<Button className="inline-flex items-center h-[52px] gap-2 px-4 py-2 rounded-lg bg-blue-700 text-white hover:bg-blue-800">
-							<SearchIcon className="h-4 w-4" />
-							Buscar
+						<Button className="inline-flex items-center justify-center h-[48px] sm:h-[52px] gap-1 sm:gap-2 px-3 sm:px-4 py-2 rounded-lg bg-blue-700 text-white hover:bg-blue-800 text-sm sm:text-base">
+							<SearchIcon className="h-3 w-3 sm:h-4 sm:w-4" />
+							<span>Buscar</span>
 						</Button>
 					</div>
 				</div>
@@ -1006,19 +1006,19 @@ export default function PlanosPage() {
 									key={plan.id}
 									className="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow"
 								>
-									<div className="p-6">
-										<div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+									<div className="p-3 sm:p-4">
+										<div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4">
 											{/* Info */}
 											<div className="flex-1">
-												<div className="flex items-start justify-between mb-4">
+												<div className="flex items-start justify-between mb-2 sm:mb-3">
 													<div>
-														<div className="flex items-center space-x-3 mb-2">
-															<h3 className="text-xl font-bold text-gray-900">
+														<div className="flex flex-wrap items-center gap-2 mb-1">
+															<h3 className="text-base sm:text-lg font-bold text-gray-900">
 																{plan.plano}
 															</h3>
 															{plan.destaque && (
 																<span
-																	className={`px-2 py-1 text-xs font-medium rounded-full ${
+																	className={`px-2 py-0.5 text-xs font-medium rounded-full ${
 																		plan.destaque === "Mais Vendido"
 																			? "bg-blue-100 text-blue-800"
 																			: plan.destaque === "Melhor Preço"
@@ -1032,15 +1032,15 @@ export default function PlanosPage() {
 																</span>
 															)}
 														</div>
-														<p className="text-gray-600 font-medium">
+														<p className="text-sm text-gray-600">
 															{plan.seguradora}
 														</p>
-														<div className="flex items-center space-x-1 mt-1">
+														<div className="flex flex-wrap items-center gap-1 mt-1">
 															<div className="flex items-center">
 																{[...Array(5)].map((_, i) => (
 																	<Star
 																		key={i}
-																		className={`h-4 w-4 ${
+																		className={`h-3 w-3 ${
 																			i < Math.floor(plan.avaliacoes)
 																				? "text-yellow-400 fill-current"
 																				: "text-gray-300"
@@ -1048,15 +1048,14 @@ export default function PlanosPage() {
 																	/>
 																))}
 															</div>
-															<span className="text-sm text-gray-600">
-																{plan.avaliacoes} ({plan.totalAvaliacoes}{" "}
-																avaliações)
+															<span className="text-xs text-gray-600">
+																{plan.avaliacoes} ({plan.totalAvaliacoes})
 															</span>
-															<div className="flex flex-col gap-0 relative bottom-2.5 left-8 right-0">
-																<span className="text-sm text-gray-600">
+															<div className="flex flex-col ml-2 sm:ml-4">
+																<span className="text-xs text-gray-500">
 																	{plan.faixaEtaria}
 																</span>
-																<span className="text-sm text-gray-600">
+																<span className="text-xs text-gray-500">
 																	{plan.aumentoIdade}
 																</span>
 															</div>
@@ -1064,55 +1063,34 @@ export default function PlanosPage() {
 													</div>
 												</div>
 
-												{/* Highlights */}
-												<div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-													<div className="text-center p-3 bg-gray-50 rounded-lg">
-														<Activity className="h-5 w-5 text-blue-500 mx-auto mb-1" />
-														<p className="text-xs text-gray-600">
-															Cobertura Médica
-														</p>
-														<p className="font-semibold text-sm">
-															USD {plan.coberturaMedica.toLocaleString()}
+												{/* Highlights - Versão compacta */}
+												<div className="flex items-center justify-start gap-3 mb-3">
+													<div className="flex items-center gap-1">
+														<Activity className="h-4 w-4 text-blue-500" />
+														<p className="text-xs">
+															<span className="font-medium">USD {plan.coberturaMedica.toLocaleString()}</span>
 														</p>
 													</div>
-													<div className="text-center p-3 bg-gray-50 rounded-lg">
-														<BaggageClaim className="h-5 w-5 text-blue-500 mx-auto mb-1" />
-														<p className="text-xs text-gray-600">Bagagem</p>
-														<p className="font-semibold text-sm">
-															USD {plan.coberturaBagagem.toLocaleString()}
+													<div className="flex items-center gap-1">
+														<BaggageClaim className="h-4 w-4 text-blue-500" />
+														<p className="text-xs">
+															<span className="font-medium">USD {plan.coberturaBagagem.toLocaleString()}</span>
 														</p>
 													</div>
-													<div className="text-center p-3 bg-gray-50 rounded-lg">
-														<ShieldOff className="h-5 w-5 text-red-500 mx-auto mb-1" />
-														<p className="text-xs text-gray-600">
-															Cancelamento
-														</p>
-														<p className="font-semibold text-sm">
-															USD {plan.coberturaCancelamento.toLocaleString()}
+													<div className="flex items-center gap-1">
+														<ShieldOff className="h-4 w-4 text-red-500" />
+														<p className="text-xs">
+															<span className="font-medium">USD {plan.coberturaCancelamento.toLocaleString()}</span>
 														</p>
 													</div>
-													{/* <div className="text-center p-3 bg-gray-50 rounded-lg">
-                            <CheckCircle className="h-5 w-5 text-purple-500 mx-auto mb-1" />
-                            <p className="text-xs text-gray-600">COVID-19</p>
-                            <p className="font-semibold text-sm">{plan.coberturaPandemia ? "Incluído" : "Não"}</p>
-                          </div> */}
 												</div>
-
-												{/* Chips */}
-												{/* <div className="flex flex-wrap gap-2">
-                          {plan.beneficios.map((beneficio, index) => (
-                            <span key={index} className="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded-full">
-                              {beneficio}
-                            </span>
-                          ))}
-                        </div> */}
 											</div>
 
 											{/* Preço/Ações */}
-											<div className="lg:w-64 text-center lg:text-right ">
-												<div className="relative inline-block  right-34 mb-4 z-10 w-100 px-4 ">
+											<div className="lg:w-56 text-center lg:text-right">
+												<div className="mb-2 px-2">
 													{plan.precoOriginal > plan.preco && (
-														<p className="text-sm text-gray-500 line-through">
+														<p className="text-xs text-gray-500 line-through">
 															{plan.precoOriginal.toLocaleString("pt-BR", {
 																style: "currency",
 																currency: "BRL",
@@ -1120,64 +1098,63 @@ export default function PlanosPage() {
 														</p>
 													)}
 
-													<div className="flex flex-row gap-2 items-end justify-end ">
-														<p className="text-3xl font-bold text-blue-600">
+													<div className="flex flex-row gap-1 items-end justify-end">
+														<p className="text-2xl font-bold text-blue-600">
 															{plan.preco.toLocaleString("pt-BR", {
 																style: "currency",
 																currency: "BRL",
 															})}
 														</p>
-														<p className="text-sm font-semibold text-gray-600">
-															{" "}
-															/ Por pessoa no PIX
-														</p>
 													</div>
-													<p className="text-sm mt-2 font-semibold text-gray-600">
-														ou em até 12x sem juros no cartão
+													<p className="text-xs text-gray-600">
+														Por pessoa no PIX
 													</p>
 												</div>
 
-												<div className="space-y-3">
-													<button className="w-full bg-blue-600  hover:cursor-pointer hover:animate-pulse text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2">
-														<span>Selecionar Plano</span>
-														<ArrowRight className="h-4 w-4" />
+												<div className="space-y-2">
+													<button className="w-full bg-blue-600 hover:cursor-pointer text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center space-x-1">
+														<span>Selecionar</span>
+														<ArrowRight className="h-3 w-3" />
 													</button>
 
-													<button
-														onClick={() => {
-															handleSelectPlan(plan.id);
-															if (
+													<div className="flex gap-2">
+														<button
+															onClick={() => {
+																handleSelectPlan(plan.id);
+																if (
+																	!selectedPlans.includes(plan.id) &&
+																	selectedPlans.length >= 5
+																) {
+																	setShowComparison(true);
+																}
+															}}
+															className={`flex-1 py-1 px-2 rounded-lg hover:cursor-pointer border transition-colors flex items-center justify-center ${
+																selectedPlans.includes(plan.id)
+																	? "bg-blue-50 border-blue-500 text-blue-700"
+																	: "border-gray-300 text-gray-700 hover:bg-gray-50"
+															}`}
+															disabled={
 																!selectedPlans.includes(plan.id) &&
-																selectedPlans.length >= 5
-															) {
-																setShowComparison(true);
+																selectedPlans.length >= 4
 															}
-														}}
-														className={`flex-1 py-2 px-4 rounded-lg w-full hover:cursor-pointer border transition-colors flex items-center justify-center space-x-1 ${
-															selectedPlans.includes(plan.id)
-																? "bg-blue-50 border-blue-500 text-blue-700"
-																: "border-gray-300 text-gray-700 hover:bg-gray-50"
-														}`}
-														disabled={
-															!selectedPlans.includes(plan.id) &&
-															selectedPlans.length >= 4
-														}
-													>
-														<GitCompare className="h-4 w-4" />
-														<span className="text-sm">
-															{selectedPlans.includes(plan.id)
-																? "Selecionado"
-																: "Comparar"}
-														</span>
-													</button>
+														>
+															<GitCompare className="h-3 w-3 mr-1" />
+															<span className="text-xs">
+																{selectedPlans.includes(plan.id)
+																	? "Selecionado"
+																	: "Comparar"}
+															</span>
+														</button>
 
-													<button
-														onClick={() => setViewPlanId(plan.id)}
-														className="flex-1 py-2 px-4 w-full rounded-lg text-sm hover:cursor-pointer  border transition-colors flex items-center justify-center space-x-1"
-														aria-label="Ver detalhes"
-													>
-														Ver todas as coberturas
-													</button>
+														<button
+															onClick={() => setViewPlanId(plan.id)}
+															className="flex-1 py-1 px-2 rounded-lg hover:cursor-pointer border transition-colors flex items-center justify-center"
+															aria-label="Ver detalhes"
+														>
+															<Eye className="h-3 w-3 mr-1" />
+															<span className="text-xs">Detalhes</span>
+														</button>
+													</div>
 												</div>
 											</div>
 										</div>

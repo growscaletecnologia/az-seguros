@@ -90,9 +90,35 @@ export class AuthService {
     const isMatch = await bcrypt.compare(pass, user.password)
     if (!isMatch) throw new UnauthorizedException('Credenciais inválidas')
 
-    if (user.status === 'SUSPENDED') throw new ForbiddenException('Conta suspensa')
-    if (user.status === 'BLOCKED') throw new ForbiddenException('Conta bloqueada')
+    // Verifica se o status do usuário é ACTIVE ou PENDING
+    if (user.status !== 'ACTIVE' && user.status !== 'PENDING') {
+      throw new ForbiddenException({
+        message: 'Acesso negado',
+        statusCode: 403,
+        userStatus: user.status,
+        details: this.getStatusMessage(user.status),
+      })
+    }
+
     return user
+  }
+
+  /**
+   * Retorna uma mensagem personalizada com base no status do usuário
+   */
+  private getStatusMessage(status: string): string {
+    switch (status) {
+      case 'SUSPENDED':
+        return 'Sua conta está temporariamente suspensa. Entre em contato com o suporte para mais informações.'
+      case 'INACTIVE':
+        return 'Sua conta está inativa. Por favor, ative sua conta para continuar.'
+      case 'BLOCKED':
+        return 'Sua conta foi bloqueada. Entre em contato com o suporte para mais informações.'
+      case 'DELETED':
+        return 'Esta conta foi excluída e não pode mais ser acessada.'
+      default:
+        return 'Sua conta não está disponível para acesso no momento.'
+    }
   }
 
   async login(user: User) {

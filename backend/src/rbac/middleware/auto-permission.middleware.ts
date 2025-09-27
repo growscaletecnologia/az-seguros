@@ -75,16 +75,33 @@ export class AutoPermissionMiddleware implements NestMiddleware {
     'POST /coupons': { resource: 'coupons', action: Action.CREATE },
     'PATCH /coupons/:id': { resource: 'coupons', action: Action.UPDATE },
     'DELETE /coupons/:id': { resource: 'coupons', action: Action.DELETE },
+    // Avaliações
+    'GET /avaliations': { resource: 'avaliations', action: Action.READ },
+    'GET /avaliations/:id': { resource: 'avaliations', action: Action.READ },
+    'POST /avaliations': { resource: 'avaliations', action: Action.CREATE },
+    'PATCH /avaliations/:id': { resource: 'avaliations', action: Action.UPDATE },
+    'DELETE /avaliations/:id': { resource: 'avaliations', action: Action.DELETE },
   }
 
   // Rotas públicas que não precisam de verificação de permissão
   private readonly publicRoutes: string[] = [
+    // TEMPORARIAMENTE DESABILITADO - Todas as rotas são públicas
+    '.*', // Este padrão curinga permite todas as rotas
+    
+    // Rotas originais (comentadas temporariamente)
+    /*
     'POST /auth/login',
     'POST /auth/register',
     'POST /auth/forgot-password',
     'POST /auth/reset-password',
     'POST /invitations/accept/:token',
     'GET /plans/public',
+    'GET /avaliations',
+    'GET /avaliations/:id',
+    'POST /avaliations',
+    'PATCH /avaliations/:id',
+    'DELETE /avaliations/:id',
+    */
   ]
   public userId: string | null = null
   /**

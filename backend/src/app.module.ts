@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { AuthModule } from './auth/auth.module'
@@ -10,6 +10,12 @@ import { CouponsModule } from './coupons/coupons.module'
 import { PostsModule } from './posts/posts.module'
 import { CategoriesModule } from './categories/categories.module'
 import { TagsModule } from './tags/tags.module'
+import { LogsModule } from './logs/logs.module'
+import { SystemPagesModule } from './system-pages/system-pages.module'
+
+import { LoggerMiddleware } from './middleware/logger'
+import { SettingsModule } from './modules/settings/settings.module'
+import { AvaliationsModule } from './avaliations/avaliations.module'
 
 @Module({
   imports: [
@@ -22,8 +28,16 @@ import { TagsModule } from './tags/tags.module'
     PostsModule,
     CategoriesModule,
     TagsModule,
+    LogsModule,
+    SystemPagesModule,
+    SettingsModule,
+    AvaliationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('*') // aplica global
+  }
+}

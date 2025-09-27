@@ -184,7 +184,7 @@ export default function BlogAdminPage() {
 																		Visualizar
 																	</Button>
 																</Link>
-																<Button
+																{/* <Button
 																	variant="destructive"
 																	size="sm"
 																	onClick={async () => {
@@ -207,7 +207,7 @@ export default function BlogAdminPage() {
 																	}}
 																>
 																	Excluir
-																</Button>
+																</Button> */}
 															</div>
 														</TableCell>
 													</TableRow>

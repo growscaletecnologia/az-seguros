@@ -42,6 +42,7 @@ export class UserRepository {
         birthDate: data.birthDate,
         password: data.password,
         oldPassword: data.oldPassword,
+        status: data.status,
         addresses: data.addresses
           ? {
               updateMany: data.addresses.map((addr) => ({

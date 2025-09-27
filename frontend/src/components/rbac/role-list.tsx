@@ -85,7 +85,7 @@ export function RoleList() {
 	return (
 		<div className="space-y-4">
 			<div className="flex justify-between items-center">
-				<h2 className="text-2xl font-bold">Papéis (Roles)</h2>
+				<h2 className="text-2xl font-bold">Tipos de Acesso</h2>
 				<Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
 					<DialogTrigger asChild>
 						<Button>
@@ -140,14 +140,14 @@ export function RoleList() {
 									</TableCell>
 									<TableCell className="text-right">
 										<div className="flex justify-end gap-2">
-											<Button
+											{/* <Button
 												variant="outline"
 												size="icon"
 												onClick={() => openPermissionsDialog(role)}
 												title="Gerenciar Permissões"
 											>
 												<Shield className="h-4 w-4" />
-											</Button>
+											</Button> */}
 											<Button
 												variant="outline"
 												size="icon"

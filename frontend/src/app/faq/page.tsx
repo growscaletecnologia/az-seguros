@@ -2,14 +2,18 @@
 "use client";
 
 import { ChevronDown } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { SystemPagesService } from "@/services/systemPages";
+import DOMPurify from "dompurify";
+import UnavailableContent from "@/components/UnavailableContent";
 
 interface FAQItem {
 	question: string;
 	answer: string;
 }
 
-const faqs: FAQItem[] = [
+// FAQs padrão caso a API não retorne dados
+const defaultFaqs: FAQItem[] = [
 	{
 		question: "O que é o seguro viagem e por que eu preciso dele?",
 		answer:
@@ -67,17 +71,102 @@ function FAQItemComponent({ item }: { item: FAQItem }) {
 	);
 }
 
+/**
+ * Componente para renderizar conteúdo HTML de forma segura
+ */
+function SafeHTML({ html }: { html: string }) {
+	return (
+		<div
+			dangerouslySetInnerHTML={{
+				__html: DOMPurify.sanitize(html),
+			}}
+		/>
+	);
+}
+
 export default function FAQPage() {
+	const [faqs, setFaqs] = useState<FAQItem[]>(defaultFaqs);
+	const [pageTitle, setPageTitle] = useState<string>("Perguntas Frequentes");
+	const [loading, setLoading] = useState<boolean>(true);
+	const [htmlContent, setHtmlContent] = useState<string | null>(null);
+
+	// Buscar conteúdo da página FAQ da API
+	useEffect(() => {
+		const fetchFAQContent = async () => {
+			try {
+				setLoading(true);
+				const faqPage = await SystemPagesService.getByType("FAQ");
+				
+				if (faqPage) {
+					// Se tiver conteúdo HTML, usamos ele diretamente
+					setHtmlContent(faqPage.content);
+					
+					// Se tiver título, atualizamos o título da página
+					if (faqPage.title) {
+						setPageTitle(faqPage.title);
+					}
+					
+					// Tentamos extrair FAQs do conteúdo se não for HTML estruturado
+					// Isso é um fallback caso o conteúdo não seja HTML completo
+					try {
+						const parsedContent = JSON.parse(faqPage.content);
+						if (Array.isArray(parsedContent) && parsedContent.length > 0) {
+							setFaqs(parsedContent);
+							setHtmlContent(null); // Não usamos HTML se temos FAQs estruturadas
+						}
+					} catch (e) {
+						// Se não conseguir fazer parse como JSON, mantém o conteúdo HTML
+						console.log("Usando conteúdo HTML da página");
+					}
+				}
+			} catch (error) {
+				console.error("Erro ao buscar conteúdo FAQ:", error);
+				// Mantém os FAQs padrão em caso de erro
+			} finally {
+				setLoading(false);
+			}
+			
+			// Se não houver conteúdo na API e não tivermos FAQs padrão, mostraremos o componente de indisponibilidade
+			if (!faqPage && defaultFaqs.length === 0) {
+				setHtmlContent(null);
+				setFaqs([]);
+			}
+		};
+
+		fetchFAQContent();
+	}, []);
+
 	return (
 		<main className="max-w-3xl mx-auto px-4 py-12">
-			<h1 className="text-3xl font-bold text-center mb-8">
-				Perguntas Frequentes
-			</h1>
-			<div className="space-y-2">
-				{faqs.map((faq, index) => (
-					<FAQItemComponent key={index} item={faq} />
-				))}
-			</div>
+			{loading ? (
+				<div className="text-center py-8">Carregando...</div>
+			) : htmlContent || faqs.length > 0 ? (
+				<>
+					<h1 className="text-3xl font-bold text-center mb-8">
+						{pageTitle}
+					</h1>
+					
+					{htmlContent ? (
+						// Renderiza conteúdo HTML se disponível
+						<div className="faq-content">
+							<SafeHTML html={htmlContent} />
+						</div>
+					) : (
+						// Renderiza FAQs estruturados se não tiver HTML
+						<div className="space-y-2">
+							{faqs.map((faq, index) => (
+								<FAQItemComponent key={index} item={faq} />
+							))}
+						</div>
+					)}
+				</>
+			) : (
+				// Mostra o componente de conteúdo indisponível quando não há dados
+				<UnavailableContent 
+					title="FAQ Indisponível"
+					message="As perguntas frequentes não estão disponíveis no momento. Por favor, tente novamente mais tarde."
+				/>
+			)}
 		</main>
 	);
 }

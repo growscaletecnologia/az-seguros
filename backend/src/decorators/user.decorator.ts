@@ -4,10 +4,10 @@ import prisma from 'src/prisma/client'
 
 /**
  * Decorator para obter o usuário logado a partir do token JWT
- * 
+ *
  * Este decorator extrai o userId do objeto request.user (fornecido pelo JwtStrategy)
  * e retorna o objeto de usuário completo do banco de dados.
- * 
+ *
  * Uso: @LoggedUser() user: User
  */
 export const LoggedUser = createParamDecorator(async (data: string, context: ExecutionContext) => {

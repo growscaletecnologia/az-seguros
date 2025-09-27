@@ -197,32 +197,32 @@ export default function CheckoutPage() {
 		<div className="bg-gray-50 min-h-screen">
 			{/* Header */}
 			<div className="bg-white shadow-sm border-b">
-				<div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-					<h1 className="text-3xl font-bold text-gray-900">Finalizar Compra</h1>
-					<p className="text-gray-600 mt-2">
+				<div className="max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6">
+					<h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">Finalizar Compra</h1>
+					<p className="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">
 						Revise seus dados e efetue o pagamento
 					</p>
 				</div>
 			</div>
 
-			<div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-				<div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+			<div className="max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
+				<div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
 					{/* Identificação dos Segurados */}
 
 					{/* Formulário de Pagamento */}
-					<div className="lg:col-span-2 space-y-6">
-						<div className="bg-white rounded-lg shadow-sm p-6">
-							<h3 className="text-lg font-semibold text-gray-900 mb-4">
+					<div className="lg:col-span-2 space-y-4 sm:space-y-6">
+						<div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
+							<h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">
 								Identificação dos Segurados
 							</h3>
 
 							{segurados.map((seg, index) => (
 								<div
 									key={index}
-									className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 items-end"
+									className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 mb-3 sm:mb-4 items-end"
 								>
 									<div>
-										<label className="block text-sm font-medium text-gray-700 mb-1">
+										<label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
 											Nome Completo
 										</label>
 										<input
@@ -232,11 +232,11 @@ export default function CheckoutPage() {
 												updateSegurado(index, "nome", e.target.value)
 											}
 											placeholder="Digite o nome completo"
-											className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+											className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
 										/>
 									</div>
 									<div>
-										<label className="block text-sm font-medium text-gray-700 mb-1">
+										<label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
 											Data de Nascimento
 										</label>
 										<input
@@ -245,12 +245,12 @@ export default function CheckoutPage() {
 											onChange={(e) =>
 												updateSegurado(index, "nascimento", e.target.value)
 											}
-											className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+											className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
 										/>
 									</div>
 									<div className="flex items-center gap-2">
 										<div className="flex-1">
-											<label className="block text-sm font-medium text-gray-700 mb-1">
+											<label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
 												CPF
 											</label>
 											<input
@@ -260,14 +260,14 @@ export default function CheckoutPage() {
 													updateSegurado(index, "cpf", e.target.value)
 												}
 												placeholder="000.000.000-00"
-												className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+												className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
 											/>
 										</div>
 										{segurados.length > 1 && (
 											<button
 												type="button"
 												onClick={() => removeSegurado(index)}
-												className="px-3 py-2 text-sm text-red-600 hover:underline"
+												className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-red-600 hover:underline"
 											>
 												Remover
 											</button>
@@ -279,22 +279,22 @@ export default function CheckoutPage() {
 							<button
 								type="button"
 								onClick={addSegurado}
-								className="w-full mt-2 border-2 border-dashed border-green-400 text-green-600 py-3 rounded-lg font-medium flex items-center justify-center hover:bg-green-50"
+								className="w-full mt-2 border-2 border-dashed border-green-400 text-green-600 py-2 sm:py-3 rounded-lg font-medium flex items-center justify-center hover:bg-green-50 text-sm"
 							>
 								+ Adicionar Segurado
 							</button>
 						</div>
 						{/* Dados da Cotação */}
-						<div className="bg-white rounded-lg shadow-sm p-6">
-							<h3 className="text-lg font-semibold text-gray-900 mb-4">
+						<div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
+							<h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">
 								Dados da Viagem
 							</h3>
-							<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+							<div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
 								<div className="flex items-center space-x-2">
-									<MapPin className="h-4 w-4 text-gray-500" />
+									<MapPin className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-500" />
 									<div>
-										<p className="text-sm text-gray-600">Destino</p>
-										<p className="font-medium">{quotationData.destino}</p>
+										<p className="text-xs sm:text-sm text-gray-600">Destino</p>
+										<p className="text-sm sm:text-base font-medium">{quotationData.destino}</p>
 									</div>
 								</div>
 								<div className="flex items-center space-x-2">

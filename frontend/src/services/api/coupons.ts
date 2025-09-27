@@ -70,12 +70,12 @@ export const couponsService = {
 	},
 
 	/**
-	 * Remove um cupom (soft delete)
+	 * Remove um cupom (exclusão permanente)
 	 * @param id ID do cupom
 	 * @returns Resultado da operação
 	 */
 	async remove(id: string): Promise<any> {
-		const response = await api.delete(`/coupons/${id}`);
+		const response = await api.delete(`/coupons/${id}?obliterate=true`);
 		return response.data;
 	},
 

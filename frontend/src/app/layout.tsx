@@ -4,6 +4,8 @@ import "./globals.css";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { Toaster } from "sonner";
+import ClientGtmScripts from "@/components/ClientGtmScripts";
+
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,11 +23,7 @@ export default function RootLayout({
 	return (
 		<html lang="pt-BR">
 			{/* <head>
-				<script
-					src="/path/or/uri/to/tinymce.min.js"
-					referrerpolicy="origin"
-					crossorigin="anonymous"
-				></script>
+				<ClientGtmScripts />
 			</head> */}
 			<body className={inter.className}>
 				<Header />

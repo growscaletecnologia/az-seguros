@@ -1,5 +1,6 @@
 "use client";
 import {
+	Activity,
 	BookImage,
 	BookKey,
 	ChevronDown,
@@ -10,6 +11,7 @@ import {
 	LayoutDashboard,
 	LogOut,
 	Menu,
+	MessageSquareQuote,
 	Settings,
 	ShoppingCart,
 	Tag,
@@ -60,17 +62,23 @@ const AdminSidebar = () => {
 			href: "/admin/cupons",
 			icon: <Tag className="h-5 w-5" />,
 		},
-		{
-			id: "pedidos",
-			label: "Área de Pedidos",
-			href: "/admin/pedidos",
-			icon: <ShoppingCart className="h-5 w-5" />,
-		},
+		// {
+		// 	id: "pedidos",
+		// 	label: "Área de Pedidos",
+		// 	href: "/admin/pedidos",
+		// 	icon: <ShoppingCart className="h-5 w-5" />,
+		// },
 		{
 			id: "blog",
 			label: "Publicações (Blog)",
 			href: "/admin/blog",
 			icon: <BookImage className="h-5 w-5" />,
+		},
+		{
+			id: "avaliacoes",
+			label: "Avaliações",
+			href: "/admin/avaliacoes",
+			icon: <MessageSquareQuote className="h-5 w-5" />,
 		},
 		{
 			id: "rbac",
@@ -80,15 +88,29 @@ const AdminSidebar = () => {
 		},
 		{
 			id: "conteudos",
-			label: "Páginas do Sistema",
+			label: "Gestão do Sistema",
 			href: "/admin/conteudos",
 			icon: <BookKey className="h-5 w-5" />,
 		},
+	
+		// {
+		// 	id: "integrations",
+		// 	label: "Integrações",
+		// 	href: "/admin/integrations",
+		// 	icon: <Globe className="h-5 w-5" />,
+		// },
+
 		{
-			id: "integrations",
-			label: "Integrações",
-			href: "/admin/integrations",
-			icon: <Globe className="h-5 w-5" />,
+			id: "activities",
+			label: "Atividades do Sistema",
+			href: "/admin/logs",
+			icon: <Activity className="h-5 w-5" />,
+		},
+		{
+			id: "configuracoes",
+			label: "Configurações",
+			href: "/admin/configuracoes",
+			icon: <Settings className="h-5 w-5" />,
 		},
 	];
 

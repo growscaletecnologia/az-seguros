@@ -1,5 +1,6 @@
 "use client";
 import { InviteUserForm } from "@/components/rbac/invite-user-form";
+import { CreateUserForm } from "@/components/rbac/create-user-form";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -89,10 +90,12 @@ const UsuariosPage = () => {
 			setLoading(true);
 			const data = await usersService.getAll();
 			const usuariosMapeados = data.map(mapApiUserToUsuario);
-			setUsuarios(usuariosMapeados);
+			console.log("usuarios Mapeados",usuariosMapeados);
+			const usuariosSemCustomer = usuariosMapeados.filter(u => u.role !== 'customer');
+			setUsuarios(usuariosSemCustomer);
 		} catch (error) {
-			console.error("Erro ao carregar usuários:", error);
-			toast.error("Erro ao carregar usuários");
+				console.error("Erro ao carregar usuários:", error);
+			toast.error(`Erro ao carregar usuários: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
 		} finally {
 			setLoading(false);
 		}
@@ -128,7 +131,7 @@ const UsuariosPage = () => {
 			setEditandoUsuario(null);
 		} catch (error) {
 			console.error("Erro ao atualizar usuário:", error);
-			toast.error("Erro ao atualizar usuário");
+			toast.error(`Erro ao atualizar usuário: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
 		}
 	};
 
@@ -139,7 +142,7 @@ const UsuariosPage = () => {
 			carregarUsuarios();
 		} catch (error) {
 			console.error("Erro ao excluir usuário:", error);
-			toast.error("Erro ao excluir usuário");
+			toast.error(`Erro ao excluir usuário: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
 		}
 	};
 
@@ -175,7 +178,7 @@ const UsuariosPage = () => {
 			carregarUsuarios();
 		} catch (error) {
 			console.error("Erro ao alterar status do usuário:", error);
-			toast.error("Erro ao alterar status do usuário");
+			toast.error(`Erro ao alterar status do usuário: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
 		}
 	};
 
@@ -205,12 +208,12 @@ const UsuariosPage = () => {
 	return (
 		<div className="container py-6">
 			<div className="flex justify-between items-center mb-6">
-				<h1 className="text-3xl font-bold">Gestão de Usuários</h1>
+				<h1 className="text-3xl font-bold">Gestão de Usuários do Sistema</h1>
 				<div className="flex gap-2">
 					<Dialog>
-						<DialogTrigger asChild>
+						{/* <DialogTrigger asChild>
 							<Button variant="outline">Convidar Usuário</Button>
-						</DialogTrigger>
+						</DialogTrigger> */}
 						<DialogContent className="sm:max-w-[600px]">
 							<DialogHeader>
 								<DialogTitle>Convidar Novo Usuário</DialogTitle>
@@ -220,6 +223,26 @@ const UsuariosPage = () => {
 									<InviteUserForm
 										onSuccess={() => {
 											toast.success("Convite enviado com sucesso!");
+											carregarUsuarios();
+										}}
+									/>
+								</CardContent>
+							</Card>
+						</DialogContent>
+					</Dialog>
+					
+					<Dialog>
+						<DialogTrigger asChild>
+							<Button>Adicionar Usuário</Button>
+						</DialogTrigger>
+						<DialogContent className="sm:max-w-[600px]">
+							<DialogHeader>
+								<DialogTitle>Adicionar Novo Usuário</DialogTitle>
+							</DialogHeader>
+							<Card>
+								<CardContent className="pt-4">
+									<CreateUserForm
+										onSuccess={() => {
 											carregarUsuarios();
 										}}
 									/>

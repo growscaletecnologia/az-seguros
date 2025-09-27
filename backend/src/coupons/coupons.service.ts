@@ -137,22 +137,37 @@ export class CouponsService {
   }
 
   /**
-   * Remove um cupom (soft delete)
+   * Remove um cupom (exclusão permanente ou soft delete)
    * @param id ID do cupom
+   * @param obliterate Se true, realiza exclusão permanente; se false, realiza soft delete
    * @returns Confirmação da remoção
    */
-  async remove(id: string) {
+  async remove(id: string, obliterate = false) {
     // Verifica se o cupom existe
     await this.findOne(id)
 
-    return this.prisma.coupom.update({
-      where: { id },
-      data: {
-        deleted: true,
-        deletedAt: new Date(),
-        status: CoupomStatus.INACTIVE,
-      },
-    })
+    if (obliterate) {
+      // Exclusão permanente
+      // Primeiro exclui os registros de uso do cupom
+      await this.prisma.coupomUsage.deleteMany({
+        where: { coupomId: id },
+      })
+
+      // Depois exclui o cupom
+      return this.prisma.coupom.delete({
+        where: { id },
+      })
+    } else {
+      // Soft delete
+      return this.prisma.coupom.update({
+        where: { id },
+        data: {
+          deleted: true,
+          deletedAt: new Date(),
+          status: CoupomStatus.INACTIVE,
+        },
+      })
+    }
   }
 
   /**

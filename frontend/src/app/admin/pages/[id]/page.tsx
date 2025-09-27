@@ -1,7 +1,7 @@
 "use client";
 
-import EditorWhat from "@/components/admin/editor";
-import { SelectSlug } from "@/components/admin/selectSlug";
+// import { SelectSlug } from "@/components/admin/selectSlug";
+import JoditEditorComponent from "@/components/Inputs/JoditEditor";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -234,7 +234,7 @@ export default function PageForm({ params }: { params: { id: string } }) {
 									handleSlug(event);
 									calculateCharacters(event);
 								}}
-								error={errors.title?.message}
+								error={String(errors?.title?.message)}
 							/>
 						</div>
 						<div>
@@ -275,10 +275,10 @@ export default function PageForm({ params }: { params: { id: string } }) {
 							control={control}
 							defaultValue=""
 							render={({ field }) => (
-								<EditorWhat
+								<JoditEditorComponent
 									value={field.value}
 									onChange={field.onChange}
-									setImages={setContentImages}
+									// setImages={setContentImages}
 								/>
 							)}
 						/>
@@ -374,11 +374,11 @@ export default function PageForm({ params }: { params: { id: string } }) {
 						</CardContent>
 					) : categories && categories.length > 0 ? (
 						<CardContent>
-							<SelectSlug
+							{/* <SelectSlug
 								items={categories}
 								selectedItems={selectedCategories}
 								onChange={setSelectedCategories}
-							/>
+							/> */}
 						</CardContent>
 					) : (
 						<CardContent className="text-left">
