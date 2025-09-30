@@ -44,14 +44,16 @@ export default function BlogAdminPage() {
 	const loadPosts = async () => {
 		try {
 			setLoading(true);
-			const response = await postsService.getPosts({
-				...filter,
-				search: search.length > 2 ? search : undefined,
-			});
+			const response = await postsService.getPostsByStatus(
+				filter.status || "PUBLISHED",
+				filter.page || 1,
+				filter.limit || 10,
+				search.length > 2 ? search : undefined
+			);
 			console.log("POSTS AQUI", response);
-			setPosts(response.posts);
+			setPosts(response.posts || []);
 			setTotalPosts(response.total || 0);
-			setTotalPages(Math.ceil(response.total / filter.limit!));
+			setTotalPages(Math.ceil((response.total || 0) / (filter.limit || 10)));
 			setResponse(response);
 		} catch (error) {
 			console.error("Erro ao carregar posts:", error);
@@ -63,7 +65,7 @@ export default function BlogAdminPage() {
 	// Carrega os posts quando os filtros mudam
 	useEffect(() => {
 		loadPosts();
-	}, [filter]);
+	}, [filter, search]);
 
 	// Manipula a pesquisa
 	const handleSearch = () => {
@@ -120,135 +122,142 @@ export default function BlogAdminPage() {
 							<TabsTrigger value="ARCHIVED">Arquivados</TabsTrigger>
 						</TabsList>
 
-						{loading ? (
-							<div className="flex justify-center py-8">Carregando...</div>
-						) : (
-							<>
-								<Table>
-									<TableHeader>
-										<TableRow>
-											<TableHead>Título</TableHead>
-											<TableHead>Status</TableHead>
-											<TableHead>Data de criação</TableHead>
-											<TableHead>Última atualização</TableHead>
-											<TableHead className="text-right">Ações</TableHead>
-										</TableRow>
-									</TableHeader>
-									<TableBody>
-										{posts?.length === 0 ? (
-											<TableRow>
-												<TableCell colSpan={5} className="text-center py-8">
-													Nenhum post encontrado
-												</TableCell>
-											</TableRow>
-										) : (
-											posts?.map((post) => {
-												// Extrair as categorias e tags da nova estrutura aninhada
-												const categories = post.categories.map(
-													(pc) => pc.category,
-												);
-												const tags = post.tags.map((pt) => pt.tag);
+						<TabsContent value="PUBLISHED">
+							{loading ? (
+								<div className="flex justify-center py-8">Carregando...</div>
+							) : (
+								<PostsTable posts={posts} onDelete={loadPosts} />
+							)}
+						</TabsContent>
 
-												return (
-													<TableRow key={post.id}>
-														<TableCell className="font-medium">
-															{post.title}
-														</TableCell>
-														<TableCell>{getStatusBadge(post.status)}</TableCell>
-														<TableCell>
-															{format(
-																new Date(post.createdAt),
-																"dd/MM/yyyy HH:mm",
-																{ locale: ptBR },
-															)}
-														</TableCell>
-														<TableCell>
-															{format(
-																new Date(post.updatedAt),
-																"dd/MM/yyyy HH:mm",
-																{ locale: ptBR },
-															)}
-														</TableCell>
-														<TableCell className="text-right">
-															<div className="flex justify-end gap-2">
-																<Link href={`/admin/blog/editar/${post.id}`}>
-																	<Button variant="outline" size="sm">
-																		Editar
-																	</Button>
-																</Link>
-																<Link
-																	href={`/blog/${post.slug}`}
-																	target="_blank"
-																>
-																	<Button variant="outline" size="sm">
-																		Visualizar
-																	</Button>
-																</Link>
-																{/* <Button
-																	variant="destructive"
-																	size="sm"
-																	onClick={async () => {
-																		if (
-																			confirm(
-																				"Tem certeza que deseja excluir este post?",
-																			)
-																		) {
-																			try {
-																				await postsService.deletePost(post.id);
-																				loadPosts();
-																			} catch (error) {
-																				console.error(
-																					"Erro ao excluir post:",
-																					error,
-																				);
-																				alert("Erro ao excluir post");
-																			}
-																		}
-																	}}
-																>
-																	Excluir
-																</Button> */}
-															</div>
-														</TableCell>
-													</TableRow>
-												);
-											})
-										)}
-									</TableBody>
-								</Table>
+						<TabsContent value="DRAFT">
+							{loading ? (
+								<div className="flex justify-center py-8">Carregando...</div>
+							) : (
+								<PostsTable posts={posts} onDelete={loadPosts} />
+							)}
+						</TabsContent>
 
-								<div className="flex items-center justify-between mt-4">
-									<div className="text-sm text-gray-500">
-										Mostrando {posts?.length || 0} de {totalPosts} posts
-									</div>
-									<div className="flex gap-2">
-										<Button
-											variant="outline"
-											size="sm"
-											disabled={filter.page === 1}
-											onClick={() =>
-												setFilter({ ...filter, page: filter.page! - 1 })
-											}
-										>
-											Anterior
-										</Button>
-										<Button
-											variant="outline"
-											size="sm"
-											disabled={!response?.nextPage}
-											onClick={() =>
-												setFilter({ ...filter, page: filter.page! + 1 })
-											}
-										>
-											Próximo
-										</Button>
-									</div>
-								</div>
-							</>
-						)}
+						<TabsContent value="ARCHIVED">
+							{loading ? (
+								<div className="flex justify-center py-8">Carregando...</div>
+							) : (
+								<PostsTable posts={posts} onDelete={loadPosts} />
+							)}
+						</TabsContent>
 					</Tabs>
 				</CardContent>
 			</Card>
 		</div>
+	);
+}
+
+/**
+ * Componente para exibir a tabela de posts
+ */
+function PostsTable({ posts, onDelete }: { posts: Post[]; onDelete: () => void }) {
+	// Formata o status do post para exibição
+	const getStatusBadge = (status: string) => {
+		switch (status) {
+			case "PUBLISHED":
+				return <Badge className="bg-green-500">Publicado</Badge>;
+			case "DRAFT":
+				return <Badge className="bg-yellow-500">Rascunho</Badge>;
+			case "ARCHIVED":
+				return <Badge className="bg-gray-500">Arquivado</Badge>;
+			default:
+				return <Badge>{status}</Badge>;
+		}
+	};
+
+	// Manipula a exclusão de um post
+	const handleDelete = async (id: string) => {
+		if (confirm("Tem certeza que deseja excluir este post?")) {
+			try {
+				await postsService.deletePost(id);
+				onDelete();
+			} catch (error) {
+				console.error("Erro ao excluir post:", error);
+				alert("Erro ao excluir post");
+			}
+		}
+	};
+
+	return (
+		<Table>
+			<TableHeader>
+				<TableRow>
+					<TableHead>Título</TableHead>
+					<TableHead>Status</TableHead>
+					<TableHead>Data de criação</TableHead>
+					<TableHead>Última atualização</TableHead>
+					<TableHead className="text-right">Ações</TableHead>
+				</TableRow>
+			</TableHeader>
+			<TableBody>
+				{posts?.length === 0 ? (
+					<TableRow>
+						<TableCell colSpan={5} className="text-center py-8">
+							Nenhum post encontrado
+						</TableCell>
+					</TableRow>
+				) : (
+					posts?.map((post) => {
+						// Extrair as categorias e tags da nova estrutura aninhada
+						const categories = post.categories.map(
+							(pc) => pc.category,
+						);
+						const tags = post.tags.map((pt) => pt.tag);
+
+						return (
+							<TableRow key={post.id}>
+								<TableCell className="font-medium">
+									{post.title}
+								</TableCell>
+								<TableCell>{getStatusBadge(post.status)}</TableCell>
+								<TableCell>
+									{format(
+										new Date(post.createdAt),
+										"dd/MM/yyyy HH:mm",
+										{ locale: ptBR },
+									)}
+								</TableCell>
+								<TableCell>
+									{format(
+										new Date(post.updatedAt),
+										"dd/MM/yyyy HH:mm",
+										{ locale: ptBR },
+									)}
+								</TableCell>
+								<TableCell className="text-right">
+									<div className="flex justify-end gap-2">
+										<Link href={`/admin/blog/editar/${post.id}`}>
+											<Button variant="outline" size="sm">
+												Editar
+											</Button>
+										</Link>
+										<Link
+											href={`/blog/${post.slug}`}
+											target="_blank"
+										>
+											<Button variant="outline" size="sm">
+												Visualizar
+											</Button>
+										</Link>
+										<Button
+											variant="destructive"
+											size="sm"
+											onClick={() => handleDelete(post.id)}
+										>
+											Excluir
+										</Button>
+									</div>
+								</TableCell>
+							</TableRow>
+						);
+					})
+				)}
+			</TableBody>
+		</Table>
 	);
 }

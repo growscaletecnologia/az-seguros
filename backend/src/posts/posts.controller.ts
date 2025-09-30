@@ -123,19 +123,61 @@ export class PostsController {
   }
 
   /**
-   * Lista todos os posts com paginação
+   * Lista posts publicados (acesso público)
+   */
+  @ApiOperation({ summary: 'Listar posts publicados (acesso público)' })
+  @ApiQuery({ name: 'page', required: false, description: 'Número da página' })
+  @ApiQuery({ name: 'limit', required: false, description: 'Limite de itens por página' })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    description: 'Texto para busca no título, descrição ou conteúdo',
+  })
+  @ApiResponse({ status: 200, description: 'Lista de posts publicados retornada com sucesso' })
+  @Get('public')
+  findPublishedPosts(
+    @Query('page') page: string = '1',
+    @Query('limit') limit: string = '10',
+    @Query('search') search?: string,
+  ) {
+    try {
+      const pageNumber = parseInt(page, 10)
+      const limitNumber = parseInt(limit, 10)
+      return this.postsService.findAllByStatus(
+        PostStatus.PUBLISHED,
+        pageNumber,
+        limitNumber,
+        search,
+      )
+    } catch (error) {
+      console.log(error)
+      throw new InternalServerErrorException('Erro ao buscar posts publicados')
+    }
+  }
+
+  /**
+   * Lista todos os posts com paginação e busca por texto
    */
   @ApiOperation({ summary: 'Listar todos os posts' })
   @ApiQuery({ name: 'page', required: false, description: 'Número da página' })
   @ApiQuery({ name: 'limit', required: false, description: 'Limite de itens por página' })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    description: 'Texto para busca no título, descrição ou conteúdo',
+  })
   @ApiResponse({ status: 200, description: 'Lista de posts retornada com sucesso' })
   @UseGuards(JwtAuthGuard)
   @Get()
-  findAll(@Query('page') page: string = '1', @Query('limit') limit: string = '10') {
+  findAll(
+    @Query('page') page: string = '1',
+    @Query('limit') limit: string = '10',
+    @Query('search') search?: string,
+  ) {
     try {
       const pageNumber = parseInt(page, 10)
       const limitNumber = parseInt(limit, 10)
-      return this.postsService.findAll(pageNumber, limitNumber)
+      return this.postsService.findAll(pageNumber, limitNumber, search)
     } catch (error) {
       console.log(error)
       throw new InternalServerErrorException('Erro ao buscar posts')
@@ -215,6 +257,7 @@ export class PostsController {
   @UseGuards(JwtAuthGuard)
   @Put(':id')
   update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto, @LoggedUser() user: User) {
+    console.log('bateu aq', id)
     try {
       return this.postsService.update(id, updatePostDto, user.id)
     } catch (error) {
@@ -243,6 +286,41 @@ export class PostsController {
         throw error
       }
       throw new InternalServerErrorException('Erro ao remover post')
+    }
+  }
+
+  /**
+   * Upload da imagem de capa do post
+   */
+  @ApiOperation({ summary: 'Upload da imagem de capa do post' })
+  @ApiParam({ name: 'id', description: 'ID do post' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Arquivo de imagem para capa do post',
+    type: 'multipart/form-data',
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: 200, description: 'Imagem de capa enviada com sucesso' })
+  @ApiResponse({ status: 404, description: 'Post não encontrado' })
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/upload-cover-image')
+  @UseInterceptors(FileInterceptor('file'))
+  uploadCoverImage(@Param('id') id: string, @UploadedFile() file: Express.Multer.File) {
+    try {
+      return this.postsService.uploadCoverImage(file, id)
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error
+      }
+      throw new InternalServerErrorException('Erro ao fazer upload da imagem de capa')
     }
   }
 

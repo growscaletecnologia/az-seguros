@@ -1,32 +1,32 @@
-import { Injectable } from '@nestjs/common';
-import { CreateLogDto } from './dto/create-log.dto';
-import { UpdateLogDto } from './dto/update-log.dto';
-import prisma from '../prisma/client';
-import { HttpMethod } from '@prisma/client';
+import { Injectable } from '@nestjs/common'
+import { CreateLogDto } from './dto/create-log.dto'
+import { UpdateLogDto } from './dto/update-log.dto'
+import prisma from '../prisma/client'
+import { HttpMethod } from '@prisma/client'
 
 interface FindAllParams {
-  page: number;
-  limit: number;
-  sortBy: string;
-  sortOrder: 'asc' | 'desc';
-  path?: string;
-  method?: string;
-  statusCode?: number;
-  userId?: string;
+  page: number
+  limit: number
+  sortBy: string
+  sortOrder: 'asc' | 'desc'
+  path?: string
+  method?: string
+  statusCode?: number
+  userId?: string
 }
 
 @Injectable()
 export class LogsService {
   async findAll(params: FindAllParams) {
-    const { page, limit, sortBy, sortOrder, path, method, statusCode, userId } = params;
-    const skip = (page - 1) * limit;
+    const { page, limit, sortBy, sortOrder, path, method, statusCode, userId } = params
+    const skip = (page - 1) * limit
 
     // Construir o filtro baseado nos parâmetros opcionais
-    const where: any = {};
-    if (path) where.path = { contains: path };
-    if (method) where.method = method as HttpMethod;
-    if (statusCode) where.statusCode = statusCode;
-    if (userId) where.userId = userId;
+    const where: any = {}
+    if (path) where.path = { contains: path }
+    if (method) where.method = method as HttpMethod
+    if (statusCode) where.statusCode = statusCode
+    if (userId) where.userId = userId
 
     // Buscar logs com paginação
     const [logs, total] = await Promise.all([
@@ -48,7 +48,7 @@ export class LogsService {
         },
       }),
       prisma.log.count({ where }),
-    ]);
+    ])
 
     return {
       data: logs,
@@ -58,7 +58,7 @@ export class LogsService {
         limit,
         totalPages: Math.ceil(total / limit),
       },
-    };
+    }
   }
 
   async findOne(id: string) {
@@ -73,6 +73,6 @@ export class LogsService {
           },
         },
       },
-    });
+    })
   }
 }

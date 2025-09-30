@@ -127,35 +127,35 @@ const AdminSidebar = () => {
 	return (
 		<>
 			{/* Mobile menu button */}
-			<div className="lg:hidden fixed top-4 left-4 z-50">
-				<button
-					onClick={() => setIsMobileOpen(!isMobileOpen)}
-					className="p-2 bg-white rounded-lg shadow-md border"
-				>
-					{isMobileOpen ? (
-						<X className="h-5 w-5" />
-					) : (
-						<Menu className="h-5 w-5" />
-					)}
-				</button>
-			</div>
+		<div className="lg:hidden fixed top-20 left-4 z-40">
+			<button
+				onClick={() => setIsMobileOpen(!isMobileOpen)}
+				className="p-2 bg-white rounded-lg shadow-md border"
+			>
+				{isMobileOpen ? (
+					<X className="h-5 w-5" />
+				) : (
+					<Menu className="h-5 w-5" />
+				)}
+			</button>
+		</div>
 
-			{/* Mobile overlay */}
-			{isMobileOpen && (
-				<div
-					className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
-					onClick={() => setIsMobileOpen(false)}
-				/>
-			)}
-
-			{/* Sidebar */}
+		{/* Mobile overlay */}
+		{isMobileOpen && (
 			<div
-				className={`
-        fixed top-0 left-0 h-full bg-white border-r border-gray-200 shadow-lg z-50 transition-all duration-300
+				className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
+				onClick={() => setIsMobileOpen(false)}
+			/>
+		)}
+
+		{/* Sidebar */}
+		<div
+			className={`
+        fixed top-16 left-0 h-[calc(100vh-4rem)] bg-white border-r border-gray-200 shadow-lg z-40 transition-all duration-300
         ${isCollapsed ? "w-16" : "w-64"}
         ${isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
       `}
-			>
+		>
 				{/* Header */}
 				<div className="p-2">
 					<div className="flex items-center justify-between">

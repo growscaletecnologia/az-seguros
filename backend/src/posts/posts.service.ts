@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common'
-import { PostStatus, User } from '@prisma/client'
+import { PostStatus, Prisma, User } from '@prisma/client'
 import { unlink } from 'fs/promises'
 import { join } from 'path'
 import { CreatePostDto } from './dto/create-post.dto'
@@ -10,26 +10,93 @@ import 'multer'
 
 @Injectable()
 export class PostsService {
+  /**
+   * Aplica imagem padrão aos posts que não possuem coverImage
+   * @param posts Array de posts ou post único
+   * @returns Posts com coverImage garantida
+   */
+  private applyDefaultCoverImage<T extends { coverImage?: string | null }>(posts: T[]): T[]
+  private applyDefaultCoverImage<T extends { coverImage?: string | null }>(post: T): T
+  private applyDefaultCoverImage<T extends { coverImage?: string | null }>(
+    postsOrPost: T[] | T,
+  ): T[] | T {
+    if (Array.isArray(postsOrPost)) {
+      return postsOrPost.map((post) => ({
+        ...post,
+        coverImage: this.getDefaultCoverImage(post.coverImage),
+      }))
+    } else {
+      return {
+        ...postsOrPost,
+        coverImage: this.getDefaultCoverImage(postsOrPost.coverImage),
+      }
+    }
+  }
+
+  /**
+   * Define uma imagem padrão de capa se nenhuma for especificada
+   * @param coverImage URL da imagem de capa atual
+   * @returns URL da imagem de capa (original ou padrão)
+   */
+  private getDefaultCoverImage(coverImage?: string | null): string {
+    return coverImage || '/images/blog-placeholder.svg'
+  }
+
   async create(createPostDto: CreatePostDto, user: User) {
     try {
-      // Validação dos campos obrigatórios
-      if (!createPostDto.title) {
-        throw new HttpException('O título do post é obrigatório', HttpStatus.UNPROCESSABLE_ENTITY)
+      // Validação dos campos obrigatórios apenas para posts publicados
+      if (createPostDto.status === PostStatus.PUBLISHED) {
+        if (!createPostDto.title) {
+          throw new HttpException(
+            'O título do post é obrigatório para publicação',
+            HttpStatus.UNPROCESSABLE_ENTITY,
+          )
+        }
+
+        if (!createPostDto.slug) {
+          throw new HttpException(
+            'O slug do post é obrigatório para publicação',
+            HttpStatus.UNPROCESSABLE_ENTITY,
+          )
+        }
+
+        if (!createPostDto.content) {
+          throw new HttpException(
+            'O conteúdo do post é obrigatório para publicação',
+            HttpStatus.UNPROCESSABLE_ENTITY,
+          )
+        }
+      } else {
+        // Para rascunhos, apenas título é obrigatório
+        if (!createPostDto.title) {
+          throw new HttpException('O título do post é obrigatório', HttpStatus.UNPROCESSABLE_ENTITY)
+        }
       }
 
-      if (!createPostDto.slug) {
-        throw new HttpException('O slug do post é obrigatório', HttpStatus.UNPROCESSABLE_ENTITY)
+      // Gerar slug automático se não fornecido (para rascunhos)
+      let slug = createPostDto.slug
+      if (!slug && createPostDto.title) {
+        slug = createPostDto.title
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '') // Remove acentos
+          .replace(/[^a-z0-9\s-]/g, '') // Remove caracteres especiais
+          .replace(/\s+/g, '-') // Substitui espaços por hífens
+          .replace(/-+/g, '-') // Remove hífens duplicados
+          .trim()
       }
 
-      // Verificar se já existe um post com o mesmo slug
-      const existentPost = await prisma.post.findUnique({
-        where: {
-          slug: createPostDto.slug,
-        },
-      })
+      // Verificar se já existe um post com o mesmo slug (apenas se slug foi fornecido)
+      if (slug) {
+        const existentPost = await prisma.post.findUnique({
+          where: {
+            slug: slug,
+          },
+        })
 
-      if (existentPost) {
-        throw new HttpException('Esse slug já está sendo usado, crie outro.', HttpStatus.CONFLICT)
+        if (existentPost) {
+          throw new HttpException('Esse slug já está sendo usado, crie outro.', HttpStatus.CONFLICT)
+        }
       }
 
       // Garantir que categoryIds e tagIds sejam arrays válidos
@@ -69,18 +136,53 @@ export class PostsService {
         }
       }
 
+      // Buscar a primeira categoria para gerar a URL completa
+      let fullUrl: string | null = null
+      if (slug) {
+        if (createPostDto.fullUrl) {
+          fullUrl = createPostDto.fullUrl
+        } else if (categoryIds.length > 0) {
+          // Buscar o slug da primeira categoria
+          const firstCategory = await prisma.category.findUnique({
+            where: { id: categoryIds[0] },
+            select: { slug: true },
+          })
+
+          if (firstCategory) {
+            // Normalizar o slug da categoria (remover acentos e espaços)
+            const categorySlug = firstCategory.slug
+              .toLowerCase()
+              .normalize('NFD')
+              .replace(/[\u0300-\u036f]/g, '')
+              .replace(/[^\w\s]/g, '')
+              .replace(/\s+/g, '-')
+
+            fullUrl = `/blog/${categorySlug}/${slug}`
+          } else {
+            fullUrl = `/blog/${slug}`
+          }
+        } else {
+          fullUrl = `/blog/${slug}`
+        }
+      }
+
+      // Definir imagem de capa padrão se não fornecida
+      const coverImage = this.getDefaultCoverImage(createPostDto.coverImage)
+
       // Criar o post com as relações
       const post = await prisma.post.create({
         data: {
           // Usar userId diretamente já que o objeto user pode não ter todos os campos
           userId: user?.id || user?.id, // Tenta usar userId do JWT ou id se disponível
           title: createPostDto.title,
-          slug: createPostDto.slug,
+          slug: slug!, // Usar o slug gerado ou fornecido
           content: content,
           resume: createPostDto.resume || '',
           description: createPostDto.resume || '', // Usando resume como description já que não existe no DTO
           metadata: metadata as any,
           status: createPostDto.status,
+          fullUrl: fullUrl,
+          coverImage: coverImage, // Usar imagem padrão se não fornecida
           updatedBy: user?.id,
 
           // Conectar categorias (apenas se houver IDs válidos)
@@ -162,13 +264,34 @@ export class PostsService {
     }
   }
 
-  async findAll(page: number = 1, limit: number = 10) {
+  /**
+   * Busca todos os posts com paginação e filtro de busca por texto
+   * @param page Número da página
+   * @param limit Limite de itens por página
+   * @param search Texto para busca no título, descrição ou conteúdo
+   * @returns Lista de posts com paginação
+   */
+  async findAll(page: number = 1, limit: number = 10, search?: string) {
     const skip = (page - 1) * limit
-    const total = await prisma.post.count()
+
+    // Construir filtro de busca
+    const whereClause = search
+      ? {
+          OR: [
+            { title: { contains: search, mode: 'insensitive' as const } },
+            { description: { contains: search, mode: 'insensitive' as const } },
+            { content: { contains: search, mode: 'insensitive' as const } },
+            { resume: { contains: search, mode: 'insensitive' as const } },
+          ],
+        }
+      : {}
+
+    const total = await prisma.post.count({ where: whereClause })
 
     if (total < limit) limit = total
 
     const posts = await prisma.post.findMany({
+      where: whereClause,
       include: {
         categories: {
           include: {
@@ -196,22 +319,38 @@ export class PostsService {
 
     const nextPage = page < Math.ceil(total / limit) ? page + 1 : null
 
-    return { posts, total, nextPage }
+    // Aplicar imagem padrão aos posts
+    const postsWithDefaultImages = this.applyDefaultCoverImage(posts)
+
+    return { posts: postsWithDefaultImages, total, nextPage }
   }
 
-  async findAllByStatus(status: PostStatus, page: number = 1, limit: number = 10) {
+  async findAllByStatus(status: PostStatus, page: number = 1, limit: number = 10, search?: string) {
     const skip = (page - 1) * limit
 
+    // Construir filtro de busca combinado com status
+    const whereClause = {
+      status,
+      ...(search
+        ? {
+            OR: [
+              { title: { contains: search, mode: 'insensitive' as const } },
+              { description: { contains: search, mode: 'insensitive' as const } },
+              { content: { contains: search, mode: 'insensitive' as const } },
+              { resume: { contains: search, mode: 'insensitive' as const } },
+            ],
+          }
+        : {}),
+    }
+
     const total = await prisma.post.count({
-      where: { status },
+      where: whereClause,
     })
 
     if (total < limit) limit = total
 
     const posts = await prisma.post.findMany({
-      where: {
-        status,
-      },
+      where: whereClause,
       include: {
         categories: {
           include: {
@@ -239,7 +378,10 @@ export class PostsService {
 
     const nextPage = page < Math.ceil(total / limit) ? page + 1 : null
 
-    return { posts, nextPage, total }
+    // Aplicar imagem padrão aos posts
+    const postsWithDefaultImages = this.applyDefaultCoverImage(posts)
+
+    return { posts: postsWithDefaultImages, nextPage, total }
   }
 
   async findOne(id: string) {
@@ -271,12 +413,18 @@ export class PostsService {
       throw new NotFoundException('Post não encontrado')
     }
 
-    return post
+    // Aplicar imagem padrão ao post
+    const postWithDefaultImage = this.applyDefaultCoverImage(post)
+
+    return postWithDefaultImage
   }
 
   async findBySlug(slug: string) {
-    const post = await prisma.post.findUnique({
-      where: { slug },
+    const post = await prisma.post.findFirst({
+      where: {
+        slug,
+        status: PostStatus.PUBLISHED, // Apenas posts publicados podem ser acessados publicamente
+      },
       include: {
         media: true,
         tags: {
@@ -303,7 +451,10 @@ export class PostsService {
       throw new NotFoundException('Post não encontrado')
     }
 
-    return post
+    // Aplicar imagem padrão ao post
+    const postWithDefaultImage = this.applyDefaultCoverImage(post)
+
+    return postWithDefaultImage
   }
 
   async update(id: string, updatePostDto: UpdatePostDto, userId: string) {
@@ -317,6 +468,57 @@ export class PostsService {
 
     if (!post) {
       throw new NotFoundException('Post não encontrado')
+    }
+
+    // Validação dos campos obrigatórios apenas para posts sendo publicados
+    if (updatePostDto.status === PostStatus.PUBLISHED) {
+      if (!updatePostDto.title && !post.title) {
+        throw new HttpException(
+          'O título do post é obrigatório para publicação',
+          HttpStatus.UNPROCESSABLE_ENTITY,
+        )
+      }
+
+      if (!updatePostDto.slug && !post.slug) {
+        throw new HttpException(
+          'O slug do post é obrigatório para publicação',
+          HttpStatus.UNPROCESSABLE_ENTITY,
+        )
+      }
+
+      if (!updatePostDto.content && !post.content) {
+        throw new HttpException(
+          'O conteúdo do post é obrigatório para publicação',
+          HttpStatus.UNPROCESSABLE_ENTITY,
+        )
+      }
+    }
+
+    // Gerar slug automático se não fornecido e título foi atualizado
+    let slug = updatePostDto.slug
+    if (!slug && updatePostDto.title && !post.slug) {
+      slug = updatePostDto.title
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '') // Remove acentos
+        .replace(/[^a-z0-9\s-]/g, '') // Remove caracteres especiais
+        .replace(/\s+/g, '-') // Substitui espaços por hífens
+        .replace(/-+/g, '-') // Remove hífens duplicados
+        .trim()
+    }
+
+    // Verificar se o slug já existe em outro post (se o slug foi alterado)
+    const finalSlug = slug || updatePostDto.slug || post.slug
+    if (finalSlug && finalSlug !== post.slug) {
+      const existentPost = await prisma.post.findUnique({
+        where: {
+          slug: finalSlug,
+        },
+      })
+
+      if (existentPost && existentPost.id !== id) {
+        throw new HttpException('Esse slug já está sendo usado, crie outro.', HttpStatus.CONFLICT)
+      }
     }
 
     // Atualizar o post com transação para garantir consistência
@@ -334,17 +536,57 @@ export class PostsService {
         })
       }
 
+      // Gerar fullUrl baseada na categoria se houver
+      let fullUrl: string | null = post.fullUrl
+      if (finalSlug) {
+        if (updatePostDto.fullUrl) {
+          fullUrl = updatePostDto.fullUrl
+        } else if (updatePostDto.categoryIds && updatePostDto.categoryIds.length > 0) {
+          // Buscar o slug da primeira categoria
+          const firstCategory = await prisma.category.findUnique({
+            where: { id: updatePostDto.categoryIds[0] },
+            select: { slug: true },
+          })
+
+          if (firstCategory) {
+            // Normalizar o slug da categoria (remover acentos e espaços)
+            const categorySlug = firstCategory.slug
+              .toLowerCase()
+              .normalize('NFD')
+              .replace(/[\u0300-\u036f]/g, '')
+              .replace(/[^\w\s]/g, '')
+              .replace(/\s+/g, '-')
+
+            fullUrl = `/blog/${categorySlug}/${finalSlug}`
+          } else {
+            fullUrl = `/blog/${finalSlug}`
+          }
+        } else if (!updatePostDto.fullUrl) {
+          // Se não há categorias sendo atualizadas, manter a estrutura existente ou usar padrão
+          fullUrl = `/blog/${finalSlug}`
+        }
+      }
+
+      // Definir imagem de capa padrão se não fornecida
+      const coverImage = updatePostDto.coverImage || post.coverImage || this.getDefaultCoverImage()
+
       // Atualizar o post
       const updated = await prisma.post.update({
         where: { id },
         data: {
-          title: updatePostDto.title,
-          slug: updatePostDto.slug,
-          content: updatePostDto.content,
-          resume: updatePostDto.resume,
-          description: updatePostDto.resume, // Usando resume como description já que não existe no DTO
-          metadata: updatePostDto.metadata as any,
-          status: updatePostDto.status,
+          title: updatePostDto.title || post.title,
+          slug: finalSlug,
+          content: updatePostDto.content || post.content,
+          resume: updatePostDto.resume || post.resume,
+          description: updatePostDto.resume || post.resume, // Usando resume como description já que não existe no DTO
+          metadata: updatePostDto.metadata
+            ? (updatePostDto.metadata as any)
+            : post.metadata
+              ? (post.metadata as any)
+              : Prisma.DbNull,
+          status: updatePostDto.status || post.status,
+          fullUrl: fullUrl,
+          coverImage: coverImage, // Usar imagem padrão se não fornecida
           updatedBy: userId,
           updatedAt: new Date(),
           publishedAt:
@@ -453,6 +695,52 @@ export class PostsService {
   }
 
   // Método de upload de imagem principal removido temporariamente para simplificação
+
+  /**
+   * Upload da imagem de capa do post
+   * @param file Arquivo de imagem
+   * @param postId ID do post
+   * @returns URL da imagem de capa
+   */
+  async uploadCoverImage(file: Express.Multer.File, postId: string) {
+    // Verificar se o post existe
+    const post = await prisma.post.findUnique({
+      where: { id: postId },
+    })
+
+    if (!post) {
+      throw new NotFoundException('Post não encontrado')
+    }
+
+    const fileUrl = `/uploads/posts/${file.filename}`
+
+    // Atualizar o post com a URL da imagem de capa
+    const updatedPost = await prisma.post.update({
+      where: { id: postId },
+      data: {
+        coverImage: fileUrl,
+      },
+    })
+
+    // Também criar um registro na tabela PostMedia para manter consistência
+    await prisma.postMedia.create({
+      data: {
+        url: fileUrl,
+        type: file.mimetype,
+        alt: `Imagem de capa - ${post.title}`,
+        isMain: false, // A imagem de capa não é considerada imagem principal
+        post: {
+          connect: { id: postId },
+        },
+      },
+    })
+
+    return {
+      message: 'Imagem de capa enviada com sucesso',
+      coverImage: fileUrl,
+      post: updatedPost,
+    }
+  }
 
   /**
    * Upload da imagem principal do post

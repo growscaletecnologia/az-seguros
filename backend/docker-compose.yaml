@@ -1,4 +1,60 @@
 services:
+  # ===============================================
+  # Backend NestJS Application
+  # ===============================================
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: az_backend_dev
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=development
+      - API_MODE=DEV
+      - TZ=${TZ}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_PORT=5432
+      - REDIS_PORT=6379
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public
+      - REDIS_URL=redis://redis:6379
+      - REDIS_HOST=redis
+      - API_SECRET=${API_SECRET}
+    ports:
+      - "5000:5000"
+      - "5555:5555"  # Prisma Studio
+    volumes:
+      # Mount source code for hot-reload
+      - ./src:/app/src:ro
+      - ./prisma:/app/prisma:ro
+      - ./package.json:/app/package.json:ro
+      - ./package-lock.json:/app/package-lock.json:ro
+      - ./tsconfig.json:/app/tsconfig.json:ro
+      - ./tsconfig.build.json:/app/tsconfig.build.json:ro
+      - ./nest-cli.json:/app/nest-cli.json:ro
+      # Mount uploads directory for file persistence
+      - ./uploads:/app/uploads
+      # Exclude node_modules to avoid conflicts
+      - /app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - az_network
+
+  # ===============================================
+  # PostgreSQL Database
+  # ===============================================
   postgres:
     image: postgres:16-alpine
     container_name: az_pg
@@ -17,7 +73,12 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
+    networks:
+      - az_network
 
+  # ===============================================
+  # Redis Cache
+  # ===============================================
   redis:
     image: redis:7-alpine
     container_name: az_redis
@@ -32,7 +93,12 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
+    networks:
+      - az_network
 
+  # ===============================================
+  # PgAdmin - Database Management Tool
+  # ===============================================
   pgadmin:
     image: dpage/pgadmin4:latest
     container_name: az_pgadmin
@@ -47,7 +113,19 @@ services:
       - postgres
     volumes:
       - pgadmindata:/var/lib/pgadmin
+    networks:
+      - az_network
 
+# ===============================================
+# Networks
+# ===============================================
+networks:
+  az_network:
+    driver: bridge
+
+# ===============================================
+# Volumes
+# ===============================================
 volumes:
   pgdata:
   redisdata:

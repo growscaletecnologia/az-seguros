@@ -128,12 +128,12 @@ export default function LogsPage() {
         <CardHeader>
           <CardTitle>Logs do Sistema</CardTitle>
           <CardDescription>
-            Visualize e filtre os logs de atividades do sistema
+            Visualize os logs de atividades do sistema
           </CardDescription>
         </CardHeader>
         <CardContent>
           {/* Filtros */}
-          <div className="flex flex-wrap gap-4 mb-6">
+          {/* <div className="flex flex-wrap gap-4 mb-6">
             <div className="flex-1 min-w-[200px]">
               <Input
                 placeholder="Filtrar por caminho"
@@ -167,7 +167,7 @@ export default function LogsPage() {
             <Button variant="outline" onClick={limparFiltros}>
               Limpar
             </Button>
-          </div>
+          </div> */}
 
           {/* Tabela de Logs */}
           <div className="rounded-md border">

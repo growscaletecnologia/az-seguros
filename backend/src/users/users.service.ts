@@ -69,10 +69,15 @@ export class UsersService {
     const passwordHash = await bcrypt.hash(newPassword, this.SALT_ROUNDS)
     return await this.userRepository.update(id, { password: passwordHash })
   }
-  async update(id: string, updateUserDto: UpdateUserDto) {
+  async update(id: string, updateUserDto: UpdateUserDto, currentUserId?: string) {
     const foundedUser = await this.userRepository.listById(id)
     if (!foundedUser) {
       throw new BadRequestError('User not found')
+    }
+
+    // Impedir que o usuário desative a si mesmo
+    if (currentUserId && currentUserId === id && updateUserDto.status === 'INACTIVE') {
+      throw new BadRequestError('Você não pode desativar sua própria conta')
     }
 
     return await this.userRepository.update(id, updateUserDto)

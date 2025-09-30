@@ -17,6 +17,10 @@ export default function JoditEditorComponent({
     height: 600,
     uploader: { insertImageAsBase64URI: true },
     toolbarAdaptive: false,
+    allowPasteHTML: true,
+    pasteHTMLAction: 'insert_as_html',
+    clipboard: true,
+    disablePlugins: 'spellcheck',
   };
 
   return (

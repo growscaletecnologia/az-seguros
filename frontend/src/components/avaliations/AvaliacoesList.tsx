@@ -28,7 +28,7 @@ export function AvaliacoesList({ limit, showOnlyActive = true }: AvaliacoesListP
         setError(null);
       } catch (err) {
         console.error('Erro ao carregar avaliações:', err);
-        setError('Não foi possível carregar as avaliações. Tente novamente mais tarde.');
+        //setError('Não foi possível carregar as avaliações. Tente novamente mais tarde.');
       } finally {
         setLoading(false);
       }

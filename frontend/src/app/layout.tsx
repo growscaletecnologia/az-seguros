@@ -22,9 +22,9 @@ export default function RootLayout({
 }) {
 	return (
 		<html lang="pt-BR">
-			{/* <head>
+			<head>
 				<ClientGtmScripts />
-			</head> */}
+			</head>
 			<body className={inter.className}>
 				<Header />
 				<main className="min-h-screen pt-16">{children}</main>

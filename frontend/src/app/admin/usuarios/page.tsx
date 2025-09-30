@@ -23,6 +23,7 @@ import {
 	type User,
 	usersService,
 } from "@/services/api/users";
+import AuthService from "@/lib/services/auth-service";
 import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
 
@@ -111,6 +112,30 @@ const UsuariosPage = () => {
 		CUSTOMER: { ver: true, editar: false, criar: false, excluir: false },
 	};
 
+	/**
+	 * Maps Portuguese role names to English backend values
+	 */
+	const mapRoleToBackend = (role: string): string => {
+		const roleMapping: Record<string, string> = {
+			'admin': 'ADMIN',
+			'gerente': 'MANAGER',
+			'cliente': 'CUSTOMER'
+		};
+		return roleMapping[role.toLowerCase()] || 'CUSTOMER';
+	};
+
+	/**
+	 * Maps English backend role values to Portuguese display names
+	 */
+	const mapRoleToDisplay = (role: string): string => {
+		const roleMapping: Record<string, string> = {
+			'ADMIN': 'admin',
+			'MANAGER': 'gerente',
+			'CUSTOMER': 'cliente'
+		};
+		return roleMapping[role.toUpperCase()] || 'cliente';
+	};
+
 	const atualizarUsuario = async () => {
 		if (!editandoUsuario) return;
 
@@ -118,7 +143,7 @@ const UsuariosPage = () => {
 			const updateUserDto: UpdateUserDto = {
 				name: editandoUsuario.nome,
 				email: editandoUsuario.email,
-				role: editandoUsuario.role.toUpperCase() as
+				role: mapRoleToBackend(editandoUsuario.role) as
 					| "ADMIN"
 					| "MANAGER"
 					| "CUSTOMER",
@@ -163,11 +188,18 @@ const UsuariosPage = () => {
 		const usuario = usuarios.find((u) => u.id === id);
 		if (!usuario) return;
 
+		// Verificar se o usuário está tentando desativar sua própria conta
+		const currentUser = AuthService.getUser();
+		if (currentUser && currentUser.id === id && usuario.ativo) {
+			toast.error("Você não pode desativar sua própria conta!");
+			return;
+		}
+
 		try {
 			const updateUserDto: UpdateUserDto = {
 				name: usuario.nome,
 				email: usuario.email,
-				role: usuario.role.toUpperCase() as "ADMIN" | "MANAGER" | "CUSTOMER",
+				role: mapRoleToBackend(usuario.role) as "ADMIN" | "MANAGER" | "CUSTOMER",
 				status: usuario.ativo ? "INACTIVE" : "ACTIVE",
 			};
 
@@ -325,34 +357,6 @@ const UsuariosPage = () => {
 										</div>
 									</div>
 
-									<div className="mb-4">
-										<label className="block text-sm font-medium mb-2">
-											Permissões CRUD
-										</label>
-										<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-											{(["ver", "editar", "criar", "excluir"] as const).map(
-												(permissao) => (
-													<label key={permissao} className="flex items-center">
-														<input
-															type="checkbox"
-															checked={editandoUsuario.permissoes[permissao]}
-															onChange={(e) =>
-																atualizarPermissao(
-																	permissao,
-																	e.target.checked,
-																	true,
-																)
-															}
-															className="mr-2"
-														/>
-														{permissao.charAt(0).toUpperCase() +
-															permissao.slice(1)}
-													</label>
-												),
-											)}
-										</div>
-									</div>
-
 									<div className="flex space-x-2">
 										<Button
 											onClick={salvarEdicao}
@@ -446,11 +450,19 @@ const UsuariosPage = () => {
 											</button>
 											<button
 												onClick={() => toggleUsuario(usuario.id)}
+												disabled={AuthService.getUser()?.id === usuario.id && usuario.ativo}
 												className={`px-3 py-1 text-xs rounded ${
-													usuario.ativo
-														? "bg-orange-500 hover:bg-orange-600"
-														: "bg-green-500 hover:bg-green-600"
+													AuthService.getUser()?.id === usuario.id && usuario.ativo
+														? "bg-gray-400 cursor-not-allowed"
+														: usuario.ativo
+															? "bg-orange-500 hover:bg-orange-600"
+															: "bg-green-500 hover:bg-green-600"
 												} text-white`}
+												title={
+													AuthService.getUser()?.id === usuario.id && usuario.ativo
+														? "Você não pode desativar sua própria conta"
+														: undefined
+												}
 											>
 												{usuario.ativo ? "Desativar" : "Ativar"}
 											</button>

@@ -14,6 +14,7 @@ export interface PostCategory {
   categoryId: string;
   createdAt: string;
   category: Category;
+  slug?:string;
 }
 
 export interface Tag {
@@ -67,6 +68,8 @@ export interface Post {
   userId: string;
   metadata: PostMetadata;
   status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
+  fullUrl?: string;
+  coverImage?: string;
   createdAt: string;
   updatedAt: string;
   updatedBy: string | null;
@@ -91,15 +94,17 @@ export interface CreatePostDTO {
   status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
   categoryIds?: string[];
   tagIds?: string[];
-  metadata?: {
-    title?: string;
-    description?: string;
-    keywords?: string;
-  };
+  fullUrl?: string;
+  coverImage?: string;
+  // metadata?: {
+  //   title?: string;
+  //   description?: string;
+  //   keywords?: string;
+  // };
 }
 
 export interface UpdatePostDTO extends Partial<CreatePostDTO> {
-  id: string;
+  //id: string;
 }
 
 export interface PostsFilter {
@@ -113,6 +118,40 @@ export interface PostsFilter {
  * Serviço para gerenciamento de posts
  */
 export const postsService = {
+  /**
+   * Busca posts publicados (acesso público)
+   */
+  async getPublishedPosts(page: number = 1, limit: number = 10, search?: string) {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+    
+    if (search) {
+      params.append('search', search);
+    }
+    
+    const { data } = await api.get(`/posts/public?${params.toString()}`);
+    return data;
+  },
+
+  /**
+   * Busca posts por status (área administrativa)
+   */
+  async getPostsByStatus(status: string, page: number = 1, limit: number = 10, search?: string) {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+    
+    if (search) {
+      params.append('search', search);
+    }
+    
+    const { data } = await api.get(`/posts/status/${status}?${params.toString()}`);
+    return data;
+  },
+
   /**
    * Busca todos os posts com filtros opcionais
    */
@@ -170,7 +209,7 @@ export const postsService = {
    * Atualiza um post existente
    */
   async updatePost(id: string, post: UpdatePostDTO) {
-    const { data } = await api.patch(`/posts/${id}`, post);
+    const { data } = await api.put(`/posts/${id}`, post);
     return data;
   },
 
@@ -179,6 +218,20 @@ export const postsService = {
    */
   async deletePost(id: string) {
     await api.delete(`/posts/${id}`);
+  },
+
+  /**
+   * Faz upload da imagem de capa do post
+   */
+  async uploadCoverImage(postId: string, file: File) {
+    const formData = new FormData();
+    formData.append('file', file);
+    const { data } = await api.post(`/posts/${postId}/upload-cover-image`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return data;
   },
 
   /**
@@ -226,18 +279,16 @@ export const postsService = {
    * Busca todas as categorias de posts
    */
   async getCategories() {
-    const { data } = await api.get('/categories/all');
-    // Garantir que retorne um array de categorias
-    return data.categories || [];
+    const { data } = await api.get('/categories');
+    return data || [];
   },
 
   /**
    * Busca todas as tags de posts
    */
   async getTags() {
-    const { data } = await api.get('/tags/all');
-    // Garantir que retorne um array de tags
-    return data.tags || [];
+    const { data } = await api.get('/tags/all-no-limit');
+    return data || [];
   }
 };
 

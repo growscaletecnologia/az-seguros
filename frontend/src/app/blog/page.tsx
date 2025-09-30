@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import Link from "next/link";
 import { postsService, Post, PostsFilter } from "@/services/posts.service";
+import { buildImageUrl } from "@/utils/imageUtils";
 
 import {
   Card,
@@ -38,16 +39,14 @@ export default function BlogPage() {
   const loadPosts = async () => {
     try {
       setLoading(true);
-      const response = await postsService.getPosts({
-        ...filter,
-        status: "PUBLISHED", // Garantir que apenas posts publicados sejam exibidos
-        search: search.length > 2 ? search : undefined,
-      });
-      // Filtro adicional para garantir que apenas posts com status PUBLISHED sejam exibidos
-      const publishedPosts = response.posts.filter(post => post.status === "PUBLISHED");
-      setPosts(publishedPosts);
-      setTotalPosts(publishedPosts.length || 0);
-      setTotalPages(Math.ceil(publishedPosts.length / filter.limit!));
+      const response = await postsService.getPublishedPosts(
+        filter.page || 1,
+        filter.limit || 9,
+        search.length > 2 ? search : undefined
+      );
+      setPosts(response.posts || []);
+      setTotalPosts(response.total || 0);
+      setTotalPages(Math.ceil((response.total || 0) / (filter.limit || 9)));
     } catch (error) {
       console.error("Erro ao carregar posts:", error);
     } finally {
@@ -72,8 +71,25 @@ export default function BlogPage() {
 
   // Função para obter a URL da imagem principal do post
   const getMainImageUrl = (post: Post) => {
+    // Prioriza coverImage se disponível
+    if (post.coverImage) {
+      return buildImageUrl(post.coverImage);
+    }
+    
+    // Caso contrário, procura por media marcada como principal
     const mainImage = post.media?.find(media => media.isMain);
-    return mainImage?.url || "/images/blog-placeholder.jpg";
+    if (mainImage?.url) {
+      return buildImageUrl(mainImage.url);
+    }
+    
+    // Se não encontrar nenhuma, usa a primeira imagem disponível
+    const firstImage = post.media?.[0];
+    if (firstImage?.url) {
+      return buildImageUrl(firstImage.url);
+    }
+    
+    // Fallback para placeholder
+    return buildImageUrl(null);
   };
 
   // Função para formatar a data

@@ -1,29 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Type } from 'class-transformer'
-import {
-  IsArray,
-  IsEnum,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  MaxLength,
-  ValidateNested,
-} from 'class-validator'
+import { IsArray, IsEnum, IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator'
+
 class MetadataDto {
   @IsString()
-  @IsNotEmpty({ message: 'O título para SEO é obrigatório.' })
-  @MaxLength(60, {
-    message: 'O título para SEO deve ter no máximo 60 caracteres.',
-  })
-  title: string
+  @IsOptional()
+  description?: string
 
   @IsString()
   @IsOptional()
-  description: string
-
-  @IsString()
-  @IsOptional()
-  keywords: string
+  keywords?: string
 }
 
 enum PostStatus {
@@ -31,14 +17,15 @@ enum PostStatus {
   DRAFT = 'DRAFT',
   ARCHIVED = 'ARCHIVED',
 }
+
 export class CreatePostDto {
   @IsString()
   @IsNotEmpty({ message: 'O título é obrigatório.' })
   title: string
 
-  @IsNotEmpty({ message: 'O slug é obrigatório.' })
+  @IsOptional()
   @IsString()
-  slug: string
+  slug?: string
 
   @IsEnum(PostStatus)
   @IsNotEmpty({ message: 'O status é obrigatório.' })
@@ -46,15 +33,16 @@ export class CreatePostDto {
 
   @IsOptional()
   @IsString()
-  content: string
+  content?: string
 
-  @IsNotEmpty({ message: 'O resumo é obrigatório.' })
+  @IsOptional()
   @IsString()
-  resume: string
+  resume?: string
 
+  @IsOptional()
   @ValidateNested()
   @Type(() => MetadataDto)
-  metadata: MetadataDto
+  metadata?: MetadataDto
 
   @IsOptional()
   @IsArray()
@@ -68,4 +56,20 @@ export class CreatePostDto {
   @ApiProperty({ example: 'data:image/png;base64,<arquivo base64>' })
   @IsOptional()
   mainImage?: string
+
+  @IsOptional()
+  @IsString()
+  @ApiProperty({
+    description: 'URL completa do post',
+    example: '/blog/seguros/passaporte',
+  })
+  fullUrl?: string
+
+  @IsOptional()
+  @IsString()
+  @ApiProperty({
+    description: 'URL da imagem de capa do post',
+    example: 'https://example.com/image.jpg',
+  })
+  coverImage?: string
 }

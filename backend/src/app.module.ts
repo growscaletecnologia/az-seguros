@@ -13,9 +13,11 @@ import { TagsModule } from './tags/tags.module'
 import { SystemPagesModule } from './system-pages/system-pages.module'
 
 import { LoggerMiddleware } from './middleware/logger'
+import { AutoPermissionMiddleware } from './rbac/middleware/auto-permission.middleware'
 import { SettingsModule } from './modules/settings/settings.module'
 import { AvaliationsModule } from './avaliations/avaliations.module'
 import { LogsModule } from './logs/logs.module'
+import { FrontsectionsModule } from './frontsections/frontsections.module'
 
 @Module({
   imports: [
@@ -32,12 +34,16 @@ import { LogsModule } from './logs/logs.module'
     SystemPagesModule,
     SettingsModule,
     AvaliationsModule,
+    FrontsectionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LoggerMiddleware).forRoutes('*') // aplica global
+    // Aplicar middlewares na ordem correta:
+    // 1. AutoPermissionMiddleware (para anexar usuário ao request)
+    // 2. LoggerMiddleware (para capturar informações do usuário)
+    consumer.apply(AutoPermissionMiddleware).forRoutes('*').apply(LoggerMiddleware).forRoutes('*')
   }
 }

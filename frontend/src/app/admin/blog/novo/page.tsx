@@ -6,6 +6,8 @@ export const runtime = "edge";
 
 import JoditEditorComponent from "@/components/Inputs/JoditEditor";
 import { TinyMCEEditor } from "@/components/Inputs/TinyMCEEditor";
+import { AddCategoryModal } from "@/components/modals/AddCategoryModal";
+import { AddTagModal } from "@/components/modals/AddTagModal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -22,13 +24,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import {
 	type CreatePostDTO,
-	type PostCategory,
-	type PostTag,
+	type Category,
+	type Tag,
 	postsService,
 } from "@/services/posts.service";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { validateImageFile, convertToWebP, generateImagePreview } from "@/utils/imageUtils";
 
 /**
  * Página de criação de novos posts
@@ -36,16 +39,26 @@ import { toast } from "sonner";
 export default function NovoBlogPostPage() {
 	const router = useRouter();
 	const [loading, setLoading] = useState(false);
-	const [categories, setCategories] = useState<PostCategory[]>([]);
-	const [tags, setTags] = useState<PostTag[]>([]);
+	const [categories, setCategories] = useState<Category[]>([]);
+	const [tags, setTags] = useState<Tag[]>([]);
 	const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 	const [selectedTags, setSelectedTags] = useState<string[]>([]);
+	
+	// Estados para controlar os modais
+	const [showCategoryModal, setShowCategoryModal] = useState(false);
+	const [showTagModal, setShowTagModal] = useState(false);
+
+	// Estado para armazenar o arquivo de imagem de capa
+	const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
+	const [coverImagePreview, setCoverImagePreview] = useState<string>("");
 
 	const [post, setPost] = useState<CreatePostDTO>({
 		title: "",
 		content: "",
 		resume: "",
 		status: "DRAFT",
+		fullUrl: "",
+		coverImage: "",
 		metadata: {
 			title: "",
 			description: "",
@@ -61,8 +74,13 @@ export default function NovoBlogPostPage() {
 					postsService.getCategories(),
 					postsService.getTags(),
 				]);
-				setCategories(categoriesData);
-				setTags(tagsData);
+				setCategories(categoriesData?.categories || []);
+				setTags(tagsData?.tags || []);
+				
+				// Seleciona automaticamente a primeira categoria disponível (Blog)
+				if (categoriesData?.categories?.length > 0) {
+					setSelectedCategories([categoriesData.categories[0].id]);
+				}
 			} catch (error) {
 				console.error("Erro ao carregar dados:", error);
 			}
@@ -70,6 +88,38 @@ export default function NovoBlogPostPage() {
 
 		loadData();
 	}, []);
+
+	// Função para recarregar categorias
+	const reloadCategories = async () => {
+		try {
+			const categoriesData = await postsService.getCategories();
+			setCategories(categoriesData);
+		} catch (error) {
+			console.error("Erro ao recarregar categorias:", error);
+		}
+	};
+
+	// Função para recarregar tags
+	const reloadTags = async () => {
+		try {
+			const tagsData = await postsService.getTags();
+			setTags(tagsData);
+		} catch (error) {
+			console.error("Erro ao recarregar tags:", error);
+		}
+	};
+
+	// Callback quando uma nova categoria é adicionada
+	const handleCategoryAdded = (newCategory: Category) => {
+		setCategories(prev => [...prev, newCategory]);
+		setSelectedCategories(prev => [...prev, newCategory.id]);
+	};
+
+	// Callback quando uma nova tag é adicionada
+	const handleTagAdded = (newTag: Tag) => {
+		setTags(prev => [...prev, newTag]);
+		setSelectedTags(prev => [...prev, newTag.id]);
+	};
 
 	// Atualiza o estado do post
 	const handleChange = (field: keyof CreatePostDTO, value: any) => {
@@ -99,6 +149,85 @@ export default function NovoBlogPostPage() {
 			.replace(/\s+/g, "-");
 
 		handleChange("slug", slug);
+		generateFullUrl(slug);
+	};
+
+	/**
+	 * Gera a URL completa baseada no slug e categoria selecionada
+	 */
+	const generateFullUrl = (slug?: string) => {
+		const currentSlug = slug || post.slug;
+		if (!currentSlug) return;
+
+		// Se há categorias selecionadas, usar a primeira categoria
+		if (selectedCategories.length > 0) {
+			const firstCategory = categories.find(cat => cat.id === selectedCategories[0]);
+			if (firstCategory) {
+				// Normalizar o slug da categoria (remover acentos e espaços)
+				const categorySlug = firstCategory.slug
+					.toLowerCase()
+					.normalize("NFD")
+					.replace(/[\u0300-\u036f]/g, "")
+					.replace(/[^\w\s]/g, "")
+					.replace(/\s+/g, "-");
+				
+				handleChange("fullUrl", `/blog/${categorySlug}/${currentSlug}`);
+			} else {
+				handleChange("fullUrl", `/blog/${currentSlug}`);
+			}
+		} else {
+			handleChange("fullUrl", `/blog/${currentSlug}`);
+		}
+	};
+
+	/**
+	 * Manipula a seleção de arquivo de imagem de capa com conversão automática para WebP
+	 */
+	const handleCoverImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0];
+		if (!file) return;
+
+		try {
+			// Validar arquivo
+			const validation = validateImageFile(file);
+			if (!validation.isValid) {
+				toast.error(validation.error);
+				return;
+			}
+
+			// Mostrar loading
+			toast.info("Processando imagem...");
+
+			// Converter para WebP se não for SVG
+			let processedFile = file;
+			if (file.type !== 'image/svg+xml') {
+				processedFile = await convertToWebP(file, 0.85, 1200, 800);
+			}
+
+			setCoverImageFile(processedFile);
+			
+			// Gerar preview
+			const preview = await generateImagePreview(processedFile);
+			setCoverImagePreview(preview);
+
+			toast.success("Imagem processada com sucesso!");
+		} catch (error) {
+			console.error("Erro ao processar imagem:", error);
+			toast.error("Erro ao processar a imagem. Tente novamente.");
+		}
+	};
+
+	/**
+	 * Remove a imagem de capa selecionada
+	 */
+	const removeCoverImage = () => {
+		setCoverImageFile(null);
+		setCoverImagePreview("");
+		// Limpar o input file
+		const fileInput = document.getElementById('coverImageFile') as HTMLInputElement;
+		if (fileInput) {
+			fileInput.value = '';
+		}
 	};
 
 	// Salva o post
@@ -106,41 +235,55 @@ export default function NovoBlogPostPage() {
 		try {
 			setLoading(true);
 
-			
 			// Atualiza o status antes de salvar
 			const postToSave: CreatePostDTO = {
 				...post,
 				content:  post.content || "",
 				status,
-				categoryIds: selectedCategories || [],
+				categoryIds: selectedCategories.length > 0 ? selectedCategories : 
+					(categories.length > 0 ? [categories[0].id] : []),
 				tagIds: selectedTags || [],
 				// Garante que os campos de texto não sejam nulos
 				resume: post.resume || "",
-				metadata: {
+				// Metadados SEO não são mais obrigatórios
+				metadata: post.metadata?.title || post.metadata?.description || post.metadata?.keywords ? {
 					title: post.metadata?.title || "",
 					description: post.metadata?.description || "",
 					keywords: post.metadata?.keywords || "",
-				},
+				} : undefined,
 			};
 
+			// Criar o post primeiro
 			const savedPost = await postsService.createPost(postToSave);
 
-			toast.success("Post salvo com sucesso!");
+			// Se há uma imagem de capa selecionada, fazer o upload
+			if (coverImageFile && savedPost.id) {
+				try {
+					await postsService.uploadCoverImage(savedPost.id, coverImageFile);
+					toast.success("Post e imagem salvos com sucesso!");
+				} catch (uploadError) {
+					console.error("Erro ao fazer upload da imagem:", uploadError);
+					toast.warning("Post salvo, mas houve erro no upload da imagem. Você pode tentar novamente na edição.");
+				}
+			} else {
+				toast.success("Post salvo com sucesso!");
+			}
+
 			router.push("/admin/blog");
 		} catch (error: any) {
 			console.error("Erro ao salvar post:", error);
 			// Exibe mensagem de erro mais específica se disponível
-			const errorMessage = 
-				error.message || 
-				error.response?.data?.message || 
+			const errorMessage =
+				error.message ||
+				error.response?.data?.message ||
 				"Erro ao salvar post. Verifique os dados e tente novamente.";
-			
+
 			toast.error(errorMessage);
 		} finally {
 			setLoading(false);
 		}
 	};
-
+ console.log("categories", categories)
 	return (
 		<div className="container mx-auto py-6">
 			<div className="flex justify-between items-center mb-6">
@@ -198,6 +341,60 @@ export default function NovoBlogPostPage() {
 										rows={3}
 									/>
 								</div>
+
+								<div>
+									<Label htmlFor="fullUrl">URL Completa</Label>
+									<Input
+										id="fullUrl"
+										value={post.fullUrl || ""}
+										onChange={(e) => handleChange("fullUrl", e.target.value)}
+										placeholder="/blog/meu-post-slug"
+									/>
+								</div>
+
+								<div>
+									<Label htmlFor="coverImageFile">Imagem de Capa</Label>
+									<div className="space-y-3">
+										{/* Input de arquivo */}
+										<Input
+											id="coverImageFile"
+											type="file"
+											accept="image/*"
+											onChange={handleCoverImageChange}
+											className="cursor-pointer"
+										/>
+										
+										{/* Preview da imagem */}
+										{coverImagePreview && (
+											<div className="relative">
+												<img
+													src={coverImagePreview}
+													alt="Preview da imagem de capa"
+													className="w-full max-w-md h-48 object-cover rounded-lg border"
+												/>
+												<Button
+													type="button"
+													variant="destructive"
+													size="sm"
+													className="absolute top-2 right-2"
+													onClick={removeCoverImage}
+												>
+													<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+														<path d="M18 6 6 18"/>
+														<path d="m6 6 12 12"/>
+													</svg>
+												</Button>
+											</div>
+										)}
+										
+										{/* Informações sobre o arquivo */}
+										<p className="text-sm text-gray-500">
+											Formatos aceitos: JPG, PNG, GIF, WebP, SVG. Tamanho máximo: 5MB
+											<br />
+											<span className="text-blue-600">As imagens serão automaticamente convertidas para WebP para melhor performance.</span>
+										</p>
+									</div>
+								</div>
 							</div>
 						</CardContent>
 					</Card>
@@ -230,32 +427,56 @@ export default function NovoBlogPostPage() {
 						<TabsContent value="categories">
 							<Card>
 								<CardHeader>
-									<CardTitle>Categorias</CardTitle>
+									<CardTitle>Categoria (selecione apenas uma)</CardTitle>
 								</CardHeader>
 								<CardContent>
-									<div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+									<div className="space-y-3">
+										{/* Opção para não selecionar categoria */}
+										<div className="flex items-center space-x-2">
+											<input
+												type="radio"
+												id="no-category"
+												name="category"
+												checked={selectedCategories.length === 0}
+												onChange={() => {
+													setSelectedCategories([]);
+													// Atualizar fullUrl quando categoria for removida
+													if (post.slug) {
+														handleChange("fullUrl", `/blog/${post.slug}`);
+													}
+												}}
+												className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500"
+											/>
+											<Label htmlFor="no-category" className="text-gray-600">
+												Sem categoria
+											</Label>
+										</div>
+										
+										{/* Lista de categorias disponíveis */}
 										{categories?.map((category) => (
 											<div
 												key={category?.id}
 												className="flex items-center space-x-2"
 											>
-												<Checkbox
+												<input
+													type="radio"
 													id={`category-${category.id}`}
+													name="category"
 													checked={selectedCategories.includes(category.id)}
-													onCheckedChange={(checked) => {
-														if (checked) {
-															setSelectedCategories([
-																...selectedCategories,
-																category.id,
-															]);
-														} else {
-															setSelectedCategories(
-																selectedCategories.filter(
-																	(id) => id !== category.id,
-																),
-															);
+													onChange={() => {
+														setSelectedCategories([category.id]);
+														// Atualizar fullUrl quando categoria for selecionada
+														if (post.slug) {
+															const categorySlug = category.slug
+																.toLowerCase()
+																.normalize("NFD")
+																.replace(/[\u0300-\u036f]/g, "")
+																.replace(/[^\w\s]/g, "")
+																.replace(/\s+/g, "-");
+															handleChange("fullUrl", `/blog/${categorySlug}/${post.slug}`);
 														}
 													}}
+													className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500"
 												/>
 												<Label htmlFor={`category-${category.id}`}>
 													{category.name}
@@ -381,16 +602,16 @@ export default function NovoBlogPostPage() {
 								</div>
 								<span>Status</span>
 							</div>
-							<Button 
+							<Button
 								className="w-full bg-white text-black hover:bg-gray-200"
 								onClick={() => handleSave("PUBLISHED")}
 								disabled={loading}
 							>
 								Publicar
 							</Button>
-							<Button 
-								variant="outline" 
-								className="w-full border-white  hover:bg-gray-800"
+							<Button
+								variant="outline"
+								className="w-full border-white  hover:bg-blue-300"
 								onClick={() => handleSave("DRAFT")}
 								disabled={loading}
 							>
@@ -415,18 +636,18 @@ export default function NovoBlogPostPage() {
 								categories
 									.filter(cat => selectedCategories.includes(cat.id))
 									.map((category) => (
-										<div key={category.id} className="flex items-center space-x-2 bg-gray-800 p-2 rounded">
-											<div className="w-4 h-4 bg-gray-600 rounded"></div>
+										<div key={category.id} className="flex items-center space-x-2 bg-sky-200 p-2 rounded">
+											
 											<span>{category.name}</span>
 										</div>
 									))
 							) : (
 								<div className="text-gray-400">Nenhuma categoria selecionada</div>
 							)}
-							<Button 
-								variant="outline" 
-								className="w-full mt-2 border-white  hover:bg-gray-800"
-								onClick={() => router.push("/admin/blog/categorias")}
+							<Button
+								variant="outline"
+								className="w-full mt-2 border-white  hover:bg-blue-300"
+								onClick={() => setShowCategoryModal(true)}
 							>
 								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-plus mr-2">
 									<path d="M5 12h14" />
@@ -455,17 +676,17 @@ export default function NovoBlogPostPage() {
 								tags
 									.filter(tag => selectedTags.includes(tag.id))
 									.map((tag) => (
-										<div key={tag.id} className="flex items-center space-x-2 bg-gray-800 p-2 rounded">
+										<div key={tag.id} className="flex items-center space-x-2 bg-sky-200 p-2 rounded">
 											<span>{tag.name}</span>
 										</div>
 									))
 							) : (
 								<div className="text-gray-400">Nenhuma tag selecionada</div>
 							)}
-							<Button 
-								variant="outline" 
-								className="w-full mt-2 border-white  hover:bg-gray-800"
-								onClick={() => router.push("/admin/blog/tags")}
+							<Button
+								variant="outline"
+								className="w-full mt-2 border-white  hover:bg-blue-300"
+								onClick={() => setShowTagModal(true)}
 							>
 								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-plus mr-2">
 									<path d="M5 12h14" />
@@ -477,6 +698,19 @@ export default function NovoBlogPostPage() {
 					</Card>
 				</div>
 			</div>
+
+			{/* Modais */}
+			<AddCategoryModal
+				open={showCategoryModal}
+				onOpenChange={setShowCategoryModal}
+				onCategoryAdded={handleCategoryAdded}
+			/>
+
+			<AddTagModal
+				open={showTagModal}
+				onOpenChange={setShowTagModal}
+				onTagAdded={handleTagAdded}
+			/>
 		</div>
 	);
 }

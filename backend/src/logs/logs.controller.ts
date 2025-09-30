@@ -1,9 +1,9 @@
 import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common'
-import { LogsService } from './logs.service';
-import { CreateLogDto } from './dto/create-log.dto';
-import { UpdateLogDto } from './dto/update-log.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
+import { LogsService } from './logs.service'
+import { CreateLogDto } from './dto/create-log.dto'
+import { UpdateLogDto } from './dto/update-log.dto'
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
+import { RolesGuard } from '../auth/guards/roles.guard'
 
 @Controller('logs')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -30,11 +30,11 @@ export class LogsController {
       method,
       statusCode: statusCode ? +statusCode : undefined,
       userId,
-    });
+    })
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.logsService.findOne(id);
+    return this.logsService.findOne(id)
   }
 }

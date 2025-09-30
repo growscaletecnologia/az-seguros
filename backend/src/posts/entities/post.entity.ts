@@ -10,6 +10,8 @@ export class Post {
   metadata?: Record<string, string>
   status: PostStatus
   slug: string
+  fullUrl?: string
+  coverImage?: string
   createdAt: Date
   updatedAt: Date
   updatedBy?: string

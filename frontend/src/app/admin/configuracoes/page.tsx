@@ -92,9 +92,9 @@ export default function ConfiguracoesPage() {
                       value={gtmSettings.gtm_head_code}
                       onChange={(e) => setGtmSettings({ ...gtmSettings, gtm_head_code: e.target.value })}
                     />
-                    <p className="text-xs text-gray-500">
+                    {/* <p className="text-xs text-gray-500">
                       Cole o código do GTM que deve ser inserido na seção &lt;head&gt; do site.
-                    </p>
+                    </p> */}
                   </div>
 
                   <div className="space-y-2">
@@ -108,9 +108,9 @@ export default function ConfiguracoesPage() {
                       value={gtmSettings.gtm_body_code}
                       onChange={(e) => setGtmSettings({ ...gtmSettings, gtm_body_code: e.target.value })}
                     />
-                    <p className="text-xs text-gray-500">
+                    {/* <p className="text-xs text-gray-500">
                       Cole o código do GTM que deve ser inserido logo após a abertura da tag &lt;body&gt;.
-                    </p>
+                    </p> */}
                   </div>
 
                   <div className="flex justify-end">

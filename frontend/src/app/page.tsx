@@ -4,7 +4,10 @@ import EmblaCarousel from "@/components/EmblaCarousel";
 import { DateRangePicker } from "@/components/Inputs/CustomCalendar";
 import EmailField from "@/components/Inputs/EmailInput";
 import PhoneField from "@/components/Inputs/PhoneInput";
+import { WhyChooseSection } from "@/components/sections/WhyChooseSection";
 import { couponsService } from "@/services/api/coupons";
+import { postsService, Post } from "@/services/posts.service";
+import { buildImageUrl } from "@/utils/imageUtils";
 import type { PreRegisterForm } from "@/types/types";
 import {
 	ArrowRight,
@@ -29,7 +32,7 @@ import Link from "next/link";
 import { useState } from "react";
 
 import DestinationSelect from "@/components/Inputs/DestinationSelect";
-import PassengersSelect from "@/components/Inputs/PassengersSelect,";
+
 import {
 	HoverCard,
 	HoverCardContent,
@@ -37,6 +40,7 @@ import {
 } from "@/components/ui/hover-card";
 import { usePreRegisterForm } from "@/hooks/useRegisterStore";
 import { AvaliacoesCarousel } from "@/components/avaliations/AvaliacoesCarousel";
+import PassengersSelect from "@/components/Inputs/PassengersSelect,";
 
 /**
  * Função para realizar rolagem suave até uma posição específica na página
@@ -90,6 +94,10 @@ export default function HomePage() {
 	const [featuredCoupon, setFeaturedCoupon] = useState<any>(null);
 	const [loadingCoupons, setLoadingCoupons] = useState(true);
 
+	// Estado para posts do blog
+	const [posts, setPosts] = useState<Post[]>([]);
+	const [loadingPosts, setLoadingPosts] = useState(true);
+
 	// Carregar cupons publicáveis ao montar o componente
 	useEffect(() => {
 		const loadPublishableCoupons = async () => {
@@ -136,6 +144,24 @@ export default function HomePage() {
 
 		loadPublishableCoupons();
 	}, []);
+
+	// Carregar posts publicados para a seção de blog
+	useEffect(() => {
+		const loadPosts = async () => {
+			try {
+				setLoadingPosts(true);
+				const response = await postsService.getPublishedPosts(1, 4); // Buscar apenas 4 posts para a homepage
+				setPosts(response.posts || []);
+			} catch (error) {
+				console.error("Erro ao carregar posts:", error);
+			} finally {
+				setLoadingPosts(false);
+			}
+		};
+
+		loadPosts();
+	}, []);
+
 	function handleSubmit(event: React.FormEvent) {
 		event.preventDefault();
 
@@ -397,184 +423,197 @@ export default function HomePage() {
 			{/* Seção Seguros Temáticos */}
 			<section className="py-10 sm:py-16 bg-gray-50">
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-					{/* <div className="text-center mb-8 sm:mb-12">
+					<div className="text-center mb-8 sm:mb-12">
 						<h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2 sm:mb-4">
-							Confira seguros de viagem para suas necessidades
+							Últimas do Blog
 						</h2>
-					</div> */}
-
-					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-						{/* Card 1 */}
-						<div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
-							<Image
-								src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e" // oceano
-								alt="Seguro Viagem Marítimo"
-								width={400}
-								height={250}
-								className="w-full h-40 sm:h-48 object-cover"
-							/>
-							<div className="p-3 sm:p-4">
-								<h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-1 sm:mb-2">
-									Seguro Viagem Marítimo
-								</h3>
-								<p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4">
-									Proteção contra imprevistos em alto mar, incluindo assistência
-									a bordo e emergências durante cruzeiros.
-								</p>
-								<Link
-									href="/planos"
-									className="text-green-600 font-semibold hover:underline flex items-center gap-1"
-								>
-									Saiba Mais <ArrowRight className="w-4 h-4" />
-								</Link>
-							</div>
-						</div>
-
-						{/* Card 2 */}
-						<div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
-							<Image
-								src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b" // estudantes
-								alt="Seguro Viagem Intercâmbio"
-								width={400}
-								height={250}
-								className="w-full h-48 object-cover"
-							/>
-							<div className="p-4">
-								<h3 className="text-lg font-semibold text-gray-900 mb-2">
-									Seguro Viagem Intercâmbio
-								</h3>
-								<p className="text-gray-600 mb-4">
-									Estude em outro país com tranquilidade. Cobertura para saúde,
-									acidentes e suporte durante todo o programa de intercâmbio.
-								</p>
-								<Link
-									href="/planos"
-									className="text-green-600 font-semibold hover:underline flex items-center gap-1"
-								>
-									Saiba Mais <ArrowRight className="w-4 h-4" />
-								</Link>
-							</div>
-						</div>
-
-						{/* Card 3 */}
-						<div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
-							<Image
-								src="https://images.unsplash.com/photo-1536213712468-eaae5b7a6d51?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fG11bGhlciUyMGdyJUMzJTgzJUMyJUExdmlkYXxlbnwwfHwwfHx8MA%3D%3D"
-								alt="Gestante em ambiente natural, com vestido azul claro"
-								width={400}
-								height={250}
-								className="w-full h-48 object-cover"
-							/>
-							<div className="p-4">
-								<h3 className="text-lg font-semibold text-gray-900 mb-2">
-									Seguro Viagem para Gestantes
-								</h3>
-								<p className="text-gray-600 mb-4">
-									Viaje com segurança durante a gestação. Coberturas especiais
-									para emergências e acompanhamento médico.
-								</p>
-								<Link
-									href="/planos"
-									className="text-green-600 font-semibold hover:underline flex items-center gap-1"
-								>
-									Saiba Mais <ArrowRight className="w-4 h-4" />
-								</Link>
-							</div>
-						</div>
-
-						{/* Card 4 */}
-						<div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
-							<Image
-								src="https://images.unsplash.com/photo-1501785888041-af3ef285b470" // montanhas
-								alt="Seguro Viagem Mochilão"
-								width={400}
-								height={250}
-								className="w-full h-48 object-cover"
-							/>
-							<div className="p-4">
-								<h3 className="text-lg font-semibold text-gray-900 mb-2">
-									Seguro Viagem Mochilão
-								</h3>
-								<p className="text-gray-600 mb-4">
-									Explore o mundo com tranquilidade. Assistência para múltiplos
-									países e coberturas pensadas para mochileiros.
-								</p>
-								<Link
-									href="/planos"
-									className="text-green-600 font-semibold hover:underline flex items-center gap-1"
-								>
-									Saiba Mais <ArrowRight className="w-4 h-4" />
-								</Link>
-							</div>
-						</div>
-					</div>
-				</div>
-			</section>
-
-			{/* Diferenciais */}
-			<section className="py-16 bg-gray-50">
-				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-					<div className="text-center mb-12">
-						<h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-							Por que escolher a SeguroViagem?
-						</h2>
-						<p className="text-xl text-gray-600 max-w-3xl mx-auto">
-							Somos a plataforma líder em seguros de viagem no Brasil, com mais
-							de 1 milhão de clientes satisfeitos.
+						<p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
+							Confira as últimas notícias, dicas e informações sobre seguros de viagem
 						</p>
 					</div>
 
-					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-						<div className="text-center group">
-							<div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-200 transition-colors">
-								<DollarSign className="h-8 w-8 text-blue-600" />
-							</div>
-							<h3 className="text-xl font-bold text-gray-900 mb-2">
-								Melhor Preço
-							</h3>
-							<p className="text-gray-600">
-								Garantimos o melhor preço do mercado ou devolvemos a diferença.
-							</p>
+					{loadingPosts ? (
+						<div className="flex justify-center py-8">
+							<p className="text-base sm:text-lg">Carregando posts...</p>
 						</div>
+					) : posts.length > 0 ? (
+						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+							{posts.map((post) => {
+								// Função para obter a URL da imagem principal
+								const getMainImageUrl = (post: Post) => {
+									// Primeiro, verifica se há uma coverImage
+									if (post.coverImage) {
+										return buildImageUrl(post.coverImage);
+									}
+									
+									// Se não, procura pela imagem principal nos media
+									const mainImage = post.media?.find(media => media.isMain);
+									if (mainImage?.url) {
+										return buildImageUrl(mainImage.url);
+									}
+									
+									// Se não encontrar nenhuma, usa a primeira imagem disponível
+									const firstImage = post.media?.[0];
+									if (firstImage?.url) {
+										return buildImageUrl(firstImage.url);
+									}
+									
+									// Fallback para placeholder
+									return buildImageUrl(null);
+								};
 
-						<div className="text-center group">
-							<div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-green-200 transition-colors">
-								<Clock className="h-8 w-8 text-green-600" />
-							</div>
-							<h3 className="text-xl font-bold text-gray-900 mb-2">
-								Suporte 24h
-							</h3>
-							<p className="text-gray-600">
-								Atendimento especializado 24 horas por dia, 7 dias por semana.
-							</p>
-						</div>
+								const mainImageUrl = getMainImageUrl(post);
+								const categories = post.categories.map(pc => pc.category);
 
-						<div className="text-center group">
-							<div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-200 transition-colors">
-								<Shield className="h-8 w-8 text-blue-600" />
-							</div>
-							<h3 className="text-xl font-bold text-gray-900 mb-2">
-								Compra Segura
-							</h3>
-							<p className="text-gray-600">
-								Transações 100% seguras com certificado SSL e criptografia.
-							</p>
+								return (
+									<div key={post.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+										<Link href={`/blog/${post.slug}`}>
+											<div className="aspect-video relative overflow-hidden">
+												<img
+													src={mainImageUrl}
+													alt={post.title}
+													width={400}
+													height={250}
+													className="w-full h-40 sm:h-48 object-cover"
+												/>
+											</div>
+											<div className="p-3 sm:p-4">
+												<h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-1 sm:mb-2 line-clamp-2">
+													{post.title}
+												</h3>
+												<p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4 line-clamp-2">
+													{post.resume || post.description}
+												</p>
+												<div className="text-blue-600 font-semibold hover:underline flex items-center gap-1">
+													Saiba Mais <ArrowRight className="w-4 h-4" />
+												</div>
+											</div>
+										</Link>
+									</div>
+								);
+							})}
 						</div>
+					) : (
+						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+							{/* Fallback para cards estáticos caso não haja posts */}
+							<div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+								<Image
+									src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e"
+									alt="Seguro Viagem Marítimo"
+									width={400}
+									height={250}
+									className="w-full h-40 sm:h-48 object-cover"
+								/>
+								<div className="p-3 sm:p-4">
+									<h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-1 sm:mb-2">
+										Seguro Viagem Marítimo
+									</h3>
+									<p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4">
+										Proteção contra imprevistos em alto mar, incluindo assistência
+										a bordo e emergências durante cruzeiros.
+									</p>
+									<Link
+										href="/planos"
+										className="text-green-600 font-semibold hover:underline flex items-center gap-1"
+									>
+										Saiba Mais <ArrowRight className="w-4 h-4" />
+									</Link>
+								</div>
+							</div>
 
-						<div className="text-center group">
-							<div className="bg-orange-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-orange-200 transition-colors">
-								<Users className="h-8 w-8 text-orange-600" />
+							<div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+								<Image
+									src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b"
+									alt="Seguro Viagem Intercâmbio"
+									width={400}
+									height={250}
+									className="w-full h-48 object-cover"
+								/>
+								<div className="p-4">
+									<h3 className="text-lg font-semibold text-gray-900 mb-2">
+										Seguro Viagem Intercâmbio
+									</h3>
+									<p className="text-gray-600 mb-4">
+										Estude em outro país com tranquilidade. Cobertura para saúde,
+										acidentes e suporte durante todo o programa de intercâmbio.
+									</p>
+									<Link
+										href="/planos"
+										className="text-green-600 font-semibold hover:underline flex items-center gap-1"
+									>
+										Saiba Mais <ArrowRight className="w-4 h-4" />
+									</Link>
+								</div>
 							</div>
-							<h3 className="text-xl font-bold text-gray-900 mb-2">
-								+1M Clientes
-							</h3>
-							<p className="text-gray-600">
-								Mais de 1 milhão de viajantes já confiaram em nossos serviços.
-							</p>
+
+							<div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+								<Image
+									src="https://images.unsplash.com/photo-1536213712468-eaae5b7a6d51?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fG11bGhlciUyMGdyJUMzJTgzJUMyJUExdmlkYXxlbnwwfHwwfHx8MA%3D%3D"
+									alt="Gestante em ambiente natural, com vestido azul claro"
+									width={400}
+									height={250}
+									className="w-full h-48 object-cover"
+								/>
+								<div className="p-4">
+									<h3 className="text-lg font-semibold text-gray-900 mb-2">
+										Seguro Viagem para Gestantes
+									</h3>
+									<p className="text-gray-600 mb-4">
+										Viaje com segurança durante a gestação. Coberturas especiais
+										para emergências e acompanhamento médico.
+									</p>
+									<Link
+										href="/planos"
+										className="text-green-600 font-semibold hover:underline flex items-center gap-1"
+									>
+										Saiba Mais <ArrowRight className="w-4 h-4" />
+									</Link>
+								</div>
+							</div>
+
+							<div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+								<Image
+									src="https://images.unsplash.com/photo-1501785888041-af3ef285b470"
+									alt="Seguro Viagem Mochilão"
+									width={400}
+									height={250}
+									className="w-full h-48 object-cover"
+								/>
+								<div className="p-4">
+									<h3 className="text-lg font-semibold text-gray-900 mb-2">
+										Seguro Viagem Mochilão
+									</h3>
+									<p className="text-gray-600 mb-4">
+										Explore o mundo com tranquilidade. Assistência para múltiplos
+										países e coberturas pensadas para mochileiros.
+									</p>
+									<Link
+										href="/planos"
+										className="text-green-600 font-semibold hover:underline flex items-center gap-1"
+									>
+										Saiba Mais <ArrowRight className="w-4 h-4" />
+									</Link>
+								</div>
+							</div>
 						</div>
-					</div>
+					)}
+
+					{/* Link para ver mais posts */}
+					{posts.length > 0 && (
+						<div className="text-center mt-8 sm:mt-12">
+							<Link
+								href="/blog"
+								className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+							>
+								Ver Todos os Posts <ArrowRight className="w-4 h-4" />
+							</Link>
+						</div>
+					)}
 				</div>
 			</section>
+
+			{/* Diferenciais - Seção "Por que escolher" dinâmica */}
+			<WhyChooseSection />
 
 			{/* Como Funciona */}
 			<section className="py-16 bg-white">

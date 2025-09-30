@@ -1,4 +1,5 @@
 import { api } from '@/lib/api';
+import { Category } from './categories.service';
 
 export interface PageMetadata {
   title: string;
@@ -17,6 +18,8 @@ export interface Page {
   title: string;
   slug: string;
   content: string;
+  description?: string;
+  resume?: string;
   status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
   userId: string;
   metadata: PageMetadata;
@@ -25,6 +28,7 @@ export interface Page {
   updatedBy: string | null;
   publishedAt?: string;
   user: PageUser;
+  categories: Category[];
 }
 
 export interface PagesResponse {

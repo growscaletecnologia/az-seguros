@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
-import { Eye, Plus, StarIcon, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Eye, Plus, StarIcon, Search, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -81,6 +81,20 @@ export default function AvaliacoesAdminPage() {
     }
   };
 
+  // Excluir avaliação
+  const handleDeleteAvaliation = async (id: string) => {
+    if (window.confirm('Tem certeza que deseja excluir esta avaliação? Esta ação não pode ser desfeita.')) {
+      try {
+        await AvaliationService.delete(id);
+        toast.success('Avaliação excluída com sucesso');
+        loadAvaliacoes(); // Recarrega a lista
+      } catch (error) {
+        console.error('Erro ao excluir avaliação:', error);
+        toast.error('Erro ao excluir avaliação');
+      }
+    }
+  };
+  
   // Visualizar avaliação
   const handlePreview = (avaliation: Avaliation) => {
     setSelectedAvaliation(avaliation);
@@ -220,6 +234,14 @@ export default function AvaliacoesAdminPage() {
                               onClick={() => handlePreview(avaliation)}
                             >
                               <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              onClick={() => handleDeleteAvaliation(avaliation.id)}
+                              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            >
+                              <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
                         </TableCell>
@@ -413,7 +435,7 @@ export default function AvaliacoesAdminPage() {
               />
             </div>
             
-            <div className="grid gap-2">
+            {/* <div className="grid gap-2">
               <Label htmlFor="avatar">URL do Avatar (opcional)</Label>
               <Input 
                 id="avatar" 
@@ -421,7 +443,7 @@ export default function AvaliacoesAdminPage() {
                 onChange={(e) => setNewAvaliation({...newAvaliation, avatar: e.target.value})}
                 placeholder="https://exemplo.com/avatar.jpg"
               />
-            </div>
+            </div> */}
             
             <div className="flex items-center space-x-2">
               <Switch 

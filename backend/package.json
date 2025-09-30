@@ -19,7 +19,14 @@
 		"test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
 		"test:e2e": "jest --config ./test/jest-e2e.json",
 		"seed": "ts-node src/prisma/seed/index.ts",
-		"seed:posts": "ts-node -r tsconfig-paths/register src/prisma/seed/posts-seed-runner.ts"
+		"seed:posts": "ts-node src/prisma/seed/posts-seed-runner.ts",
+		"docker:dev": "docker-compose up -d",
+		"docker:dev:build": "docker-compose up -d --build",
+		"docker:dev:down": "docker-compose down",
+		"docker:dev:logs": "docker-compose logs -f backend",
+		"docker:prod": "docker-compose -f docker-compose.prod.yaml up -d",
+		"docker:prod:build": "docker-compose -f docker-compose.prod.yaml up -d --build",
+		"docker:prod:down": "docker-compose -f docker-compose.prod.yaml down"
 	},
 	"prisma": {
 		"schema": "src/prisma/schema.prisma"

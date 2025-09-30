@@ -22,8 +22,6 @@ import { AuthModule } from '../auth/auth.module'
   exports: [EffectivePermissionsService, PermissionGuard, AutoPermissionMiddleware],
 })
 export class RbacModule {
-  configure(consumer: MiddlewareConsumer) {
-    // Aplica o middleware a todas as rotas
-    consumer.apply(AutoPermissionMiddleware).forRoutes({ path: '*', method: RequestMethod.ALL })
-  }
+  // Removendo a configuração de middleware daqui, pois agora é feita no AppModule
+  // para garantir a ordem correta de execução
 }

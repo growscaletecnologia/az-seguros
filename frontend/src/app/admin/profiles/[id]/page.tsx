@@ -13,6 +13,7 @@ import { ClipboardCheck } from "lucide-react";
 import { toast } from "sonner";
 import { profilesService, UserFunction } from "@/services/profiles.service";
 import { useTheme } from "next-themes";
+import React from "react";
 
 // Schema de validação
 const profileSchema = z.object({
@@ -27,10 +28,14 @@ const profileSchema = z.object({
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
 
-export default function ProfileForm({ params }: { params: { id: string } }) {
+export default function ProfileForm({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const { theme } = useTheme();
-  const isNew = params.id === "new";
+  
+  // Desembrulha os parâmetros usando React.use()
+  const { id } = React.use(params);
+  const isNew = id === "new";
+  
   const [isPending, setIsPending] = useState(false);
   const [userFunctions, setUserFunctions] = useState<UserFunction[]>([]);
 
@@ -68,7 +73,7 @@ export default function ProfileForm({ params }: { params: { id: string } }) {
         
         // Se estiver editando, carregar dados do perfil
         if (!isNew) {
-          const profile = await profilesService.getProfileById(params.id);
+          const profile = await profilesService.getProfileById(id);
           setValue("name", profile.name);
           
           // Mapear as ações do perfil para o formulário
@@ -83,7 +88,7 @@ export default function ProfileForm({ params }: { params: { id: string } }) {
     };
 
     loadUserFunctions();
-  }, [isNew, params.id, setValue]);
+  }, [isNew, id, setValue]);
 
   const onSubmit = async (data: ProfileFormValues) => {
     try {
@@ -93,7 +98,7 @@ export default function ProfileForm({ params }: { params: { id: string } }) {
         await profilesService.createProfile(data);
         toast.success("Perfil criado com sucesso!");
       } else {
-        await profilesService.updateProfile(params.id, data);
+        await profilesService.updateProfile(id, data);
         toast.success("Perfil atualizado com sucesso!");
       }
       

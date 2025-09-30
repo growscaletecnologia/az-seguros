@@ -1,7 +1,8 @@
 "use client";
 
 import { TinyMCEEditor } from "@/components/Inputs/TinyMCEEditor";
-
+import { AddCategoryModal } from "@/components/modals/AddCategoryModal";
+import { AddTagModal } from "@/components/modals/AddTagModal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -17,17 +18,18 @@ import {
 	postsService,
 } from "@/services/posts.service";
 import { useRouter } from "next/navigation";
+import { Upload } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import JoditEditorComponent from "@/components/Inputs/JoditEditor";
 import { toast } from "sonner";
+import { validateImageFile, convertToWebP, generateImagePreview, buildImageUrl } from "@/utils/imageUtils";
 
 /**
  * Página de edição de posts existentes
  */
-// Temporariamente modificado para evitar erro de build com React.use(params)
 export default function EditarBlogPostPage({
 	params,
-}: { params: { id: string } }) {
+}: { params: Promise<{ id: string }> }) {
 	const router = useRouter();
 	const [loading, setLoading] = useState(true);
 	const [saving, setSaving] = useState(false);
@@ -36,9 +38,15 @@ export default function EditarBlogPostPage({
 	const [tags, setTags] = useState<PostTag[]>([]);
 	const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 	const [selectedTags, setSelectedTags] = useState<string[]>([]);
+	const [showCategoryModal, setShowCategoryModal] = useState(false);
+	const [showTagModal, setShowTagModal] = useState(false);
 	
-	// Acessa o ID diretamente dos parâmetros sem usar React.use
-	const postId = params.id;
+	// Estados para upload de imagem de capa
+	const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
+	const [coverImagePreview, setCoverImagePreview] = useState<string>("");
+	
+	// Desembrulha os parâmetros usando React.use()
+	const { id: postId } = React.use(params);
 
 	// Carrega o post e dados relacionados
 	useEffect(() => {
@@ -52,12 +60,21 @@ export default function EditarBlogPostPage({
 				]);
 
 				setPost(postData);
-				setCategories(categoriesData);
-				setTags(tagsData);
+				setCategories(categoriesData?.categories || []);
+				setTags(tagsData?.tags || []);
 
 				// Configura as categorias e tags selecionadas
-				setSelectedCategories(postData.categories.map((cat) => cat.id));
-				setSelectedTags(postData.tags.map((tag) => tag.id));
+				const postCategories = postData.categories?.map((cat: any) => cat.id) || [];
+				const postTags = postData.tags?.map((tag: any) => tag.id) || [];
+				
+				// Se não há categorias selecionadas, usar a primeira categoria disponível
+				if (postCategories.length === 0 && categoriesData?.categories?.length > 0) {
+					setSelectedCategories([categoriesData.categories[0].id]);
+				} else {
+					setSelectedCategories(postCategories);
+				}
+				
+				setSelectedTags(postTags);
 			} catch (error) {
 				console.error("Erro ao carregar dados:", error);
 				toast.error("Erro ao carregar o post. Verifique se o ID é válido.");
@@ -68,12 +85,62 @@ export default function EditarBlogPostPage({
 		};
 
 		loadData();
-	}, [params.id, router]);
+	}, [postId, router]);
 
 	// Atualiza o estado do post
 	const handleChange = (field: keyof UpdatePostDTO, value: any) => {
 		if (!post) return;
 		setPost({ ...post, [field]: value } as Post);
+	};
+
+	/**
+	 * Manipula a seleção de arquivo de imagem de capa com conversão automática para WebP
+	 */
+	const handleCoverImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0];
+		if (!file) return;
+
+		try {
+			// Validar arquivo
+			const validation = validateImageFile(file);
+			if (!validation.isValid) {
+				toast.error(validation.error);
+				return;
+			}
+
+			// Mostrar loading
+			toast.info("Processando imagem...");
+
+			// Converter para WebP se não for SVG
+			let processedFile = file;
+			if (file.type !== 'image/svg+xml') {
+				processedFile = await convertToWebP(file, 0.85, 1200, 800);
+			}
+
+			setCoverImageFile(processedFile);
+			
+			// Gerar preview
+			const preview = await generateImagePreview(processedFile);
+			setCoverImagePreview(preview);
+
+			toast.success("Imagem processada com sucesso!");
+		} catch (error) {
+			console.error("Erro ao processar imagem:", error);
+			toast.error("Erro ao processar a imagem. Tente novamente.");
+		}
+	};
+
+	/**
+	 * Remove a imagem de capa selecionada
+	 */
+	const removeCoverImage = () => {
+		setCoverImageFile(null);
+		setCoverImagePreview("");
+		// Limpar o input file
+		const fileInput = document.getElementById('coverImageFile') as HTMLInputElement;
+		if (fileInput) {
+			fileInput.value = '';
+		}
 	};
 
 	// Atualiza os metadados do post
@@ -100,6 +167,96 @@ export default function EditarBlogPostPage({
 			.replace(/\s+/g, "-");
 
 		handleChange("slug", slug);
+		generateFullUrl(slug);
+	};
+
+	/**
+	 * Gera a URL completa baseada no slug e categoria selecionada
+	 */
+	const generateFullUrl = (slug?: string) => {
+		const currentSlug = slug || post?.slug;
+		if (!currentSlug) return;
+
+		// Se há categorias selecionadas, usar a primeira categoria
+		if (selectedCategories.length > 0) {
+			const firstCategory = categories.find(cat => cat.id === selectedCategories[0]);
+			if (firstCategory) {
+				// Normalizar o slug da categoria (remover acentos e espaços)
+				const categorySlug = firstCategory.slug
+					.toLowerCase()
+					.normalize("NFD")
+					.replace(/[\u0300-\u036f]/g, "")
+					.replace(/[^\w\s]/g, "")
+					.replace(/\s+/g, "-");
+				
+				handleChange("fullUrl", `/blog/${categorySlug}/${currentSlug}`);
+			} else {
+				handleChange("fullUrl", `/blog/${currentSlug}`);
+			}
+		} else {
+			handleChange("fullUrl", `/blog/${currentSlug}`);
+		}
+	};
+
+	// Recarrega as categorias após adicionar uma nova
+	const reloadCategories = async () => {
+		try {
+			const categoriesData = await postsService.getCategories();
+			setCategories(categoriesData);
+		} catch (error) {
+			console.error("Erro ao recarregar categorias:", error);
+		}
+	};
+
+	// Recarrega as tags após adicionar uma nova
+	const reloadTags = async () => {
+		try {
+			const tagsData = await postsService.getTags();
+			setTags(tagsData);
+		} catch (error) {
+			console.error("Erro ao recarregar tags:", error);
+		}
+	};
+
+	// Callback para quando uma nova categoria é adicionada
+	const handleCategoryAdded = (newCategory: PostCategory) => {
+		setCategories([...categories, newCategory]);
+		setSelectedCategories([...selectedCategories, newCategory.id]);
+		setShowCategoryModal(false);
+	};
+
+	// Callback para quando uma nova tag é adicionada
+	const handleTagAdded = (newTag: PostTag) => {
+		setTags([...tags, newTag]);
+		setSelectedTags([...selectedTags, newTag.id]);
+		setShowTagModal(false);
+	};
+
+	/**
+	 * Função específica para upload de imagem sem alterar outros dados
+	 */
+	const handleImageUpload = async () => {
+		if (!coverImageFile) {
+			toast.error("Selecione uma imagem primeiro.");
+			return;
+		}
+
+		try {
+			setSaving(true);
+			await postsService.uploadCoverImage(post.id, coverImageFile);
+			toast.success("Imagem de capa atualizada com sucesso!");
+			
+			// Recarregar os dados do post para mostrar a nova imagem
+			const updatedPost = await postsService.getPostById(post.id);
+			setPost(updatedPost);
+			setCoverImageFile(null);
+			setCoverImagePreview("");
+		} catch (error) {
+			console.error("Erro ao fazer upload da imagem:", error);
+			toast.error("Erro ao fazer upload da imagem.");
+		} finally {
+			setSaving(false);
+		}
 	};
 
 	// Salva as alterações do post
@@ -109,25 +266,64 @@ export default function EditarBlogPostPage({
 		try {
 			setSaving(true);
 
+			// Validações básicas antes de salvar
+			if (status === "PUBLISHED") {
+				if (!post.title?.trim()) {
+					toast.error("O título é obrigatório para publicar o post.");
+					return;
+				}
+				if (!post.slug?.trim()) {
+					toast.error("O slug é obrigatório para publicar o post.");
+					return;
+				}
+				if (!post.content?.trim()) {
+					toast.error("O conteúdo é obrigatório para publicar o post.");
+					return;
+				}
+			}
+
 			const updateData: UpdatePostDTO = {
-				id: post.id,
+				//id: post.id,
 				title: post.title,
 				slug: post.slug,
 				content: post.content,
 				resume: post.resume,
 				status: status || post.status,
-				categoryIds: selectedCategories,
-				tagIds: selectedTags,
-				metadata: post.metadata,
+				categoryIds: selectedCategories.length > 0 
+					? selectedCategories.filter(id => id !== null && id !== undefined) 
+					: (categories.length > 0 ? [categories[0].id] : []),
+				tagIds: selectedTags.length > 0 
+					? selectedTags.filter(id => id !== null && id !== undefined) 
+					: [],
+				//metadata: post.metadata,
 			};
 
 			await postsService.updatePost(post.id, updateData);
 
-			alert("Post atualizado com sucesso!");
+			// Se há uma nova imagem de capa selecionada, fazer upload
+			if (coverImageFile) {
+				try {
+					await postsService.uploadCoverImage(post.id, coverImageFile);
+					toast.success("Post e imagem de capa atualizados com sucesso!");
+				} catch (uploadError) {
+					console.error("Erro ao fazer upload da imagem:", uploadError);
+					toast.error("Post atualizado, mas houve erro no upload da imagem.");
+				}
+			} else {
+				toast.success("Post atualizado com sucesso!");
+			}
+
 			router.push("/admin/blog");
-		} catch (error) {
+		} catch (error: any) {
 			console.error("Erro ao atualizar post:", error);
-			alert("Erro ao atualizar post. Verifique os dados e tente novamente.");
+			// Tratamento específico para diferentes tipos de erro
+			if (error?.response?.status === 409) {
+				toast.error("Este slug já está sendo usado por outro post. Escolha um slug diferente.");
+			} else if (error?.response?.status === 422) {
+				toast.error("Dados inválidos. Verifique os campos obrigatórios.");
+			} else {
+				toast.error("Erro ao atualizar post. Verifique os dados e tente novamente.");
+			}
 		} finally {
 			setSaving(false);
 		}
@@ -216,6 +412,80 @@ export default function EditarBlogPostPage({
 									rows={3}
 								/>
 							</div>
+
+							{/* Seção de Upload de Imagem de Capa */}
+							<div>
+								<Label htmlFor="coverImageFile">Imagem de Capa</Label>
+								<div className="space-y-2">
+									<Input
+										id="coverImageFile"
+										type="file"
+										accept="image/*"
+										onChange={handleCoverImageChange}
+										className="cursor-pointer"
+									/>
+									<p className="text-sm text-gray-500">
+										Formatos aceitos: JPG, PNG, GIF, WebP, SVG. Tamanho máximo: 5MB
+										<br />
+										<span className="text-blue-600">As imagens serão automaticamente convertidas para WebP para melhor performance.</span>
+									</p>
+									
+									{/* Preview da nova imagem selecionada */}
+									{coverImagePreview && (
+										<div className="space-y-2">
+											<div className="relative inline-block">
+												<img
+													src={coverImagePreview}
+													alt="Preview da imagem de capa"
+													className="w-32 h-32 object-cover rounded-md border"
+												/>
+												<Button
+													type="button"
+													variant="destructive"
+													size="sm"
+													className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
+													onClick={removeCoverImage}
+												>
+													×
+												</Button>
+											</div>
+											{/* Botão para upload apenas da imagem */}
+											<Button
+												type="button"
+												variant="outline"
+												size="sm"
+												onClick={handleImageUpload}
+												disabled={saving}
+												className="flex items-center gap-2"
+											>
+												{saving ? (
+													<>
+														<div className="w-4 h-4 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
+														Enviando...
+													</>
+												) : (
+													<>
+														<Upload className="w-4 h-4" />
+														Atualizar apenas imagem
+													</>
+												)}
+											</Button>
+										</div>
+									)}
+
+									{/* Mostrar imagem atual se não há nova selecionada */}
+					{!coverImagePreview && post.coverImage && (
+						<div className="relative inline-block">
+							<img
+								src={buildImageUrl(post.coverImage)}
+								alt="Imagem de capa atual"
+								className="w-32 h-32 object-cover rounded-md border"
+							/>
+							<p className="text-sm text-gray-500 mt-1">Imagem atual</p>
+						</div>
+					)}
+								</div>
+							</div>
 						</div>
 					</CardContent>
 				</Card>
@@ -251,7 +521,7 @@ export default function EditarBlogPostPage({
 									{post.media.map((media) => (
 										<div key={media.id} className="relative group">
 											<img
-												src={media.url}
+												src={buildImageUrl(media.url)}
 												alt="Mídia do post"
 												className={`w-full h-32 object-cover rounded-md ${media.isMain ? "ring-2 ring-blue-500" : ""}`}
 											/>
@@ -321,38 +591,70 @@ export default function EditarBlogPostPage({
 					<TabsList className="mb-4">
 						<TabsTrigger value="categories">Categorias</TabsTrigger>
 						<TabsTrigger value="tags">Tags</TabsTrigger>
-						<TabsTrigger value="seo">SEO</TabsTrigger>
 					</TabsList>
 
 					<TabsContent value="categories">
 						<Card>
 							<CardHeader>
-								<CardTitle>Categorias</CardTitle>
+								<div className="flex justify-between items-center">
+									<CardTitle>Categoria (selecione apenas uma)</CardTitle>
+									<Button
+										variant="outline"
+										size="sm"
+										onClick={() => setShowCategoryModal(true)}
+									>
+										Adicionar Nova Categoria
+									</Button>
+								</div>
 							</CardHeader>
 							<CardContent>
-								<div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+								<div className="space-y-3">
+									{/* Opção para não selecionar categoria */}
+									<div className="flex items-center space-x-2">
+										<input
+											type="radio"
+											id="no-category"
+											name="category"
+											checked={selectedCategories.length === 0}
+											onChange={() => {
+												setSelectedCategories([]);
+												// Atualizar fullUrl quando categoria for removida
+												if (post?.slug) {
+													handleChange("fullUrl", `/blog/${post.slug}`);
+												}
+											}}
+											className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500"
+										/>
+										<Label htmlFor="no-category" className="text-gray-600">
+											Sem categoria
+										</Label>
+									</div>
+									
+									{/* Lista de categorias disponíveis */}
 									{categories.map((category) => (
 										<div
 											key={category.id}
 											className="flex items-center space-x-2"
 										>
-											<Checkbox
+											<input
+												type="radio"
 												id={`category-${category.id}`}
+												name="category"
 												checked={selectedCategories.includes(category.id)}
-												onCheckedChange={(checked) => {
-													if (checked) {
-														setSelectedCategories([
-															...selectedCategories,
-															category.id,
-														]);
-													} else {
-														setSelectedCategories(
-															selectedCategories.filter(
-																(id) => id !== category.id,
-															),
-														);
+												onChange={() => {
+													setSelectedCategories([category.id]);
+													// Atualizar fullUrl quando categoria for selecionada
+													if (post?.slug) {
+														const categorySlug = category.slug
+															.toLowerCase()
+															.normalize("NFD")
+															.replace(/[\u0300-\u036f]/g, "")
+															.replace(/[^\w\s]/g, "")
+															.replace(/\s+/g, "-");
+														handleChange("fullUrl", `/blog/${categorySlug}/${post.slug}`);
 													}
 												}}
+												className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500"
 											/>
 											<Label htmlFor={`category-${category.id}`}>
 												{category.name}
@@ -367,7 +669,16 @@ export default function EditarBlogPostPage({
 					<TabsContent value="tags">
 						<Card>
 							<CardHeader>
-								<CardTitle>Tags</CardTitle>
+								<div className="flex justify-between items-center">
+									<CardTitle>Tags</CardTitle>
+									<Button
+										variant="outline"
+										size="sm"
+										onClick={() => setShowTagModal(true)}
+									>
+										Adicionar Nova Tag
+									</Button>
+								</div>
 							</CardHeader>
 							<CardContent>
 								<div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -393,56 +704,21 @@ export default function EditarBlogPostPage({
 							</CardContent>
 						</Card>
 					</TabsContent>
-
-					<TabsContent value="seo">
-						<Card>
-							<CardHeader>
-								<CardTitle>Metadados SEO</CardTitle>
-							</CardHeader>
-							<CardContent>
-								<div className="space-y-4">
-									<div>
-										<Label htmlFor="meta-title">Título SEO</Label>
-										<Input
-											id="meta-title"
-											value={post.metadata?.title || ""}
-											onChange={(e) =>
-												handleMetadataChange("title", e.target.value)
-											}
-											placeholder="Título para SEO (recomendado: até 60 caracteres)"
-										/>
-									</div>
-
-									<div>
-										<Label htmlFor="meta-description">Descrição SEO</Label>
-										<Textarea
-											id="meta-description"
-											value={post.metadata?.description || ""}
-											onChange={(e) =>
-												handleMetadataChange("description", e.target.value)
-											}
-											placeholder="Descrição para SEO (recomendado: até 160 caracteres)"
-											rows={3}
-										/>
-									</div>
-
-									<div>
-										<Label htmlFor="meta-keywords">Palavras-chave</Label>
-										<Input
-											id="meta-keywords"
-											value={post.metadata?.keywords || ""}
-											onChange={(e) =>
-												handleMetadataChange("keywords", e.target.value)
-											}
-											placeholder="Palavras-chave separadas por vírgula"
-										/>
-									</div>
-								</div>
-							</CardContent>
-						</Card>
-					</TabsContent>
 				</Tabs>
 			</div>
+
+			{/* Modais */}
+			<AddCategoryModal
+				open={showCategoryModal}
+				onOpenChange={setShowCategoryModal}
+				onCategoryAdded={handleCategoryAdded}
+			/>
+
+			<AddTagModal
+				open={showTagModal}
+				onOpenChange={setShowTagModal}
+				onTagAdded={handleTagAdded}
+			/>
 		</div>
 	);
 }

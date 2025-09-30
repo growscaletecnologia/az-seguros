@@ -6,6 +6,8 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { AllExceptionsFilter } from './common/errors/all-exceptions.filter'
 import { ValidationPipe } from '@nestjs/common'
 import helmet from 'helmet'
+import { NestExpressApplication } from '@nestjs/platform-express'
+import { join } from 'path'
 
 function normalizeOrigins(envVal?: string | string[]) {
   if (!envVal) return []
@@ -17,7 +19,12 @@ function normalizeOrigins(envVal?: string | string[]) {
 }
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule)
+  const app = await NestFactory.create<NestExpressApplication>(AppModule)
+
+  // Configurar arquivos estáticos para uploads
+  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
+    prefix: '/uploads/',
+  })
 
   app.use(helmet())
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))

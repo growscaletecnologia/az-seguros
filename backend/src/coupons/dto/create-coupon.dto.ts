@@ -30,9 +30,15 @@ export class CreateCouponDto {
   @Min(0)
   discount: number
 
-  @ApiProperty({ description: 'Status do cupom', enum: CouponStatus })
+  @ApiProperty({
+    description: 'Status do cupom',
+    enum: CouponStatus,
+    required: false,
+    default: CouponStatus.ACTIVE,
+  })
+  @IsOptional()
   @IsEnum(CouponStatus)
-  status: CouponStatus
+  status?: CouponStatus
 
   @ApiProperty({ description: 'Tipo de desconto (percentual ou valor fixo)', enum: DiscountType })
   @IsEnum(DiscountType)

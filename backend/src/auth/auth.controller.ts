@@ -18,7 +18,6 @@ export class AuthController {
   async login(@Body() body: { email: string; password: string }) {
     console.log(body.email, body.password)
     const user = await this.authService.validateUser(body.email, body.password)
-    console.log('user', user)
     return this.authService.login(user)
   }
 

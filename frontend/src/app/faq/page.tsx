@@ -93,9 +93,11 @@ export default function FAQPage() {
 	// Buscar conteúdo da página FAQ da API
 	useEffect(() => {
 		const fetchFAQContent = async () => {
+			let faqPage = null;
+			
 			try {
 				setLoading(true);
-				const faqPage = await SystemPagesService.getByType("FAQ");
+				faqPage = await SystemPagesService.getByType("FAQ");
 				
 				if (faqPage) {
 					// Se tiver conteúdo HTML, usamos ele diretamente

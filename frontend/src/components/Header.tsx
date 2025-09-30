@@ -37,15 +37,29 @@ export default function Header() {
 			if (isAuth) {
 				const userData = AuthService.getUser();
 				setUser(userData);
+			} else {
+				setUser(null);
 			}
 		};
 
 		checkAuth();
-		// Adicionar um listener para mudanças no localStorage
-		window.addEventListener("storage", checkAuth);
-		
+
+		// Adicionar listener para mudanças no localStorage (para outras abas)
+		const handleStorageChange = () => {
+			checkAuth();
+		};
+		// Adicionar listener para eventos customizados de autenticação (para a mesma aba)
+		const handleAuthStateChange = (event: CustomEvent) => {
+			const { isAuthenticated: authState, user: userData } = event.detail;
+			setIsAuthenticated(authState);
+			setUser(userData);
+		};
+
+		window.addEventListener("storage", handleStorageChange);
+		window.addEventListener("authStateChanged", handleAuthStateChange as EventListener);
 		return () => {
-			window.removeEventListener("storage", checkAuth);
+			window.removeEventListener("storage", handleStorageChange);
+			window.removeEventListener("authStateChanged", handleAuthStateChange as EventListener);
 		};
 	}, []);
 
@@ -97,10 +111,10 @@ export default function Header() {
 							FAQ
 						</Link>
 						<Link
-							href="/ajuda"
+							href="/blog"
 							className="text-gray-700 hover:text-blue-600 font-medium text-sm lg:text-base"
 						>
-							Ajuda
+							Blog
 						</Link>
 						<div className="flex items-center space-x-2 lg:space-x-4">
 							<div className="hidden lg:flex items-center space-x-1 text-green-600">

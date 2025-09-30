@@ -204,16 +204,26 @@ model Address {
 }
 
 model Log {
-  id           String     @id @default(cuid())
-  userId       String?
-  path         String
-  method       HttpMethod
-  statusCode   Int
-  userAgent    String?
-  ip           String?
-  requestBody  Json?
-  responseTime Int // em milissegundos
-  createdAt    DateTime   @default(now())
+  id             String     @id @default(cuid())
+  userId         String?
+  userName       String?    // Nome do usuário no momento do log
+  userEmail      String?    // Email do usuário no momento do log
+  path           String
+  method         HttpMethod
+  statusCode     Int
+  userAgent      String?
+  ip             String?
+  requestBody    Json?
+  responseTime   Int // em milissegundos
+  createdAt      DateTime   @default(now())
+  
+  // Informações adicionais sobre a origem do request
+  referer        String?
+  origin         String?
+  xForwardedFor  String?
+  xRealIp        String?
+  host           String?
+  acceptLanguage String?
 
   user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 
@@ -221,6 +231,7 @@ model Log {
   @@index([path])
   @@index([method])
   @@index([createdAt])
+  @@index([ip])
 }
 
 /**
@@ -311,6 +322,8 @@ model Post {
   userId      String     // Autor do post
   metadata    Json?      // Metadados para SEO (título, descrição, palavras-chave)
   status      PostStatus @default(DRAFT)
+  fullUrl     String?    // URL completa do post (ex: /blog/meu-post)
+  coverImage  String?    // URL da imagem de capa do post
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   updatedBy   String?    // Último usuário que atualizou o post
@@ -414,7 +427,7 @@ enum SystemPageType {
   TERMS
   POLICIES
   HELP
-  OTHER
+  CONTACT
 }
 
 enum SystemPageStatus {
@@ -485,4 +498,31 @@ model Avaliation {
 
   @@index([rating])
   @@index([active])
+}
+
+/**
+ * ==========================================================
+ * Front Sections - Seção "Por que escolher"
+ * =========================================================
+ * - FrontSection: Representa os blocos da seção "Por que escolher" na página inicial
+ */
+
+enum FrontSectionStatus {
+  ACTIVE   // Ativo e visível
+  INACTIVE // Inativo e oculto
+}
+
+model FrontSection {
+  id          String            @id @default(cuid())
+  title       String            // Título do bloco (ex: "Melhor Preço")
+  description String            @db.Text // Descrição do bloco
+  icon        String            // Nome do ícone (ex: "DollarSign", "Clock", "Shield", "Users")
+  bgColor     String            @default("blue") // Cor de fundo do ícone (blue, green, orange, etc.)
+  order       Int               @default(0) // Ordem de exibição
+  status      FrontSectionStatus @default(ACTIVE)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@index([status])
+  @@index([order])
 }

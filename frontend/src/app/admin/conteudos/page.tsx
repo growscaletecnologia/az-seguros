@@ -17,11 +17,14 @@ import {
   SystemPagesService
 } from "@/services/systemPages";
 import { settingsService } from "@/services/settings.service";
+import { frontSectionsService, type FrontSection } from "@/services/frontsections.service";
+import { FrontSectionModal } from "@/components/modals/FrontSectionModal";
 import JoditEditorComponent from "@/components/Inputs/JoditEditor";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { api } from "@/lib/api";
 import { toast } from "sonner";
 import { Separator } from "@radix-ui/react-dropdown-menu";
+import { useRouter } from "next/navigation";
+import { Edit, Trash2, Plus, Eye, EyeOff } from "lucide-react";
+import * as LucideIcons from "lucide-react";
 
 // Interface para os conteúdos legados
 interface Conteudo {
@@ -34,35 +37,137 @@ interface Conteudo {
 }
 
 const ConteudosPage = () => {
+	const router = useRouter();
+	
 	// ------------------ STATE SYSTEM PAGES ------------------
 	const [systemPages, setSystemPages] = useState<SystemPage[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
-	const [editingPage, setEditingPage] = useState<SystemPage | null>(null);
-	const [deletePassword, setDeletePassword] = useState("");
-	const [deletePageId, setDeletePageId] = useState<string | null>(null);
-	const [isDeleting, setIsDeleting] = useState(false);
+	
+	// ------------------ STATE FRONT SECTIONS ------------------
+	const [frontSections, setFrontSections] = useState<FrontSection[]>([]);
+	const [isLoadingFrontSections, setIsLoadingFrontSections] = useState(true);
+	const [showFrontSectionModal, setShowFrontSectionModal] = useState(false);
+	const [editingFrontSection, setEditingFrontSection] = useState<FrontSection | null>(null);
 	const [sectionTitle, setSectionTitle] = useState<string>(
 		"Por que escolher a SeguroViagem?"
 	);
 	
-	const [newSystemPage, setNewSystemPage] = useState({
-		title: "",
-		slug: "",
-		content: "",
-		type: "TERMS" as SystemPageType,
-	});
-	
-	// Carregar páginas do sistema
-	const fetchSystemPages = async () => {
+	// ------------------ FUNCTIONS SYSTEM PAGES ------------------
+	/**
+	 * Loads all system pages from the API
+	 */
+	const loadSystemPages = async () => {
 		try {
 			setIsLoading(true);
 			const response = await SystemPagesService.getAll();
 			setSystemPages(response.systemPages);
 		} catch (error) {
-			console.error("Erro ao carregar páginas do sistema:", error);
-			toast.error("Erro ao carregar páginas do sistema");
+			console.error("Erro ao carregar páginas:", error);
 		} finally {
 			setIsLoading(false);
+		}
+	};
+
+	// ------------------ FUNCTIONS FRONT SECTIONS ------------------
+	/**
+	 * Carrega todas as seções do backend
+	 */
+	const loadFrontSections = async () => {
+		try {
+			setIsLoadingFrontSections(true);
+			const sections = await frontSectionsService.getAll();
+			setFrontSections(sections);
+		} catch (error) {
+			console.error("Erro ao carregar seções:", error);
+			toast.error("Erro ao carregar seções");
+		} finally {
+			setIsLoadingFrontSections(false);
+		}
+	};
+
+	/**
+	 * Abre o modal para criar nova seção
+	 */
+	const handleNewFrontSection = () => {
+		setEditingFrontSection(null);
+		setShowFrontSectionModal(true);
+	};
+
+	/**
+	 * Abre o modal para editar seção existente
+	 */
+	const handleEditFrontSection = (section: FrontSection) => {
+		setEditingFrontSection(section);
+		setShowFrontSectionModal(true);
+	};
+
+	/**
+	 * Callback quando uma seção é salva
+	 */
+	const handleFrontSectionSaved = (section: FrontSection) => {
+		loadFrontSections(); // Recarrega a lista
+	};
+
+	/**
+	 * Alterna o status de uma seção (ACTIVE/INACTIVE)
+	 */
+	const toggleFrontSectionStatus = async (section: FrontSection) => {
+		try {
+			await frontSectionsService.toggleStatus(section.id);
+			await loadFrontSections();
+			toast.success(`Seção ${section.status === 'ACTIVE' ? 'desativada' : 'ativada'} com sucesso!`);
+		} catch (error) {
+			console.error("Erro ao alterar status:", error);
+			toast.error("Erro ao alterar status da seção");
+		}
+	};
+
+	/**
+	 * Remove uma seção
+	 */
+	const handleDeleteFrontSection = async (section: FrontSection) => {
+		if (!confirm(`Tem certeza que deseja excluir a seção "${section.title}"?`)) {
+			return;
+		}
+
+		try {
+			await frontSectionsService.remove(section.id);
+			await loadFrontSections();
+			toast.success("Seção excluída com sucesso!");
+		} catch (error) {
+			console.error("Erro ao excluir seção:", error);
+			toast.error("Erro ao excluir seção");
+		}
+	};
+
+	/**
+	 * Renderiza o ícone da seção
+	 */
+	const renderSectionIcon = (iconName: string) => {
+		const IconComponent = (LucideIcons as any)[iconName];
+		if (!IconComponent) return <div className="w-6 h-6 bg-gray-300 rounded"></div>;
+		return <IconComponent className="w-6 h-6" />;
+	};
+
+	
+
+	/**
+	 * Navigates to the edit page route
+	 */
+	const editSystemPage = (page: SystemPage) => {
+		router.push(`/admin/conteudos/editar/${page.id}`);
+	};
+
+	/**
+	 * Toggles the status of a system page between PUBLISHED and DRAFT
+	 */
+	const toggleSystemPageStatus = async (page: SystemPage) => {
+		try {
+			const newStatus = page.status === "PUBLISHED" ? "DRAFT" : "PUBLISHED";
+			await SystemPagesService.update(page.id, { status: newStatus });
+			await loadSystemPages();
+		} catch (error) {
+			console.error("Erro ao alterar status:", error);
 		}
 	};
 	
@@ -94,7 +199,7 @@ const ConteudosPage = () => {
 			});
 			
 			// Atualizar a lista
-			await fetchSystemPages();
+			await loadSystemPages();
 			toast.success("Versão restaurada com sucesso!");
 		} catch (error) {
 			console.error("Erro ao restaurar versão:", error);
@@ -103,123 +208,9 @@ const ConteudosPage = () => {
 	};
 	
 	useEffect(() => {
-		fetchSystemPages();
+		loadSystemPages();
+		loadFrontSections();
 	}, []);
-	
-	// Criar nova página do sistema
-	const createSystemPage = async () => {
-		try {
-			const newPage = await SystemPagesService.create({
-				...newSystemPage,
-				status: "PUBLISHED"
-			});
-			setSystemPages([...systemPages, newPage]);
-			setNewSystemPage({
-				title: "",
-				slug: "",
-				content: "",
-				type: "TERMS"
-			});
-			toast.success("Página criada com sucesso!");
-		} catch (error) {
-			console.error("Erro ao criar página:", error);
-			toast.error("Erro ao criar página");
-		}
-	};
-	
-	// Editar página do sistema
-	const editSystemPage = (page: SystemPage) => {
-		setEditingPage(page);
-	};
-	
-	// Salvar edição da página
-	const saveSystemPageEdit = async () => {
-		if (editingPage) {
-			try {
-				const updatedPage = await SystemPagesService.update(editingPage.id, {
-					title: editingPage.title,
-					slug: editingPage.slug,
-					content: editingPage.content,
-					type: editingPage.type,
-					status: editingPage.status
-				});
-				
-				setSystemPages(systemPages.map(page => 
-					page.id === updatedPage.id ? updatedPage : page
-				));
-				setEditingPage(null);
-				toast.success("Página atualizada com sucesso!");
-			} catch (error) {
-				console.error("Erro ao atualizar página:", error);
-				toast.error("Erro ao atualizar página");
-			}
-		}
-	};
-	
-	// Toggle status da página (publicado/rascunho)
-	const toggleSystemPageStatus = async (page: SystemPage) => {
-		try {
-			const newStatus = page.status === "PUBLISHED" ? "DRAFT" : "PUBLISHED";
-			
-			// Se estamos publicando, mostrar confirmação
-			if (newStatus === "PUBLISHED") {
-				// Verificar se já existe uma página publicada do mesmo tipo
-				const existingPublished = systemPages.find(p => 
-					p.type === page.type && 
-					p.status === "PUBLISHED" && 
-					p.id !== page.id
-				);
-				
-				if (existingPublished) {
-					// Confirmar com o usuário
-					const confirm = window.confirm(
-						`Já existe uma página do tipo "${page.type}" publicada. Ao publicar esta nova versão, a versão anterior será arquivada. Deseja continuar?`
-					);
-					
-					if (!confirm) return;
-				}
-			}
-			
-			const updatedPage = await SystemPagesService.update(page.id, {
-				status: newStatus
-			});
-			
-			// Atualizar a lista de páginas (incluindo possíveis páginas arquivadas)
-			await fetchSystemPages();
-			
-			toast.success(`Página ${newStatus === "PUBLISHED" ? "publicada" : "despublicada"} com sucesso!`);
-		} catch (error) {
-			console.error("Erro ao alterar status da página:", error);
-			toast.error("Erro ao alterar status da página");
-		}
-	};
-	
-	// Confirmar exclusão com senha
-	const confirmDelete = async () => {
-		if (!deletePageId || !deletePassword) return;
-		
-		try {
-			setIsDeleting(true);
-			
-			// Validar senha do usuário
-			await api.post("/auth/login", {
-				email: localStorage.getItem("userEmail") || "",
-				password: deletePassword
-			});
-			
-			// Se a senha estiver correta, excluir a página
-			await SystemPagesService.remove(deletePageId);
-			setSystemPages(systemPages.filter(page => page.id !== deletePageId));
-			setDeletePageId(null);
-			setDeletePassword("");
-			toast.success("Página excluída com sucesso!");
-		} catch (error) {
-			console.error("Erro ao excluir página:", error);
-			toast.error("Senha incorreta ou erro ao excluir página");
-		} finally {
-			setIsDeleting(false);
-		}
-	};
 	
 	// Obter cor com base no tipo da página
 	const getTypeColor = (type: SystemPageType) => {
@@ -241,42 +232,8 @@ const ConteudosPage = () => {
 		}
 	};
 
-	// ------------------ STATE SECTION “POR QUE ESCOLHER” ------------------
-	const [sectionItems, setSectionItems] = useState([
-		{
-			id: 1,
-			icone: "💰",
-			titulo: "Melhor Preço",
-			descricao:
-				"Garantimos o melhor preço do mercado ou devolvemos a diferença.",
-		},
-		{
-			id: 2,
-			icone: "⏰",
-			titulo: "Suporte 24h",
-			descricao:
-				"Atendimento especializado 24 horas por dia, 7 dias por semana.",
-		},
-		{
-			id: 3,
-			icone: "🛡️",
-			titulo: "Compra Segura",
-			descricao: "Transações 100% seguras com certificado SSL e criptografia.",
-		},
-		{
-			id: 4,
-			icone: "👥",
-			titulo: "+1M Clientes",
-			descricao:
-				"Mais de 1 milhão de viajantes já confiaram em nossos serviços.",
-		},
-	]);
-
-	const handleUpdateSection = (id: number, field: string, value: string) => {
-		setSectionItems((prev) =>
-			prev.map((item) => (item.id === id ? { ...item, [field]: value } : item)),
-		);
-	};
+	// ------------------ STATE SECTION "POR QUE ESCOLHER" ------------------
+	// Removido: agora usa frontSections do backend
 
 	// ------------------ STATE HEADER & FOOTER ------------------
 	const [headerFooter, setHeaderFooter] = useState({
@@ -354,21 +311,6 @@ const ConteudosPage = () => {
 					<div className="bg-white p-6 rounded-lg shadow">
 						<div className="flex justify-between items-center mb-6">
 							<h2 className="text-xl font-semibold">Páginas do Sistema</h2>
-							<Button
-								onClick={() => setEditingPage({
-									id: '',
-									title: '',
-									slug: '',
-									content: '',
-									type: 'TERMS',
-									status: 'DRAFT',
-									createdAt: new Date().toISOString(),
-									updatedAt: new Date().toISOString()
-								})}
-								className="bg-blue-600 hover:bg-blue-700"
-							>
-								Nova Página
-							</Button>
 						</div>
 						
 						{isLoading ? (
@@ -440,146 +382,10 @@ const ConteudosPage = () => {
 											Restaurar
 										</Button>
 									)}
-									
-									<AlertDialog>
-										<AlertDialogTrigger asChild>
-											<Button
-												variant="outline"
-												className="bg-red-500 text-white hover:bg-red-600 border-none"
-												onClick={() => setDeletePageId(page.id)}
-											>
-												Excluir
-											</Button>
-										</AlertDialogTrigger>
-													<AlertDialogContent>
-														<AlertDialogHeader>
-															<AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
-															<AlertDialogDescription>
-																Esta ação não pode ser desfeita. Digite sua senha para confirmar a exclusão.
-															</AlertDialogDescription>
-														</AlertDialogHeader>
-														<div className="py-4">
-															<Input
-																type="password"
-																placeholder="Digite sua senha"
-																value={deletePassword}
-																onChange={(e) => setDeletePassword(e.target.value)}
-															/>
-														</div>
-														<AlertDialogFooter>
-															<AlertDialogCancel onClick={() => {
-																setDeletePageId(null);
-																setDeletePassword("");
-															}}>
-																Cancelar
-															</AlertDialogCancel>
-															<AlertDialogAction
-																onClick={confirmDelete}
-																disabled={isDeleting || !deletePassword}
-																className="bg-red-500 hover:bg-red-600"
-															>
-																{isDeleting ? "Excluindo..." : "Excluir"}
-															</AlertDialogAction>
-														</AlertDialogFooter>
-													</AlertDialogContent>
-												</AlertDialog>
 											</div>
 										</div>
 									</div>
 								))}
-							</div>
-						)}
-						
-						{/* Editor de página */}
-						{editingPage && (
-							<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-								<div className="bg-white rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-									<div className="p-6">
-										<div className="flex justify-between items-center mb-6">
-											<h2 className="text-xl font-semibold">
-												{editingPage.id ? "Editar Página" : "Nova Página"}
-											</h2>
-											<Button
-												variant="ghost"
-												onClick={() => setEditingPage(null)}
-												className="text-gray-500"
-											>
-												✕
-											</Button>
-										</div>
-										
-										<div className="space-y-4">
-											<div className="grid grid-cols-2 gap-4">
-												<div>
-													<label className="block text-sm font-medium mb-1">Título</label>
-													<Input
-														value={editingPage.title}
-														onChange={(e) => setEditingPage({...editingPage, title: e.target.value})}
-													/>
-												</div>
-												<div>
-													<label className="block text-sm font-medium mb-1">Slug</label>
-													<Input
-														value={editingPage.slug}
-														onChange={(e) => setEditingPage({...editingPage, slug: e.target.value})}
-													/>
-												</div>
-											</div>
-											
-											<div className="grid grid-cols-2 gap-4">
-												<div>
-													<label className="block text-sm font-medium mb-1">Tipo</label>
-													<select
-														className="w-full border rounded p-2"
-														value={editingPage.type}
-														onChange={(e) => setEditingPage({...editingPage, type: e.target.value as SystemPageType})}
-													>
-														<option value="TERMS">Termos de Uso</option>
-														<option value="PRIVACY">Política de Privacidade</option>
-														<option value="FAQ">Perguntas Frequentes</option>
-														<option value="HELP">Ajuda</option>
-														<option value="ABOUT">Sobre</option>
-														<option value="CONTACT">Contato</option>
-													</select>
-												</div>
-												<div>
-													<label className="block text-sm font-medium mb-1">Status</label>
-													<select
-														className="w-full border rounded p-2"
-														value={editingPage.status}
-														onChange={(e) => setEditingPage({...editingPage, status: e.target.value as SystemPageStatus})}
-													>
-														<option value="PUBLISHED">Publicado</option>
-														<option value="DRAFT">Rascunho</option>
-													</select>
-												</div>
-											</div>
-											
-											<div>
-												<label className="block text-sm font-medium mb-1">Conteúdo</label>
-												<JoditEditorComponent
-													value={editingPage.content}
-													onChange={(value) => setEditingPage({...editingPage, content: value})}
-												/>
-											</div>
-											
-											<div className="flex justify-end space-x-2 pt-4">
-												<Button
-													variant="outline"
-													onClick={() => setEditingPage(null)}
-												>
-													Cancelar
-												</Button>
-												<Button
-													onClick={editingPage.id ? saveSystemPageEdit : createSystemPage}
-													className="bg-blue-600 hover:bg-blue-700"
-												>
-													{editingPage.id ? "Salvar Alterações" : "Criar Página"}
-												</Button>
-											</div>
-										</div>
-									</div>
-								</div>
 							</div>
 						)}
 					</div>
@@ -588,44 +394,105 @@ const ConteudosPage = () => {
 				{/* Aba Section */}
 				<TabsContent value="section">
 					<div className="bg-white p-6 rounded-lg shadow space-y-6">
-						<h2 className="text-xl font-semibold mb-4">
-							<CardTitle className="mb-4">Título da Seção</CardTitle>
-							<Input
-								value={sectionTitle}
-								onChange={(e) => setSectionTitle(e.target.value)}
-								placeholder="Ícone (emoji ou classe)"
-							/>
-						</h2>
-						<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-							{sectionItems.map((item) => (
-								<div key={item.id} className="border p-4 rounded space-y-3">
-									<Input
-										value={item.icone}
-										onChange={(e) =>
-											handleUpdateSection(item.id, "icone", e.target.value)
-										}
-										placeholder="Ícone (emoji ou classe)"
-									/>
-									<Input
-										value={item.titulo}
-										onChange={(e) =>
-											handleUpdateSection(item.id, "titulo", e.target.value)
-										}
-										placeholder="Título"
-									/>
-									<Textarea
-										value={item.descricao}
-										onChange={(e) =>
-											handleUpdateSection(item.id, "descricao", e.target.value)
-										}
-										placeholder="Descrição"
-									/>
-								</div>
-							))}
+						<div className="flex justify-between items-center mb-6">
+							<h2 className="text-xl font-semibold">Seção: Por que escolher</h2>
+							<Button 
+								onClick={handleNewFrontSection}
+								className="bg-blue-600 text-white hover:bg-blue-700"
+							>
+								<Plus className="h-4 w-4 mr-2" />
+								Nova Seção
+							</Button>
 						</div>
-						<Button className="bg-blue-600 text-white hover:bg-blue-700">
-							Salvar Alterações
-						</Button>
+
+						{isLoadingFrontSections ? (
+							<div className="flex justify-center p-8">
+								<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-700"></div>
+							</div>
+						) : frontSections.length === 0 ? (
+							<div className="text-center p-8 border rounded bg-gray-50">
+								<p className="text-gray-500">Nenhuma seção encontrada</p>
+								<Button 
+									onClick={handleNewFrontSection}
+									className="mt-4 bg-blue-600 text-white hover:bg-blue-700"
+								>
+									<Plus className="h-4 w-4 mr-2" />
+									Criar primeira seção
+								</Button>
+							</div>
+						) : (
+							<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+								{frontSections
+									.sort((a, b) => a.order - b.order)
+									.map((section) => (
+									<div key={section.id} className="border p-4 rounded-lg space-y-3 relative">
+										{/* Status Badge */}
+										<div className="absolute top-2 right-2">
+											<span
+												className={`px-2 py-1 text-xs rounded ${
+													section.status === 'ACTIVE'
+														? "bg-green-100 text-green-800"
+														: "bg-red-100 text-red-800"
+												}`}
+											>
+												{section.status === 'ACTIVE' ? 'Ativo' : 'Inativo'}
+											</span>
+										</div>
+
+										{/* Ícone e Título */}
+										<div className="flex items-center gap-3 mb-3">
+											<div className={`p-2 rounded-lg bg-${section.bgColor}-100`}>
+												{renderSectionIcon(section.icon)}
+											</div>
+											<div>
+												<h3 className="font-semibold text-lg">{section.title}</h3>
+												<p className="text-sm text-gray-500">Ordem: {section.order}</p>
+											</div>
+										</div>
+
+										{/* Descrição */}
+										<p className="text-gray-600 text-sm">{section.description}</p>
+
+										{/* Ações */}
+										<div className="flex gap-2 pt-3 border-t">
+											<Button
+												onClick={() => handleEditFrontSection(section)}
+												variant="outline"
+												size="sm"
+												className="flex-1"
+											>
+												<Edit className="h-4 w-4 mr-1" />
+												Editar
+											</Button>
+											<Button
+												onClick={() => toggleFrontSectionStatus(section)}
+												variant="outline"
+												size="sm"
+												className={`${
+													section.status === 'ACTIVE'
+														? 'text-orange-600 hover:bg-orange-50'
+														: 'text-green-600 hover:bg-green-50'
+												}`}
+											>
+												{section.status === 'ACTIVE' ? (
+													<><EyeOff className="h-4 w-4 mr-1" /> Desativar</>
+												) : (
+													<><Eye className="h-4 w-4 mr-1" /> Ativar</>
+												)}
+											</Button>
+											<Button
+												onClick={() => handleDeleteFrontSection(section)}
+												variant="outline"
+												size="sm"
+												className="text-red-600 hover:bg-red-50"
+											>
+												<Trash2 className="h-4 w-4" />
+											</Button>
+										</div>
+									</div>
+								))}
+							</div>
+						)}
 					</div>
 				</TabsContent>
 
@@ -739,6 +606,14 @@ const ConteudosPage = () => {
 					</div>
 				</TabsContent>
 			</Tabs>
+
+			{/* Modal FrontSection */}
+			<FrontSectionModal
+				open={showFrontSectionModal}
+				onOpenChange={setShowFrontSectionModal}
+				onSectionSaved={handleFrontSectionSaved}
+				editingSection={editingFrontSection}
+			/>
 		</div>
 	);
 };

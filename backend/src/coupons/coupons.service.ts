@@ -32,7 +32,7 @@ export class CouponsService {
         usageLimit: createCouponDto.usageLimit,
         front_publishable: createCouponDto.front_publishable || false,
         description: createCouponDto.description,
-        status: CoupomStatus.ACTIVE,
+        status: createCouponDto.status || CoupomStatus.ACTIVE,
       },
     })
   }

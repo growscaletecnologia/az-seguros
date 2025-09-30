@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 // import { SelectSlug } from "@/components/admin/selectSlug";
 import JoditEditorComponent from "@/components/Inputs/JoditEditor";
 import { Button } from "@/components/ui/button";
@@ -50,7 +51,7 @@ const pageSchema = z.object({
 	resume: z.string().optional(),
 	content: z.string().min(1, "Conteúdo é obrigatório"),
 	metadata: z.object({
-		title: z.string().optional(),
+		//title: z.string().optional(),
 		description: z.string().optional(),
 		keywords: z.string().optional(),
 	}),
@@ -58,9 +59,10 @@ const pageSchema = z.object({
 
 type PageFormValues = z.infer<typeof pageSchema>;
 
-export default function PageForm({ params }: { params: { id: string } }) {
+export default function PageForm({ params }: { params: Promise<{ id: string }> }) {
 	const router = useRouter();
-	const isNew = params.id === "new";
+	const { id } = React.use(params);
+	const isNew = id === "new";
 	const [isLoading, setIsLoading] = useState(!isNew);
 	const [categories, setCategories] = useState<any[]>([]);
 	const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -84,7 +86,7 @@ export default function PageForm({ params }: { params: { id: string } }) {
 			resume: "",
 			content: "",
 			metadata: {
-				title: "",
+				//title: "",
 				description: "",
 				keywords: "",
 			},
@@ -114,19 +116,19 @@ export default function PageForm({ params }: { params: { id: string } }) {
 		if (!isNew) {
 			loadPage();
 		}
-	}, [isNew, params.id]);
+	}, [isNew, id]);
 
 	// Carregar dados da página existente
 	const loadPage = async () => {
 		try {
-			const page = await pagesService.getPageById(params.id);
+			const page = await pagesService.getPageById(id);
 
 			// Preencher formulário com dados da página
 			setValue("title", page.title);
 			setValue("slug", page.slug);
 			setValue("resume", page.resume || "");
 			setValue("content", page.content);
-			setValue("metadata.title", page.metadata?.title || "");
+			//setValue("metadata.title", page.metadata?.title || "");
 			setValue("metadata.description", page.metadata?.description || "");
 			setValue("metadata.keywords", page.metadata?.keywords || "");
 
@@ -201,7 +203,7 @@ export default function PageForm({ params }: { params: { id: string } }) {
 				response = await pagesService.createPage(pageData);
 				toast.success("Página criada com sucesso!");
 			} else {
-				response = await pagesService.updatePage(params.id, pageData);
+				response = await pagesService.updatePage(id, pageData);
 				toast.success("Página atualizada com sucesso!");
 			}
 
@@ -297,7 +299,7 @@ export default function PageForm({ params }: { params: { id: string } }) {
 									caracteres: {titleCharacteres}
 								</p>
 							</div>
-							<div className="space-y-2 block">
+							{/* <div className="space-y-2 block">
 								<Input
 									{...register("metadata.title")}
 									id="metadata-title"
@@ -305,7 +307,7 @@ export default function PageForm({ params }: { params: { id: string } }) {
 									onChange={calculateCharacters}
 									error={errors.metadata?.title?.message}
 								/>
-							</div>
+							</div> */}
 							<div className="space-y-2">
 								<Label htmlFor="metadata-description">Descrição</Label>
 								<Textarea

@@ -1,14 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Type } from 'class-transformer'
-import {
-  IsArray,
-  IsEnum,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  MaxLength,
-  ValidateNested,
-} from 'class-validator'
+import { IsArray, IsEnum, IsOptional, IsString, ValidateNested } from 'class-validator'
 
 enum PostStatus {
   PUBLISHED = 'PUBLISHED',
@@ -17,23 +9,24 @@ enum PostStatus {
 }
 
 class MetadataDto {
-  @IsString()
-  @IsNotEmpty({ message: 'O título para SEO é obrigatório.' })
-  @MaxLength(60, {
-    message: 'O título para SEO deve ter no máximo 60 caracteres.',
-  })
-  title: string
+  // @IsString()
+  // @IsOptional()
+  // title?: string
 
   @IsString()
   @IsOptional()
-  description: string
+  description?: string
 
   @IsString()
   @IsOptional()
-  keywords: string
+  keywords?: string
 }
 
 export class UpdatePostDto {
+  @IsString()
+  @IsOptional()
+  id?: string
+
   @IsString()
   @IsOptional()
   title?: string
@@ -71,4 +64,20 @@ export class UpdatePostDto {
   @ApiProperty({ example: 'data:image/png;base64,<arquivo base64>' })
   @IsOptional()
   mainImage?: string
+
+  @IsOptional()
+  @IsString()
+  @ApiProperty({
+    description: 'URL completa do post',
+    example: '/blog/seguros/passaporte',
+  })
+  fullUrl?: string
+
+  @IsOptional()
+  @IsString()
+  @ApiProperty({
+    description: 'URL da imagem de capa do post',
+    example: 'https://example.com/image.jpg',
+  })
+  coverImage?: string
 }

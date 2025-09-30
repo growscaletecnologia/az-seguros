@@ -87,7 +87,7 @@ export class AutoPermissionMiddleware implements NestMiddleware {
   private readonly publicRoutes: string[] = [
     // TEMPORARIAMENTE DESABILITADO - Todas as rotas são públicas
     '.*', // Este padrão curinga permite todas as rotas
-    
+
     // Rotas originais (comentadas temporariamente)
     /*
     'POST /auth/login',
@@ -153,8 +153,17 @@ export class AutoPermissionMiddleware implements NestMiddleware {
         }
 
         console.log('[AutoPermissionMiddleware] Sessão encontrada no Redis:', session.id)
-        // Obter dados do usuário da sessão
-        //  const user = session.userData as User
+
+        // Anexar informações do usuário ao objeto request para uso posterior
+        // Compatível com o formato esperado pelo JwtStrategy e LoggerMiddleware
+        ;(req as any).user = {
+          userId: this.userId,
+          role: payload.role,
+          // Dados adicionais da sessão se disponíveis
+          ...(session.userData && typeof session.userData === 'object' ? session.userData : {}),
+        }
+
+        console.log('[AutoPermissionMiddleware] Usuário anexado ao request:', (req as any).user)
       } catch (error) {
         console.log('[AutoPermissionMiddleware] Erro ao verificar token:', error)
         console.log(error)

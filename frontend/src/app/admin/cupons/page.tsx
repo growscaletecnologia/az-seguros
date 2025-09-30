@@ -40,7 +40,17 @@ const CuponsPage = () => {
 	const [selectedCouponForReport, setSelectedCouponForReport] =
 		useState<string>("");
 
-	const [novoCupom, setNovoCupom] = useState({
+	const [novoCupom, setNovoCupom] = useState<{
+		code: string;
+		discount: number;
+		discountType: "PERCENTAGE" | "FIXED";
+		expiresAt: string;
+		usageLimit: number;
+		front_publishable: boolean;
+		description: string;
+		userId?: string;
+		status: "ACTIVE" | "INACTIVE" | "REDEEMED" | "EXPIRED";
+	}>({
 		code: "",
 		discount: 0,
 		discountType: "PERCENTAGE",
@@ -75,13 +85,20 @@ const CuponsPage = () => {
 	const criarCupom = async () => {
 		try {
 			setLoading(true);
-			await couponsService.create(novoCupom);
+			// Garantir que o status seja definido como ACTIVE se não estiver especificado ou estiver vazio
+			const cupomData = {
+				...novoCupom,
+				status: novoCupom.status || "ACTIVE" as const
+			};
+			await couponsService.create(cupomData);
 			toast.success("Cupom criado com sucesso!");
 			setDialogOpen(false);
 			resetForm();
 			loadCoupons();
-		} catch (error) {
-			toast.error("Erro ao criar cupom");
+		} catch (error: any) {
+			// Melhor tratamento de erro com mensagem específica
+			const errorMessage = error?.response?.data?.message || error?.message || "Erro ao criar cupom";
+			toast.error(errorMessage);
 			console.error(error);
 		} finally {
 			setLoading(false);
@@ -101,7 +118,7 @@ const CuponsPage = () => {
 				usageLimit: novoCupom.usageLimit,
 				front_publishable: novoCupom.front_publishable,
 				description: novoCupom.description,
-				status: novoCupom.status,
+				status: novoCupom.status || "ACTIVE" as const,
 			};
 
 			await couponsService.update(editingCoupon.id, updateData);
@@ -109,8 +126,10 @@ const CuponsPage = () => {
 			setDialogOpen(false);
 			resetForm();
 			loadCoupons();
-		} catch (error) {
-			toast.error("Erro ao atualizar cupom");
+		} catch (error: any) {
+			// Melhor tratamento de erro com mensagem específica
+			const errorMessage = error?.response?.data?.message || error?.message || "Erro ao atualizar cupom";
+			toast.error(errorMessage);
 			console.error(error);
 		} finally {
 			setLoading(false);
@@ -162,6 +181,7 @@ const CuponsPage = () => {
 			front_publishable: false,
 			description: "",
 			userId: AuthService.getUser()?.id,
+			status: "ACTIVE"
 		});
 		setEditingCoupon(null);
 	};
