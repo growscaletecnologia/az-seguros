@@ -1,4 +1,7 @@
 /* eslint-disable prettier/prettier */
+import { config } from "dotenv";
+config(); // carrega o .env da raiz do backend
+
 import { PrismaClient, PostStatus, UserStatus, Action } from '@prisma/client'
 import * as bcrypt from 'bcrypt'
 import { seedFrontSections } from './frontsections-seed'
