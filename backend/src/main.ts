@@ -37,12 +37,12 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config)
   SwaggerModule.setup('api', app, document)
-
+  app.setGlobalPrefix('api')
   const ENV_ORIGINS = normalizeOrigins(process.env.FRONT_ORIGIN)
   const DEFAULT_ORIGINS = normalizeOrigins([
     'http://localhost:3000',
     'http://localhost:3001',
-    'https://suaescola.net',
+    'https://seguroviagem.growscale.com.br',
   ])
   const REGEX_ORIGINS: RegExp[] = [/\.ngrok-free\.app$/i, /\.vercel\.app$/i, /\.localhost:\d+$/i]
   const ALLOWLIST = new Set([...DEFAULT_ORIGINS, ...ENV_ORIGINS])
