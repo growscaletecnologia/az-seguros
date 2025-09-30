@@ -62,9 +62,9 @@ const AdminSidebar = () => {
 			href: "/admin/cupons",
 			icon: <Tag className="h-5 w-5" />,
 		},
-		// {
-		// 	id: "pedidos",
-		// 	label: "Área de Pedidos",
+		// { xablau
+		// 	id: "pedidos", xablaue
+		// 	label: "Área de Pedidos", xablau 
 		// 	href: "/admin/pedidos",
 		// 	icon: <ShoppingCart className="h-5 w-5" />,
 		// },
