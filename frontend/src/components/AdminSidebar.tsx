@@ -80,12 +80,12 @@ const AdminSidebar = () => {
 			href: "/admin/avaliacoes",
 			icon: <MessageSquareQuote className="h-5 w-5" />,
 		},
-		{
-			id: "rbac",
-			label: "Perfis de Acesso",
-			href: "/admin/rbac",
-			icon: <Fingerprint className="h-5 w-5" />,
-		},
+		// {
+		// 	id: "rbac",
+		// 	label: "Perfis de Acesso",
+		// 	href: "/admin/rbac",
+		// 	icon: <Fingerprint className="h-5 w-5" />,
+		// },
 		{
 			id: "conteudos",
 			label: "Gestão do Sistema",
