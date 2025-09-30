@@ -22,8 +22,9 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule)
 
   // Configurar arquivos estáticos para uploads
+  const uploadPrefix = process.env.NODE_ENV === 'production' ? '/api/uploads/' : '/uploads/';
   app.useStaticAssets(join(__dirname, '..', 'uploads'), {
-    prefix: '/uploads/',
+    prefix: uploadPrefix,
   })
 
   app.use(helmet())
