@@ -67,7 +67,7 @@ COPY . .
 RUN npx prisma generate --schema=./src/prisma/schema.prisma
 
 # Expor porta
-EXPOSE 3000
+EXPOSE 5000
 
 # Usar dumb-init para gerenciar processos
 ENTRYPOINT ["dumb-init", "--"]
@@ -99,7 +99,7 @@ COPY --from=builder --chown=nestjs:nodejs /app/src/prisma ./src/prisma
 
 # Definir variáveis de ambiente para produção
 ENV NODE_ENV=production
-ENV PORT=3000
+ENV PORT=5000
 
 # Mudar para usuário não-root
 USER nestjs
@@ -109,7 +109,7 @@ EXPOSE 5000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:3000/health || exit 1
+    CMD curl -f http://localhost:5000/health || exit 1
 
 # Usar dumb-init para gerenciar processos
 ENTRYPOINT ["dumb-init", "--"]
