@@ -43,10 +43,9 @@ COPY --from=deps /app/node_modules ./node_modules
 
 # Copiar código fonte
 COPY src ./src
-COPY prisma ./prisma
 
-# Gerar Prisma Client
-RUN npx prisma generate
+# Gerar Prisma Client (o schema está em src/prisma/)
+RUN npx prisma generate --schema=./src/prisma/schema.prisma
 
 # Build da aplicação
 RUN npm run build && \
@@ -65,7 +64,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Gerar Prisma Client
-RUN npx prisma generate
+RUN npx prisma generate --schema=./src/prisma/schema.prisma
 
 # Expor porta
 EXPOSE 3000
@@ -96,7 +95,7 @@ WORKDIR /app
 COPY --from=builder --chown=nestjs:nodejs /app/dist ./dist
 COPY --from=builder --chown=nestjs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nestjs:nodejs /app/package*.json ./
-COPY --from=builder --chown=nestjs:nodejs /app/prisma ./prisma
+COPY --from=builder --chown=nestjs:nodejs /app/src/prisma ./src/prisma
 
 # Definir variáveis de ambiente para produção
 ENV NODE_ENV=production
