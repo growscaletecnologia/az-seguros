@@ -26,7 +26,9 @@
 		"docker:dev:logs": "docker-compose logs -f backend",
 		"docker:prod": "docker-compose -f docker-compose.prod.yaml up -d",
 		"docker:prod:build": "docker-compose -f docker-compose.prod.yaml up -d --build",
-		"docker:prod:down": "docker-compose -f docker-compose.prod.yaml down"
+		"docker:prod:down": "docker-compose -f docker-compose.prod.yaml down",
+		"migrate:deploy": "prisma migrate deploy",
+  		"seed:prod": "node dist/prisma/seed/index.js"
 	},
 	"prisma": {
 		"schema": "src/prisma/schema.prisma"
