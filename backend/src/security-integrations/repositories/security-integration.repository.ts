@@ -6,8 +6,19 @@ import prisma from 'src/prisma/client'
 @Injectable()
 export class SecurityIntegrationRepository {
   async create(data: CreateSecurityIntegrationDto) {
+    const createData = {
+      clientId: data.clientId !== undefined ? String(data.clientId) : '', // Garante que nunca será undefined
+      securityName: 'example',
+      grantType: 'example',
+      clientSecret: 'example',
+      username: 'example',
+      password: 'example',
+      scope: 'example',
+      ativa: true,
+      markUp: 10,
+    };
     return prisma.securityIntegration.create({
-      data,
+      data: createData,
     })
   }
 
@@ -22,9 +33,13 @@ export class SecurityIntegrationRepository {
   }
 
   async update(id: string, data: UpdateSecurityIntegrationDto) {
+    const updateData = {
+      ...data,
+      clientId: data.clientId !== undefined ? String(data.clientId) : undefined,
+    }
     return prisma.securityIntegration.update({
       where: { id },
-      data,
+      data: updateData,
     })
   }
 

@@ -528,20 +528,49 @@ model FrontSection {
 }
 
 
+/**
+ * ==========================================================
+ * Insurance Integration Models
+ * =========================================================
+ * - SecurityIntegration: Represents API credentials and config for each insurance provider
+ * - InsuranceCache: Caches insurance quotes for better performance and rate limiting
+ */
+
 model SecurityIntegration {
-  id        String   @id @default(cuid())
-  securityName String   // Pergunta de segurança
-  grantType String   // Tipo de concessão (password, client_credentials, etc.)
-  clientId  Int      // ID do cliente
-  clientSecret String // Segredo do cliente
-  username     String   // Nome de usuário para autenticação
-  password     String   // Senha do usuário para autenticação
-  scope        String?  // Escopo de acesso solicitado (opcional)
-  ativa        Boolean? @default(true) // Status ativo/inativo da integração
-  markUp    Int?
-  accessToken String? // Token de acesso obtido após a autenticação
-  refreshToken String? // Token de atualização obtido após a autenticação
-  expiresIn    Int?     // Tempo de expiração do token de acesso em segundos
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              String   @id @default(cuid())
+  insurerName     String? @default("")
+  baseUrl         String? @default("")
+  authUrl         String?
+  grantType       String
+  clientId        String
+  clientSecret    String
+  username        String?
+  password        String?
+  scope           String?
+  ativa           Boolean  @default(true)
+  markUp          Int?
+  accessToken     String?
+  refreshToken    String?
+  expiresIn       Int?
+  tokenExpiresAt  DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  InsuranceCache InsuranceCache[]
+}
+
+model InsuranceCache {
+  id          String   @id @default(cuid())
+  insurerId   String
+  destination String
+  paxCount    Int
+  ageGroup    String
+  days        Int
+  data        Json
+  updatedAt   DateTime @default(now())
+
+  insurer SecurityIntegration @relation(fields: [insurerId], references: [id], onDelete: Cascade)
+
+  @@index([insurerId])
+  @@index([destination])
 }
