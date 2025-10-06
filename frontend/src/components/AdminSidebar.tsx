@@ -9,6 +9,7 @@ import {
 	Fingerprint,
 	Globe,
 	LayoutDashboard,
+	Link2,
 	LogOut,
 	Menu,
 	MessageSquareQuote,
@@ -106,6 +107,13 @@ const AdminSidebar = () => {
 			href: "/admin/logs",
 			icon: <Activity className="h-5 w-5" />,
 		},
+		{
+			id: "activities",
+			label: "Integração Seguradoras",
+			href: "/admin/integrations",
+			icon: <Link2 className="h-5 w-5" />,
+		},
+
 		{
 			id: "configuracoes",
 			label: "Configurações",

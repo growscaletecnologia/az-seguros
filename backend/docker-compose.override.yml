@@ -1,0 +1,8 @@
+services:
+  postgres:
+    ports:
+      - "5433:5432"   # acessa no host em localhost:5433
+
+  redis:
+    ports:
+      - "6380:6379"   # acessa no host em localhost:6380
