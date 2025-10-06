@@ -31,7 +31,7 @@ export const loginSchema = z.object({
 // Classe de serviço de autenticação
 export class AuthService {
 	private static API_URL =
-		process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+		process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 	private static TOKEN_KEY = "auth_token";
 	private static USER_KEY = "auth_user";
 
