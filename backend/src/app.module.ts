@@ -19,6 +19,7 @@ import { AvaliationsModule } from './avaliations/avaliations.module'
 import { LogsModule } from './logs/logs.module'
 import { FrontsectionsModule } from './frontsections/frontsections.module'
 import { SecurityIntegrationsModule } from './security-integrations/security-integrations.module'
+import { InsuranceModule } from './insurance/insurance.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { SecurityIntegrationsModule } from './security-integrations/security-int
     AvaliationsModule,
     FrontsectionsModule,
     SecurityIntegrationsModule,
+    InsuranceModule,
   ],
   controllers: [AppController],
   providers: [AppService],

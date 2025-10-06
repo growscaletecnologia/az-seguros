@@ -12,7 +12,10 @@ export class SecurityIntegrationsService {
   }
 
   async findAll() {
-    return this.repository.findAll()
+    console.log("entrou no service")
+    const data = await this.repository.findAll()
+    console.log(data)
+    return data
   }
 
   async findOne(id: string) {
