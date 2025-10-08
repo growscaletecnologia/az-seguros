@@ -52,11 +52,9 @@ export class LoggerMiddleware implements NestMiddleware {
       if (userInfo.userId) {
         logData.userId = userInfo.userId
       }
-      void prisma.log
-        .create({ data: logData })
-        .catch((err) => {
-          console.error('Erro ao salvar log:', err)
-        })
+      void prisma.log.create({ data: logData }).catch((err) => {
+        console.error('Erro ao salvar log:', err)
+      })
     })
 
     next()

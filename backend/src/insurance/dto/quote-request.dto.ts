@@ -1,31 +1,58 @@
-import { IsString, IsArray, ArrayMinSize, ValidateNested, IsOptional, IsDateString } from 'class-validator';
-import { Type } from 'class-transformer';
+import {
+  IsString,
+  IsArray,
+  ArrayMinSize,
+  ValidateNested,
+  IsOptional,
+  IsDateString,
+  IsBoolean,
+} from 'class-validator'
+import { Type } from 'class-transformer'
 
 class PassengerDto {
   @IsString()
-  age: number;
+  type: string
+
+  @IsString()
+  age: number
 }
 
 export class QuoteRequestDto {
+  
   @IsString()
-  destination: string;
+  dateFormat: string
+
+  @IsOptional()
+  multitrip?: boolean
+
+  @IsOptional()
+  multitrip_days?: number
 
   @IsDateString()
-  travelStart: string;
+  departure: string
 
   @IsDateString()
-  travelEnd: string;
+  arrival: string
+
+  @IsString()
+  destinyGroup: string
+
+  @IsBoolean()
+  @IsOptional()
+  priceDetails?: boolean
 
   @IsArray()
   @ArrayMinSize(1)
   @ValidateNested({ each: true })
   @Type(() => PassengerDto)
-  passengers: PassengerDto[];
+  passengers: PassengerDto[]
 
-  @IsString()
-  @IsOptional()
-  currency?: string;
+  // @IsString()
+  // @IsOptional()
+  // currency?: string
 
-  @IsOptional()
-  previewMode?: boolean;
+  // @IsOptional()
+  // previewMode?: boolean
+
+
 }

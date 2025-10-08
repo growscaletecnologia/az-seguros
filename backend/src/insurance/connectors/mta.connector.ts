@@ -7,23 +7,23 @@ import { TokenService } from '../services/token.service'
 import { BadRequestError } from 'src/common/errors/http-errors'
 
 @Injectable()
-export class HeroConnector extends InsuranceConnectorBase {
+export class MTAConnector extends InsuranceConnectorBase {
   baseUrl = ''
 
-  private readonly logger = new Logger(HeroConnector.name)
+  private readonly logger = new Logger(MTAConnector.name)
    constructor(tokenService: TokenService) {
     super(tokenService); // Passa o tokenService para o construtor da classe base
    }
 
   async authenticate(id?: string): Promise<string> {
-    console.log('[HeroConnector] authenticate() called');
+    console.log('[MTAConnector] authenticate() called');
     return this.withErrorHandling(async () => {
       const credentials = await prisma.securityIntegration.findFirst({
         where: { id: id },
       });
-      console.log('[HeroConnector] Credentials:', credentials);
+      console.log('[MTAConnector] Credentials:', credentials);
       if (!credentials) {
-        console.log('[HeroConnector] Hero credentials not found');
+        console.log('[MTAConnector] Hero credentials not found');
         throw new Error('Hero credentials not found');
       }
   
@@ -35,8 +35,8 @@ export class HeroConnector extends InsuranceConnectorBase {
   
       this.initializeAxios();
       this.logger.debug('Authenticating with Hero API...');
-      console.log('[HeroConnector] Authenticating with Hero API...');
-      console.log('[HeroConnector] fullAuthUrl:', fullAuthUrl);
+      console.log('[MTAConnector] Authenticating with Hero API...');
+      console.log('[MTAConnector] fullAuthUrl:', fullAuthUrl);
   
       try {
         const { data } = await this.axiosInstance.post(
@@ -53,7 +53,7 @@ export class HeroConnector extends InsuranceConnectorBase {
             headers: { 'Content-Type': 'application/json' },
           },
         );
-        console.log('[HeroConnector] Auth response:', data);
+        console.log('[MTAConnector] Auth response:', data);
   
         await this.tokenService.updateTokens(
           credentials.id,
@@ -63,24 +63,24 @@ export class HeroConnector extends InsuranceConnectorBase {
         );
   
         this.logger.debug('Successfully authenticated with Hero API');
-        console.log('[HeroConnector] Successfully authenticated with Hero API');
+        console.log('[MTAConnector] Successfully authenticated with Hero API');
         return data.access_token;
       } catch (err) {
-        console.log('[HeroConnector] Error during authentication:', err);
+        console.log('[MTAConnector] Error during authentication:', err);
         throw err;
       }
     });
   }
   
   async getPlans(params?: QuoteRequestDto, id?: string): Promise<NormalizedPlan[]> {
-    console.log('[HeroConnector] getPlans() called with params:', params);
+    console.log('[MTAConnector] getPlans() called with params:', params);
     return this.withErrorHandling(async () => {
       const credentials = await prisma.securityIntegration.findFirst({
         where: { id: id },
       });
-      console.log('[HeroConnector] getPlans credentials:', credentials);
+      console.log('[MTAConnector] getPlans credentials:', credentials);
       if (!credentials) {
-        console.log('[HeroConnector] Hero credentials not found');
+        console.log('[MTAConnector] Hero credentials not found');
         throw new Error('Hero credentials not found');
       }
   
@@ -94,13 +94,13 @@ export class HeroConnector extends InsuranceConnectorBase {
   
       // Verifica se existe accessToken válido, senão autentica
       if (!credentials.accessToken) {
-        console.log('[HeroConnector] No accessToken, authenticating...');
+        console.log('[MTAConnector] No accessToken, authenticating...');
         credentials.accessToken = await this.authenticate(id);
       }
    
-      this.logger.debug('Requesting quotes from Hero API...');
+      this.logger.debug('Requesting quotes from MTA API...');
       const fullPlansUrl = `${fullBaseUrl}getPlans`; // Adiciona o endpoint ao final da baseUrl
-      console.log('[HeroConnector] fullPlansUrl:', fullPlansUrl);
+      console.log('[MTAConnector] fullPlansUrl:', fullPlansUrl);
   
       try {
 
@@ -111,19 +111,19 @@ export class HeroConnector extends InsuranceConnectorBase {
               'Content-Type': 'application/json',
             },
           });
-          console.log('[HeroConnector] API response:', data);
+          console.log('[MTAConnector] API response:', data);
     
           // Transform the indexed object into an array
           const plansArray = Object.values(data.data).filter((item) => typeof item === 'object');
-          console.log('[HeroConnector] Transformed plans array:', plansArray);
+          console.log('[MTAConnector] Transformed plans array:', plansArray);
     
           // Process data directly without Zod validation
           const processedData = { plans: plansArray, metadata: data.metadata || {} };
-          console.log('[HeroConnector] Processed data (without validation):', processedData);
+          console.log('[MTAConnector] Processed data (without validation):', processedData);
     
           // Normalize and apply markup
           const normalizedPlans = this.normalizePlans(processedData, credentials.id);
-          console.log('[HeroConnector] Normalized plans:', normalizedPlans);
+          console.log('[MTAConnector] Normalized plans:', normalizedPlans);
     
           return normalizedPlans;
         }else{
@@ -131,7 +131,7 @@ export class HeroConnector extends InsuranceConnectorBase {
         }
        
       } catch (err) {
-        console.error('[HeroConnector] Error during getPlans:', err);
+        console.error('[MTAConnector] Error during getPlans:', err);
         throw err;
       }
     });
@@ -141,7 +141,7 @@ export class HeroConnector extends InsuranceConnectorBase {
     const appliedMarkUp = await this.applyMarkup(rawData.plans, insurerId);
   
     return appliedMarkUp.map((plan) => {
-      console.log('[HeroConnector] Normalizing plan:', plan);
+      console.log('[MTAConnector] Normalizing plan:', plan);
   
       return {
         name: plan.name,
@@ -188,7 +188,7 @@ export class HeroConnector extends InsuranceConnectorBase {
   }
 
   // private buildQuoteRequest(params: QuoteRequestDto) {
-  //   console.log('[HeroConnector] buildQuoteRequest called with:', params)
+  //   console.log('[MTAConnector] buildQuoteRequest called with:', params)
   //   const req = {
   //     destination: params.destination,
   //     start_date: params.travelStart,
@@ -198,7 +198,7 @@ export class HeroConnector extends InsuranceConnectorBase {
   //         age: p.age,
   //         coverage_type: this.determineCoverageType(p.age),
   //       }
-  //       console.log('[HeroConnector] Passenger for request:', passenger)
+  //       console.log('[MTAConnector] Passenger for request:', passenger)
   //       return passenger
   //     }),
   //     currency: params.currency || 'BRL',
@@ -207,20 +207,20 @@ export class HeroConnector extends InsuranceConnectorBase {
   //       include_baggage: true,
   //     },
   //   }
-  //   console.log('[HeroConnector] Final request body:', req)
+  //   console.log('[MTAConnector] Final request body:', req)
   //   return req
   // }
 
   async getCotation(params?: QuoteRequestDto, id?: string){
-      console.log('[HeroConnector] getCotation() called with params:', params);
+      console.log('[MTAConnector] getCotation() called with params:', params);
     return this.withErrorHandling(async () => {
       const credentials = await prisma.securityIntegration.findFirst({
         where: { id: id },
       });
-      //console.log('[HeroConnector] getCotation credentials:', credentials);
+      //console.log('[MTAConnector] getCotation credentials:', credentials);
       if (!credentials) {
-        console.log('[HeroConnector] Hero credentials not found');
-        throw new Error('Hero credentials not found');
+        console.log('[MTAConnector] MTA credentials not found');
+        throw new Error('MTA credentials not found');
       }
   
       // Usa a baseUrl completa diretamente
@@ -233,13 +233,13 @@ export class HeroConnector extends InsuranceConnectorBase {
   
       // Verifica se existe accessToken válido, senão autentica
       if (!credentials.accessToken) {
-        console.log('[HeroConnector] No accessToken, authenticating...');
+        console.log('[MTAConnector] No accessToken, authenticating...');
         credentials.accessToken = await this.authenticate(id);
       }
    
-      this.logger.debug('Requesting quotes from Hero API...');
+      this.logger.debug('Requesting quotes from MTA API...');
       const fullPlansUrl = `${fullBaseUrl}cotation`; 
-      //console.log('[HeroConnector] fullPlansUrl:', fullPlansUrl);
+      //console.log('[MTAConnector] fullPlansUrl:', fullPlansUrl);
   
       try {
 
@@ -253,19 +253,19 @@ export class HeroConnector extends InsuranceConnectorBase {
             },
             
           });
-          //console.log('[HeroConnector] API response:', data);
+          //console.log('[MTAConnector] API response:', data);
     
           // Transform the indexed object into an array
           const plansArray = Object.values(data.data).filter((item) => typeof item === 'object');
-          console.log('[HeroConnector] Transformed plans array:', plansArray);
+          console.log('[MTAConnector] Transformed plans array:', plansArray);
     
           // Process data directly without Zod validation
           const processedData = { plans: plansArray, metadata: data.metadata || {} };
-          console.log('[HeroConnector] Processed data (without validation):', processedData);
+          console.log('[MTAConnector] Processed data (without validation):', processedData);
     
           // Normalize and apply markup
           const normalizedPlans = this.normalizePlans(processedData, id||'');
-          console.log('[HeroConnector] Normalized plans:', normalizedPlans);
+          console.log('[MTAConnector] Normalized plans:', normalizedPlans);
     
           return normalizedPlans;
         }else{
@@ -273,14 +273,14 @@ export class HeroConnector extends InsuranceConnectorBase {
         }
        
       } catch (err) {
-        console.error('[HeroConnector] Error during getPlans:', err);
+        console.error('[MTAConnector] Error during getPlans:', err);
         throw err;
       }
     });
   }
 
   private determineCoverageType(age: number): string {
-    console.log('[HeroConnector] determineCoverageType called with age:', age)
+    console.log('[MTAConnector] determineCoverageType called with age:', age)
     if (age < 18) return 'CHILD'
     if (age >= 65) return 'SENIOR'
     return 'ADULT'

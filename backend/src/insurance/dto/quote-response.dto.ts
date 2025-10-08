@@ -3,7 +3,7 @@ import { NormalizedPlan } from './normalized-plan.dto';
 export interface QuoteResponse {
   meta: {
     requestId: string;
-    destination: string;
+    destinyGroup: string;
     days: number;
     passengers: number;
     averageAge: number;

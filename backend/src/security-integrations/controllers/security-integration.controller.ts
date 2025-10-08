@@ -55,6 +55,7 @@ export class SecurityIntegrationController {
     @Param('id') id: string,
     @Body() updateSecurityIntegrationDto: UpdateSecurityIntegrationDto,
   ) {
+    console.log('id', id, updateSecurityIntegrationDto)
     return this.securityIntegrationService.update(id, updateSecurityIntegrationDto)
   }
 

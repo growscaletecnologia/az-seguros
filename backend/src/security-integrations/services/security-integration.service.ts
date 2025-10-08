@@ -12,7 +12,7 @@ export class SecurityIntegrationsService {
   }
 
   async findAll() {
-    console.log("entrou no service")
+    console.log('entrou no service')
     const data = await this.repository.findAll()
     console.log(data)
     return data

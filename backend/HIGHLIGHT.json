@@ -1,0 +1,804 @@
+[
+    {
+        "code": 1747,
+        "name": "MTA 40 Europa +Telemedicina Albert Einstein",
+        "provider_code": "17",
+        "provider_name": "My Travel Assist",
+        "price": {
+            "child": {
+                "min_age": 0,
+                "max_age": 20,
+                "price": "23.1"
+            },
+            "adult": {
+                "min_age": 21,
+                "max_age": 64,
+                "price": "23.1"
+            },
+            "elderly": {
+                "min_age": 65,
+                "max_age": 75,
+                "price": "30.89"
+            }
+        },
+        "covid_coverage": false,
+        "travel_renewal": "",
+        "receptive_product": false,
+        "special_product": false,
+        "specialist_indicator": false,
+        "tags": "",
+        "benefits": [
+            {
+                "subcategory_id": 54,
+                "category_name": "Coberturas Médicas",
+                "code": "502",
+                "name": "Permite emissão em viagem?",
+                "description": "Permite emissão em viagem?",
+                "coverage": "CONSULTAR NOSSO ATENDIMENTO",
+                "long_description": "ATENÇÃO!  Em nenhuma circunstância deve ser realizada a contratação em viagem sem o contato com o nosso time de atendimento. O plano só poderá ser emitido em viagem desde que seja expressamente autorizado por escrito. Procure nosso atendimento para ser realizada a análise e indicação do plano correto para emissão em viagem. Um período de carência poderá ser estipulado, conforme regras da Seguradora."
+            },
+            {
+                "subcategory_id": 55,
+                "category_name": "Coberturas Médicas",
+                "code": "505",
+                "name": "Validade Geográfica",
+                "description": "Validade Geográfica",
+                "coverage": "EUROPA",
+                "long_description": "Indica em quais lugares do mundo o plano de seguro escolhido é válido. ATENÇÃO: alguns países pedem coberturas específicas como exigência para entrar em seu território. Verifique as exigências do seu(s) país(es) de destino para se certificar de que você escolheu o seguro correto. Caso precise de ajuda, entre em contato com nosso atendimento."
+            },
+            {
+                "subcategory_id": 52,
+                "category_name": "Coberturas Médicas",
+                "code": "500",
+                "name": "Franquia de DMH",
+                "description": "Franquia USD 200",
+                "coverage": "NÃO",
+                "long_description": "A franquia é o valor cobrado pela seguradora para acionamento de Despesas Médicas Hospitalares deste plano. A franquia é cobrada para cada chamado realizado. Ela é cobrada somente no caso das despesas médicas hospitalares (DMH). Outros benefícios oferecidos a franquia é isenta."
+            },
+            {
+                "subcategory_id": 51,
+                "category_name": "Coberturas Médicas",
+                "code": "51",
+                "name": "Despesa Médica Hospitalar Total",
+                "description": "None",
+                "coverage": "USD 40.000",
+                "long_description": "Consiste no valor total de Despesa Médica Hospitalar disponibilizado para o plano contratado. Consulte as Condições Gerias da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 2,
+                "category_name": "Coberturas Médicas",
+                "code": "2",
+                "name": "Despesa Médica Hospitalar",
+                "description": "Despesa Médica Hospitalar",
+                "coverage": "USD 40.000",
+                "long_description": "Esta Cobertura garante a prestação de serviço ao Segurado, na forma prevista nas Condições Contratuais e limitada ao valor do Capital Segurado contratado, ou, na impossibilidade de contato ou utilização da rede de serviços autorizada, o reembolso das despesas médicas e hospitalares efetuadas pelo Segurado para seu tratamento, sob orientação médica, ocasionado por acidente pessoal ou enfermidade súbita e aguda ocorrida durante o período de viagem ao exterior e constatada a sua saída do país de domicílio, incluindo episódios de crise ocasionados por doença preexistente ou crônica, quando gerar quadro clínico de Emergência ou Urgência. Consulte as Condições Gerias da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 3,
+                "category_name": "Coberturas Médicas",
+                "code": "3",
+                "name": "Cobertura Médica para Prática de Esportes",
+                "description": "Cobertura para acidentes provenientes de práticas de esportes",
+                "coverage": "DENTRO DMH",
+                "long_description": "Consiste  na  indenização,  por  meio  de  reembolso  das despesas  ou  prestação  dos  serviços correspondentes,  limitada  ao  valor  do  Capital  Segurado  contratado,  das  despesas  médicas, hospitalares e/ou odontológicas efetuadas pelo  Segurado para seu tratamento, sob orientação médica, \r\nocasionado exclusivamente  pela  prática  de  esporte  amador,  em  caso  de  acidente  pessoal ocorrido durante o período de viagem ao exterior e uma vez constatada a sua saída do país de domicílio, com um deslocamento superior a 100 km (cem quilômetros) no caso de viagens terrestres. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 47,
+                "category_name": "Coberturas Médicas",
+                "code": "47",
+                "name": "Cobertura Médica para Gestante",
+                "description": "Cobertura Médica para Gestante",
+                "coverage": "DENTRO DMH - ATÉ 28 SEMANAS",
+                "long_description": "Consiste  na  indenização,  por  meio  de  reembolso  das despesas  ou  prestação  dos  serviços correspondentes,  limitada  ao  valor  do  Capital  Segurado  contratado,  das  despesas  médicas, \r\nhospitalares e/ou odontológicas complementares da gestante, ou seja, as despesas não cobertas pela \r\ncobertura básica de Despesas Médicas e/ou Hospitalares em Viagem ao Exterior (DMH em Viagem ao \r\nExterior) ou pela cobertura básica de Despesas Odontológicas em Viagem ao Exterior (DO em Viagem \r\nao Exterior). Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 56,
+                "category_name": "Coberturas Médicas",
+                "code": "56",
+                "name": "Telemedicina",
+                "description": "Telemedicina",
+                "coverage": "SIM",
+                "long_description": "Em caso de urgência o cliente pode solicitar assistência médica remota durante sua viagem, ou seja, fazer a primeira consulta por vídeo conferência."
+            },
+            {
+                "subcategory_id": 4,
+                "category_name": "Coberturas Médicas",
+                "code": "4",
+                "name": "Cobertura Odontológica",
+                "description": "Cobertura para assistência odontológica",
+                "coverage": "USD 250",
+                "long_description": "Consiste na indenização, por meio de reembolso das despesas ou prestação de serviços, limitada ao valor do Capital Segurado contratado, das despesas odontológicas efetuadas pelo Segurado para seu tratamento,  sob  orientação  de  um  profissional  habilitado,  ocasionado  por  acidente  pessoal  ou enfermidade súbita e aguda ocorrida durante o período de Viagem ao Exterior, conforme definição nas condições Particulares deste seguro, com um deslocamento superior a 100 km (cem quilômetros) no caso de viagens terrestres.  Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 5,
+                "category_name": "Coberturas Médicas",
+                "code": "5",
+                "name": "Cobertura Farmacêutica (por reembolso)",
+                "description": "Cobertura para assistência farmacêutica",
+                "coverage": "USD 250",
+                "long_description": "Este seguro consiste na indenização, por meio de reembolso das despesas com medicamentos  após a alta hospitalar ou atendimento médico, prescritos pelo médico que prestou o atendimento ao Segurado por uma das coberturas de despesas médias e/ou hospitalares deste seguro. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 6,
+                "category_name": "Coberturas Médicas",
+                "code": "6",
+                "name": "Fisioterapia",
+                "description": "Cobertura para assistência de fisioterapia",
+                "coverage": "NÃO",
+                "long_description": "Esta cobertura garante a indenização das despesas com tratamento fisioterápico emergencial, efetuadas pelo Segurado sob orientação médica,\r\ndecorrentes de acidente pessoal ou enfermidade súbita e aguda ocorrida durante o\r\nperíodo de viagem ao exterior e uma vez constatada a sua saída do país de domicílio. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 57,
+                "category_name": "COVID-19",
+                "code": "57",
+                "name": "Despesas Médica e Hospitalares por COVID-19",
+                "description": "Despesas Médica e Hospitalares por COVID-19",
+                "coverage": "DENTRO DO DMH",
+                "long_description": "Esta cobertura consiste no pagamento de uma indenização em forma de reembolso ou prestação de serviço, em caso de Despesas Médicas e Hospitalares do segurado devido a diagnóstico de COVID-19, ocorrida durante o período de viagem, previamente determinado e uma vez constatada a saída do Segurado de sua cidade ou país de domicílio, respeitando todos os riscos excluídos que constam nas condições gerais do seguro contratado."
+            },
+            {
+                "subcategory_id": 7,
+                "category_name": "Repatriações",
+                "code": "7",
+                "name": "Regresso Sanitário",
+                "description": "Repatriação Sanitária",
+                "coverage": "USD 15.000",
+                "long_description": "Consiste na indenização, por meio de reembolso das despesas ou da prestação dos serviços correspondentes, das despesas com o traslado de regresso do Segurado ao local de origem da viagem de seu domicílio, conforme definido nas condições contratuais, desde que determinadas pelo médico legalmente habilitado, caso este não se encontre em condições de retornar como passageiro regular por motivo de acidente pessoal ou enfermidade cobertos. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 8,
+                "category_name": "Repatriações",
+                "code": "8",
+                "name": "Traslado de Corpo",
+                "description": "Repatriação Funerária",
+                "coverage": "USD 10.000",
+                "long_description": "Consiste no reembolso das despesas com a liberação e transporte do corpo do Segurado, em caso de morte durante o período da viagem, do local da ocorrência do evento coberto até o Domicílio ou local do sepultamento, incluindo-se nessas despesas todos os procedimentos e objetos imprescindíveis ao traslado do corpo. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 9,
+                "category_name": "Repatriações",
+                "code": "9",
+                "name": "Traslado Médico",
+                "description": "Traslado Médico",
+                "coverage": "USD 10.000",
+                "long_description": "Consiste na indenização, por reembolso das despesas com a remoção ou transferência do segurado até a clínica ou hospital mais próximo em condições de atendê-lo, por motivo de acidente pessoal ou enfermidade cobertos, ou a prestação do serviço correspondente, quando previsto nas condições contratuais do plano. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 10,
+                "category_name": "Repatriações",
+                "code": "10",
+                "name": "Regresso de Menor Desacompanhado",
+                "description": "Regresso de Menor Desacompanhado",
+                "coverage": "NÃO",
+                "long_description": "Consiste na indenização, por meio de reembolso de despesas ou prestação dos serviços correspondentes, das despesas com o traslado de 1 (um) acompanhante para retorno do menor, que estivere sob responsabilidade única do Segurado durante a viagem, até o local de domicílio ou origem da viagem, ocasionado pelo falecimento ou internação hospitalar do Segurado ocorrida durante o período de viagem. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 50,
+                "category_name": "Auxílios e Serviços",
+                "code": "50",
+                "name": "Gastos Por Atraso do Voo",
+                "description": "None",
+                "coverage": "USD 200 (8 HORAS)",
+                "long_description": "Consiste  na  indenização,  por  meio  de  reembolso  das despesas  com  hospedagem,  traslado, alimentação,  e  despesas  telefônicas  do  Segurado,  que  não  tenham  sido  pagas  pela  companhia transportadora  regular,  decorrentes  do  atraso  de  embarque  superior  à  6  (seis), 8 (oito) ou 12 (doze)  horas,  conforme indicado no bilhete de embarque durante a viagem segurada, limitada ao Capital Segurado contratado. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 12,
+                "category_name": "Auxílios e Serviços",
+                "code": "12",
+                "name": "Hospedagem de Acompanhante e ou Familiar",
+                "description": "Acompanhamento de Familiar",
+                "coverage": "USD 500 - ATÉ 10 DIAS",
+                "long_description": "Consiste  na  indenização,  por  meio  de  reembolso  de  despesas  ou  prestação  dos  serviços correspondentes, ao  Segurado do valor das despesas com 1 (um) acompanhante , por determinação \r\nmédica , decorrente de acidente pessoal ou enfermidade súbita e aguda ocorrida com o Segurado durante o período de viagem, desde que viajando sozinho ou acompanhado de dependentes menores ou maiores de idade, limitada ao máximo de 10 diárias em hotel e alimentação, do mesmo tipo de acomodação aquele em que estiver hospedado o Segurado, limitada ao Capital Segurado contratado. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 13,
+                "category_name": "Auxílios e Serviços",
+                "code": "13",
+                "name": "Convalescença em Hotel",
+                "description": "Convalescença em Hotel",
+                "coverage": "USD 400 - ATÉ 10 DIAS",
+                "long_description": "Consiste  na  indenização,  por  meio  de  reembolso  de  despesas  ou  prestação  dos  serviços correspondentes, ao Segurado, caso o mesmo fique impossibilitado para prosseguir viagem ou retornar ao domicílio ou local de origem da viagem, por determinação médica, decorrente de acidente pessoal ou enfermidade súbita e aguda ocorrida durante o período de viagem, limitada ao máximo de 10 diárias em hotel e alimentação, conforme estabelecido no Bilhete de Seguro, com o mesmo tipo de acomodação  daquele  originalmente  contratado  para  a viagem,  limitada  ao  Capital  Segurado contratado. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 14,
+                "category_name": "Auxílios e Serviços",
+                "code": "14",
+                "name": "Retorno de Acompanhante",
+                "description": "Retorno de Acompanhante",
+                "coverage": "USD 1.500",
+                "long_description": "Consiste  na  indenização,  por  meio  de  reembolso  de  despesas  ou  prestação  dos  serviços correspondentes, limitada ao valor do Capital Segurado contratado, das despesas com o traslado de regresso do(s) acompanhante(s) do Segurado ao local de domicílio ou origem da viagem, ocasionado pelo falecimento ou regresso sanitário do Segurado ocorrido durante o período de viagem. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 16,
+                "category_name": "Auxílios e Serviços",
+                "code": "16",
+                "name": "Passagem Aérea Ida e Volta para Um Familiar",
+                "description": "Passagem Aérea Ida e Volta para Um Familiar",
+                "coverage": "NÃO",
+                "long_description": "Essa cobertura é utilizada em caso do segurado esteja viajando sozinho e os médicos julgarem necessário a hospitalização no período superior a 48 horas. Assim, o mesmo terá direito a um bilhete de passagem aérea de ida e volta em classe econômica para um acompanhante indicado pelo segurado. Importante: A pessoa indicada deverá, obrigatoriamente, morar no Brasil. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 18,
+                "category_name": "Auxílios e Serviços",
+                "code": "18",
+                "name": "Despesas Extraordinárias por Permanência Forçada",
+                "description": "Despesas Extraordinárias por Permanência Forçada",
+                "coverage": "NÃO",
+                "long_description": "Esta Cobertura, desde que contratada, garante ao Segurado o reembolso, até o limite do Capital segurado contratado, das despesas extraordinárias por permanência forçada que o impeça de voltar ao seu pais de origem por alguns motivos listados por cada seguradora. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 20,
+                "category_name": "Auxílios e Serviços",
+                "code": "20",
+                "name": "Assistência na Localização da Bagagem",
+                "description": "Assistência na Localização da Bagagem",
+                "coverage": "SIM",
+                "long_description": "Essa cobertura garante que a seguradora entre em contato com a companhia aérea constantemente para repassar ao segurado as informações atualizadas da localização de sua bagagem. Após a localização, a seguradora se encarregará de entregá-la. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 21,
+                "category_name": "Auxílios e Serviços",
+                "code": "21",
+                "name": "Orientação em Caso de Perda de Documentos e Cartão de Crédito",
+                "description": "Orientação em Caso de Perda de Documentos e Cartão de Crédito",
+                "coverage": "SIM",
+                "long_description": "Essa cobertura garante ao segurado que em caso de perda ou roubo de documentos indispensáveis para continuar a viagem do mesmo e/ou de seus acompanhantes, a seguradora prestará informações sobre os órgãos competentes para obter um novo passaporte ou outras medidas necessárias. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 22,
+                "category_name": "Auxílios e Serviços",
+                "code": "22",
+                "name": "Transmissão de Mensagem Urgente",
+                "description": "Transmissão de Mensagem Urgente",
+                "coverage": "SIM",
+                "long_description": "Essa cobertura abrange a necessidade da transmissão de uma mensagem urgente para os parentes do segurado, em caso de situação de emergência em que o mesmo se encontra, como terremotos ou atentados terroristas. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 23,
+                "category_name": "Auxílios e Serviços",
+                "code": "23",
+                "name": "Organização de Traslado para Consulta",
+                "description": "Organização de Traslado para Consulta",
+                "coverage": "SIM",
+                "long_description": "Essa cobertura é utilizada para orientação e direcionamento ao segurado em caso de um atendimento médico, hospitalar de como chegar a local direcionado para seu atendimento. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 24,
+                "category_name": "Auxílios e Serviços",
+                "code": "24",
+                "name": "Pet Assistence",
+                "description": "Pet Assistence",
+                "coverage": "NÃO",
+                "long_description": "Essa cobertura é direcionada ao animal que fica no Brasil hospedagem em hotel “pet” ou se estiver em viagem com a pessoa segurada, e o PET precisa de um pronto atendimento veterinário. É feito o reembolso no valor estipulado na apólice. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 25,
+                "category_name": "Auxílios e Serviços",
+                "code": "25",
+                "name": "Assistência Emergencial Via Aplicativo",
+                "description": "Assistência Emergencial Via Aplicativo",
+                "coverage": "NÃO",
+                "long_description": "Assistência via aplicativo celular, onde o segurado busca atendimento e direcionamento para a rede credenciada. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 26,
+                "category_name": "Auxílios e Serviços",
+                "code": "26",
+                "name": "Orientação para Transferência de Pagamento de Fiança Judicial",
+                "description": "Orientação para Transferência de Pagamento de Fiança Judicial",
+                "coverage": "SIM",
+                "long_description": "Essa cobertura garante orientação que a seguradora disponibiliza para o segurado de como fazer o procedimento em caso de algum pagamento de fiança judicial no local, devido a um acidente automobilístico ocorrido. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 27,
+                "category_name": "Auxílios e Serviços",
+                "code": "27",
+                "name": "Orientação e Direcionamento à Rede de Atendimento Médico",
+                "description": "Orientação e Direcionamento à Rede de Atendimento Médico",
+                "coverage": "SIM",
+                "long_description": "Essa cobertura abrange a assistência ao segurado para direcionamento de atendimento da sua necessidade. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 30,
+                "category_name": "Auxílios e Serviços",
+                "code": "30",
+                "name": "Garantia de Viagem de Regresso",
+                "description": "Garantia de Viagem de Regresso",
+                "coverage": "USD 1.500",
+                "long_description": "Essa cobertura garante ao segurado direito de retorno ao local de origem, através de uma passagem aérea de classe econômica, em caso de: incêndio ou roubo na residência habitual do segurado, enfermidade de caráter súbito, acidente ou falecimento do próprio segurado, ou de seu companheiro de viagem. Importante: Serão considerados membros da família, os familiares de 1º grau de parentesco e que residam no Brasil. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 32,
+                "category_name": "Assistência Jurídica",
+                "code": "32",
+                "name": "Assistência Jurídica por Acidente de Trânsito",
+                "description": "Assistência Jurídica por Acidente de Trânsito",
+                "coverage": "USD 1.000",
+                "long_description": "Consiste  na  indenização e ou empréstimo,  por  meio  de  reembolso  de  despesas  ou  prestação  dos  serviços correspondentes, limitada ao valor do Capital Segurado contratado, das despesas com honorários \r\nadvocatícios para assistência jurídica do Segurado em decorrência de acidente ocorrido durante a viagem.  Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 34,
+                "category_name": "Assistência Jurídica",
+                "code": "34",
+                "name": "Remessa para Fiança Judicial para Acidentes de Trânsito",
+                "description": "Remessa para Fiança Judicial para Acidentes de Trânsito",
+                "coverage": "USD 2.500",
+                "long_description": "Consiste no reembolso e ou empréstimo de despesas legais do segurado, como custos de fiança, por motivo de ordem de prisão ou detenção indevida por parte de qualquer governo ou poder estrangeiro no período da viagem. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 35,
+                "category_name": "Seguros",
+                "code": "35",
+                "name": "Cancelamento de Viagem",
+                "description": "Cancelamento de Viagem",
+                "coverage": "USD 500",
+                "long_description": "Essa cobertura garante ao assegurado o valor da cobertura contratada para o reembolso de multas em relação ao cancelamento de viagem devido a morte de parente de primeiro grau, internação do próprio assegurado com 48 horas antes do voo. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 36,
+                "category_name": "Seguros",
+                "code": "36",
+                "name": "Cancelamento de Viagem Total ou Plus Reason",
+                "description": "Cancelamento de Viagem Plus Reason",
+                "coverage": "NÃO",
+                "long_description": "Essa cobertura consiste no pagamento das multas referente aos serviços contratados após a aquisição deste seguro em alguns motivos descritos nas condições gerais das seguradoras, despesas com aquisição de pacotes turísticos e/ou serviços de viagens, como transporte e hospedagem, na ocorrência de evento coberto que impeça o segurado de viajar. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 40,
+                "category_name": "Seguros",
+                "code": "40",
+                "name": "Interrupção de Viagem",
+                "description": "Interrupção de Viagem",
+                "coverage": "USD 500",
+                "long_description": "Consiste na indenização por meio de reembolso ao Segurado ou ao(s) seu(s) beneficiário(s)Capital Segurado  das  perdas  irrecuperáveis  com  depósitos  ou despesas  antecipadas  para  a  viagem, de acordo com as condições gerais de cada seguradora, observadas, ainda, as condições do contrato assinado pelo Segurado com a agência de viagens e/ou operador turístico (incluindo as políticas de cancelamento e/ou interrupção quando for o caso), quando ocorrer a interrupção da viagem por motivos explícitos nas condições gerais da seguradora escolhida, como por exemplo, internação do segurado, morte de parente de primeiro grau, roubo em sua residência. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 41,
+                "category_name": "Seguros",
+                "code": "41",
+                "name": "Danos à Mala",
+                "description": "Danos à Mala",
+                "coverage": "NÃO",
+                "long_description": "Essa cobertura garante ao segurado o pagamento do valor do capital segurado contratado ou indenização correspondente aos prejuízos sofridos em caso de danos à mala, durante transporte aéreo, respeitando os riscos excluídos. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 42,
+                "category_name": "Seguros",
+                "code": "42",
+                "name": "Seguro de Bagagem Extraviada",
+                "description": "Seguro de Bagagem Extraviada",
+                "coverage": "USD 800 (COMPLEMENTAR)",
+                "long_description": "Consiste no pagamento de uma indenização complementar ou suplementar ao valor da indenização já paga ao Segurado pela Companhia Aérea responsável pelo transporte. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 43,
+                "category_name": "Seguros",
+                "code": "43",
+                "name": "Atraso de Bagagem (apenas para voos de ida)",
+                "description": "Reembolso de Gastos Por Demora de Bagagem",
+                "coverage": "USD 200 (8 HORAS)",
+                "long_description": "Consiste no pagamento de despesas com compras de artigos de uso pessoal, em razão de ao atraso ocasionado à(s) bagagem(ns) do Segurado, desde que sob responsabilidade da companhia transportadora, devidamente comprovado através da apresentação do relatório comprobatório de dano (PIR - Property Irregularity Report) e desde que o local do\r\ndesembarque não seja o do país de residência do Segurado. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 44,
+                "category_name": "Seguros",
+                "code": "44",
+                "name": "Seguro de Invalidez Permanente Por Acidente",
+                "description": "Seguro de Invalidez Permanente Por Acidente",
+                "coverage": "R$ 15.000",
+                "long_description": "Consiste no pagamento de indenização ao Segurado, limitada ao Capital Segurado contratado, em caso de perda, redução ou impotência funcional definitiva, total ou parcial, de um membro ou órgão, em decorrência de lesão física sofrida pelo Segurado, provocada por acidente pessoal ocorrido durante o período de viagem. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 45,
+                "category_name": "Seguros",
+                "code": "45",
+                "name": "Morte Acidental",
+                "description": "Seguro Por Morte Acidental",
+                "coverage": "R$ 15.000",
+                "long_description": "Consiste no pagamento do Capital Segurado ao(s) beneficiário(s) indicado(s) no Bilhete de Seguro, de uma única vez, em caso de falecimento do Segurado por acidente pessoal coberto, durante o período de viagem. Consulte as Condições Gerais da Seguradora Contratada."
+            }
+        ],
+        "priority": 1
+    },
+    {
+        "code": 1955,
+        "name": "MTA 100 Europa (exceto EUA) +Telemedicina Albert Einstein",
+        "provider_code": "17",
+        "provider_name": "My Travel Assist",
+        "price": {
+            "child": {
+                "min_age": 0,
+                "max_age": 20,
+                "price": "35.06"
+            },
+            "adult": {
+                "min_age": 21,
+                "max_age": 64,
+                "price": "35.06"
+            },
+            "elderly": {
+                "min_age": 65,
+                "max_age": 75,
+                "price": "55.6"
+            }
+        },
+        "covid_coverage": false,
+        "travel_renewal": "",
+        "receptive_product": false,
+        "special_product": false,
+        "specialist_indicator": true,
+        "tags": "",
+        "benefits": [
+            {
+                "subcategory_id": 54,
+                "category_name": "Coberturas Médicas",
+                "code": "502",
+                "name": "Permite emissão em viagem?",
+                "description": "Permite emissão em viagem?",
+                "coverage": "CONSULTAR NOSSO ATENDIMENTO",
+                "long_description": "ATENÇÃO!  Em nenhuma circunstância deve ser realizada a contratação em viagem sem o contato com o nosso time de atendimento. O plano só poderá ser emitido em viagem desde que seja expressamente autorizado por escrito. Procure nosso atendimento para ser realizada a análise e indicação do plano correto para emissão em viagem. Um período de carência poderá ser estipulado, conforme regras da Seguradora."
+            },
+            {
+                "subcategory_id": 55,
+                "category_name": "Coberturas Médicas",
+                "code": "505",
+                "name": "Validade Geográfica",
+                "description": "Validade Geográfica",
+                "coverage": "EUROPA",
+                "long_description": "Indica em quais lugares do mundo o plano de seguro escolhido é válido. ATENÇÃO: alguns países pedem coberturas específicas como exigência para entrar em seu território. Verifique as exigências do seu(s) país(es) de destino para se certificar de que você escolheu o seguro correto. Caso precise de ajuda, entre em contato com nosso atendimento."
+            },
+            {
+                "subcategory_id": 52,
+                "category_name": "Coberturas Médicas",
+                "code": "500",
+                "name": "Franquia de DMH",
+                "description": "Franquia USD 200",
+                "coverage": "NÃO",
+                "long_description": "A franquia é o valor cobrado pela seguradora para acionamento de Despesas Médicas Hospitalares deste plano. A franquia é cobrada para cada chamado realizado. Ela é cobrada somente no caso das despesas médicas hospitalares (DMH). Outros benefícios oferecidos a franquia é isenta."
+            },
+            {
+                "subcategory_id": 51,
+                "category_name": "Coberturas Médicas",
+                "code": "51",
+                "name": "Despesa Médica Hospitalar Total",
+                "description": "None",
+                "coverage": "USD 100.000",
+                "long_description": "Consiste no valor total de Despesa Médica Hospitalar disponibilizado para o plano contratado. Consulte as Condições Gerias da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 2,
+                "category_name": "Coberturas Médicas",
+                "code": "2",
+                "name": "Despesa Médica Hospitalar",
+                "description": "Despesa Médica Hospitalar",
+                "coverage": "USD 100.000",
+                "long_description": "Esta Cobertura garante a prestação de serviço ao Segurado, na forma prevista nas Condições Contratuais e limitada ao valor do Capital Segurado contratado, ou, na impossibilidade de contato ou utilização da rede de serviços autorizada, o reembolso das despesas médicas e hospitalares efetuadas pelo Segurado para seu tratamento, sob orientação médica, ocasionado por acidente pessoal ou enfermidade súbita e aguda ocorrida durante o período de viagem ao exterior e constatada a sua saída do país de domicílio, incluindo episódios de crise ocasionados por doença preexistente ou crônica, quando gerar quadro clínico de Emergência ou Urgência. Consulte as Condições Gerias da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 3,
+                "category_name": "Coberturas Médicas",
+                "code": "3",
+                "name": "Cobertura Médica para Prática de Esportes",
+                "description": "Cobertura para acidentes provenientes de práticas de esportes",
+                "coverage": "DENTRO DMH",
+                "long_description": "Consiste  na  indenização,  por  meio  de  reembolso  das despesas  ou  prestação  dos  serviços correspondentes,  limitada  ao  valor  do  Capital  Segurado  contratado,  das  despesas  médicas, hospitalares e/ou odontológicas efetuadas pelo  Segurado para seu tratamento, sob orientação médica, \r\nocasionado exclusivamente  pela  prática  de  esporte  amador,  em  caso  de  acidente  pessoal ocorrido durante o período de viagem ao exterior e uma vez constatada a sua saída do país de domicílio, com um deslocamento superior a 100 km (cem quilômetros) no caso de viagens terrestres. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 47,
+                "category_name": "Coberturas Médicas",
+                "code": "47",
+                "name": "Cobertura Médica para Gestante",
+                "description": "Cobertura Médica para Gestante",
+                "coverage": "DENTRO DMH - ATÉ 28 SEMANAS",
+                "long_description": "Consiste  na  indenização,  por  meio  de  reembolso  das despesas  ou  prestação  dos  serviços correspondentes,  limitada  ao  valor  do  Capital  Segurado  contratado,  das  despesas  médicas, \r\nhospitalares e/ou odontológicas complementares da gestante, ou seja, as despesas não cobertas pela \r\ncobertura básica de Despesas Médicas e/ou Hospitalares em Viagem ao Exterior (DMH em Viagem ao \r\nExterior) ou pela cobertura básica de Despesas Odontológicas em Viagem ao Exterior (DO em Viagem \r\nao Exterior). Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 56,
+                "category_name": "Coberturas Médicas",
+                "code": "56",
+                "name": "Telemedicina",
+                "description": "Telemedicina",
+                "coverage": "SIM",
+                "long_description": "Em caso de urgência o cliente pode solicitar assistência médica remota durante sua viagem, ou seja, fazer a primeira consulta por vídeo conferência."
+            },
+            {
+                "subcategory_id": 4,
+                "category_name": "Coberturas Médicas",
+                "code": "4",
+                "name": "Cobertura Odontológica",
+                "description": "Cobertura para assistência odontológica",
+                "coverage": "USD 600",
+                "long_description": "Consiste na indenização, por meio de reembolso das despesas ou prestação de serviços, limitada ao valor do Capital Segurado contratado, das despesas odontológicas efetuadas pelo Segurado para seu tratamento,  sob  orientação  de  um  profissional  habilitado,  ocasionado  por  acidente  pessoal  ou enfermidade súbita e aguda ocorrida durante o período de Viagem ao Exterior, conforme definição nas condições Particulares deste seguro, com um deslocamento superior a 100 km (cem quilômetros) no caso de viagens terrestres.  Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 5,
+                "category_name": "Coberturas Médicas",
+                "code": "5",
+                "name": "Cobertura Farmacêutica (por reembolso)",
+                "description": "Cobertura para assistência farmacêutica",
+                "coverage": "USD 600",
+                "long_description": "Este seguro consiste na indenização, por meio de reembolso das despesas com medicamentos  após a alta hospitalar ou atendimento médico, prescritos pelo médico que prestou o atendimento ao Segurado por uma das coberturas de despesas médias e/ou hospitalares deste seguro. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 6,
+                "category_name": "Coberturas Médicas",
+                "code": "6",
+                "name": "Fisioterapia",
+                "description": "Cobertura para assistência de fisioterapia",
+                "coverage": "NÃO",
+                "long_description": "Esta cobertura garante a indenização das despesas com tratamento fisioterápico emergencial, efetuadas pelo Segurado sob orientação médica,\r\ndecorrentes de acidente pessoal ou enfermidade súbita e aguda ocorrida durante o\r\nperíodo de viagem ao exterior e uma vez constatada a sua saída do país de domicílio. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 57,
+                "category_name": "COVID-19",
+                "code": "57",
+                "name": "Despesas Médica e Hospitalares por COVID-19",
+                "description": "Despesas Médica e Hospitalares por COVID-19",
+                "coverage": "DENTRO DO DMH",
+                "long_description": "Esta cobertura consiste no pagamento de uma indenização em forma de reembolso ou prestação de serviço, em caso de Despesas Médicas e Hospitalares do segurado devido a diagnóstico de COVID-19, ocorrida durante o período de viagem, previamente determinado e uma vez constatada a saída do Segurado de sua cidade ou país de domicílio, respeitando todos os riscos excluídos que constam nas condições gerais do seguro contratado."
+            },
+            {
+                "subcategory_id": 7,
+                "category_name": "Repatriações",
+                "code": "7",
+                "name": "Regresso Sanitário",
+                "description": "Repatriação Sanitária",
+                "coverage": "USD 20.000",
+                "long_description": "Consiste na indenização, por meio de reembolso das despesas ou da prestação dos serviços correspondentes, das despesas com o traslado de regresso do Segurado ao local de origem da viagem de seu domicílio, conforme definido nas condições contratuais, desde que determinadas pelo médico legalmente habilitado, caso este não se encontre em condições de retornar como passageiro regular por motivo de acidente pessoal ou enfermidade cobertos. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 8,
+                "category_name": "Repatriações",
+                "code": "8",
+                "name": "Traslado de Corpo",
+                "description": "Repatriação Funerária",
+                "coverage": "USD 20.000",
+                "long_description": "Consiste no reembolso das despesas com a liberação e transporte do corpo do Segurado, em caso de morte durante o período da viagem, do local da ocorrência do evento coberto até o Domicílio ou local do sepultamento, incluindo-se nessas despesas todos os procedimentos e objetos imprescindíveis ao traslado do corpo. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 9,
+                "category_name": "Repatriações",
+                "code": "9",
+                "name": "Traslado Médico",
+                "description": "Traslado Médico",
+                "coverage": "USD 20.000",
+                "long_description": "Consiste na indenização, por reembolso das despesas com a remoção ou transferência do segurado até a clínica ou hospital mais próximo em condições de atendê-lo, por motivo de acidente pessoal ou enfermidade cobertos, ou a prestação do serviço correspondente, quando previsto nas condições contratuais do plano. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 10,
+                "category_name": "Repatriações",
+                "code": "10",
+                "name": "Regresso de Menor Desacompanhado",
+                "description": "Regresso de Menor Desacompanhado",
+                "coverage": "NÃO",
+                "long_description": "Consiste na indenização, por meio de reembolso de despesas ou prestação dos serviços correspondentes, das despesas com o traslado de 1 (um) acompanhante para retorno do menor, que estivere sob responsabilidade única do Segurado durante a viagem, até o local de domicílio ou origem da viagem, ocasionado pelo falecimento ou internação hospitalar do Segurado ocorrida durante o período de viagem. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 50,
+                "category_name": "Auxílios e Serviços",
+                "code": "50",
+                "name": "Gastos Por Atraso do Voo",
+                "description": "None",
+                "coverage": "USD 200 (8 HORAS)",
+                "long_description": "Consiste  na  indenização,  por  meio  de  reembolso  das despesas  com  hospedagem,  traslado, alimentação,  e  despesas  telefônicas  do  Segurado,  que  não  tenham  sido  pagas  pela  companhia transportadora  regular,  decorrentes  do  atraso  de  embarque  superior  à  6  (seis), 8 (oito) ou 12 (doze)  horas,  conforme indicado no bilhete de embarque durante a viagem segurada, limitada ao Capital Segurado contratado. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 12,
+                "category_name": "Auxílios e Serviços",
+                "code": "12",
+                "name": "Hospedagem de Acompanhante e ou Familiar",
+                "description": "Acompanhamento de Familiar",
+                "coverage": "USD 500 - ATÉ 10 DIAS",
+                "long_description": "Consiste  na  indenização,  por  meio  de  reembolso  de  despesas  ou  prestação  dos  serviços correspondentes, ao  Segurado do valor das despesas com 1 (um) acompanhante , por determinação \r\nmédica , decorrente de acidente pessoal ou enfermidade súbita e aguda ocorrida com o Segurado durante o período de viagem, desde que viajando sozinho ou acompanhado de dependentes menores ou maiores de idade, limitada ao máximo de 10 diárias em hotel e alimentação, do mesmo tipo de acomodação aquele em que estiver hospedado o Segurado, limitada ao Capital Segurado contratado. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 13,
+                "category_name": "Auxílios e Serviços",
+                "code": "13",
+                "name": "Convalescença em Hotel",
+                "description": "Convalescença em Hotel",
+                "coverage": "USD 600 - ATÉ 10 DIAS",
+                "long_description": "Consiste  na  indenização,  por  meio  de  reembolso  de  despesas  ou  prestação  dos  serviços correspondentes, ao Segurado, caso o mesmo fique impossibilitado para prosseguir viagem ou retornar ao domicílio ou local de origem da viagem, por determinação médica, decorrente de acidente pessoal ou enfermidade súbita e aguda ocorrida durante o período de viagem, limitada ao máximo de 10 diárias em hotel e alimentação, conforme estabelecido no Bilhete de Seguro, com o mesmo tipo de acomodação  daquele  originalmente  contratado  para  a viagem,  limitada  ao  Capital  Segurado contratado. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 14,
+                "category_name": "Auxílios e Serviços",
+                "code": "14",
+                "name": "Retorno de Acompanhante",
+                "description": "Retorno de Acompanhante",
+                "coverage": "USD 1.500",
+                "long_description": "Consiste  na  indenização,  por  meio  de  reembolso  de  despesas  ou  prestação  dos  serviços correspondentes, limitada ao valor do Capital Segurado contratado, das despesas com o traslado de regresso do(s) acompanhante(s) do Segurado ao local de domicílio ou origem da viagem, ocasionado pelo falecimento ou regresso sanitário do Segurado ocorrido durante o período de viagem. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 16,
+                "category_name": "Auxílios e Serviços",
+                "code": "16",
+                "name": "Passagem Aérea Ida e Volta para Um Familiar",
+                "description": "Passagem Aérea Ida e Volta para Um Familiar",
+                "coverage": "NÃO",
+                "long_description": "Essa cobertura é utilizada em caso do segurado esteja viajando sozinho e os médicos julgarem necessário a hospitalização no período superior a 48 horas. Assim, o mesmo terá direito a um bilhete de passagem aérea de ida e volta em classe econômica para um acompanhante indicado pelo segurado. Importante: A pessoa indicada deverá, obrigatoriamente, morar no Brasil. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 18,
+                "category_name": "Auxílios e Serviços",
+                "code": "18",
+                "name": "Despesas Extraordinárias por Permanência Forçada",
+                "description": "Despesas Extraordinárias por Permanência Forçada",
+                "coverage": "NÃO",
+                "long_description": "Esta Cobertura, desde que contratada, garante ao Segurado o reembolso, até o limite do Capital segurado contratado, das despesas extraordinárias por permanência forçada que o impeça de voltar ao seu pais de origem por alguns motivos listados por cada seguradora. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 20,
+                "category_name": "Auxílios e Serviços",
+                "code": "20",
+                "name": "Assistência na Localização da Bagagem",
+                "description": "Assistência na Localização da Bagagem",
+                "coverage": "SIM",
+                "long_description": "Essa cobertura garante que a seguradora entre em contato com a companhia aérea constantemente para repassar ao segurado as informações atualizadas da localização de sua bagagem. Após a localização, a seguradora se encarregará de entregá-la. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 21,
+                "category_name": "Auxílios e Serviços",
+                "code": "21",
+                "name": "Orientação em Caso de Perda de Documentos e Cartão de Crédito",
+                "description": "Orientação em Caso de Perda de Documentos e Cartão de Crédito",
+                "coverage": "SIM",
+                "long_description": "Essa cobertura garante ao segurado que em caso de perda ou roubo de documentos indispensáveis para continuar a viagem do mesmo e/ou de seus acompanhantes, a seguradora prestará informações sobre os órgãos competentes para obter um novo passaporte ou outras medidas necessárias. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 22,
+                "category_name": "Auxílios e Serviços",
+                "code": "22",
+                "name": "Transmissão de Mensagem Urgente",
+                "description": "Transmissão de Mensagem Urgente",
+                "coverage": "SIM",
+                "long_description": "Essa cobertura abrange a necessidade da transmissão de uma mensagem urgente para os parentes do segurado, em caso de situação de emergência em que o mesmo se encontra, como terremotos ou atentados terroristas. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 23,
+                "category_name": "Auxílios e Serviços",
+                "code": "23",
+                "name": "Organização de Traslado para Consulta",
+                "description": "Organização de Traslado para Consulta",
+                "coverage": "SIM",
+                "long_description": "Essa cobertura é utilizada para orientação e direcionamento ao segurado em caso de um atendimento médico, hospitalar de como chegar a local direcionado para seu atendimento. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 24,
+                "category_name": "Auxílios e Serviços",
+                "code": "24",
+                "name": "Pet Assistence",
+                "description": "Pet Assistence",
+                "coverage": "NÃO",
+                "long_description": "Essa cobertura é direcionada ao animal que fica no Brasil hospedagem em hotel “pet” ou se estiver em viagem com a pessoa segurada, e o PET precisa de um pronto atendimento veterinário. É feito o reembolso no valor estipulado na apólice. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 25,
+                "category_name": "Auxílios e Serviços",
+                "code": "25",
+                "name": "Assistência Emergencial Via Aplicativo",
+                "description": "Assistência Emergencial Via Aplicativo",
+                "coverage": "NÃO",
+                "long_description": "Assistência via aplicativo celular, onde o segurado busca atendimento e direcionamento para a rede credenciada. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 26,
+                "category_name": "Auxílios e Serviços",
+                "code": "26",
+                "name": "Orientação para Transferência de Pagamento de Fiança Judicial",
+                "description": "Orientação para Transferência de Pagamento de Fiança Judicial",
+                "coverage": "SIM",
+                "long_description": "Essa cobertura garante orientação que a seguradora disponibiliza para o segurado de como fazer o procedimento em caso de algum pagamento de fiança judicial no local, devido a um acidente automobilístico ocorrido. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 27,
+                "category_name": "Auxílios e Serviços",
+                "code": "27",
+                "name": "Orientação e Direcionamento à Rede de Atendimento Médico",
+                "description": "Orientação e Direcionamento à Rede de Atendimento Médico",
+                "coverage": "SIM",
+                "long_description": "Essa cobertura abrange a assistência ao segurado para direcionamento de atendimento da sua necessidade. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 30,
+                "category_name": "Auxílios e Serviços",
+                "code": "30",
+                "name": "Garantia de Viagem de Regresso",
+                "description": "Garantia de Viagem de Regresso",
+                "coverage": "USD 1.500",
+                "long_description": "Essa cobertura garante ao segurado direito de retorno ao local de origem, através de uma passagem aérea de classe econômica, em caso de: incêndio ou roubo na residência habitual do segurado, enfermidade de caráter súbito, acidente ou falecimento do próprio segurado, ou de seu companheiro de viagem. Importante: Serão considerados membros da família, os familiares de 1º grau de parentesco e que residam no Brasil. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 32,
+                "category_name": "Assistência Jurídica",
+                "code": "32",
+                "name": "Assistência Jurídica por Acidente de Trânsito",
+                "description": "Assistência Jurídica por Acidente de Trânsito",
+                "coverage": "USD 1.000",
+                "long_description": "Consiste  na  indenização e ou empréstimo,  por  meio  de  reembolso  de  despesas  ou  prestação  dos  serviços correspondentes, limitada ao valor do Capital Segurado contratado, das despesas com honorários \r\nadvocatícios para assistência jurídica do Segurado em decorrência de acidente ocorrido durante a viagem.  Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 34,
+                "category_name": "Assistência Jurídica",
+                "code": "34",
+                "name": "Remessa para Fiança Judicial para Acidentes de Trânsito",
+                "description": "Remessa para Fiança Judicial para Acidentes de Trânsito",
+                "coverage": "USD 2.500",
+                "long_description": "Consiste no reembolso e ou empréstimo de despesas legais do segurado, como custos de fiança, por motivo de ordem de prisão ou detenção indevida por parte de qualquer governo ou poder estrangeiro no período da viagem. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 35,
+                "category_name": "Seguros",
+                "code": "35",
+                "name": "Cancelamento de Viagem",
+                "description": "Cancelamento de Viagem",
+                "coverage": "USD 1.000",
+                "long_description": "Essa cobertura garante ao assegurado o valor da cobertura contratada para o reembolso de multas em relação ao cancelamento de viagem devido a morte de parente de primeiro grau, internação do próprio assegurado com 48 horas antes do voo. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 36,
+                "category_name": "Seguros",
+                "code": "36",
+                "name": "Cancelamento de Viagem Total ou Plus Reason",
+                "description": "Cancelamento de Viagem Plus Reason",
+                "coverage": "NÃO",
+                "long_description": "Essa cobertura consiste no pagamento das multas referente aos serviços contratados após a aquisição deste seguro em alguns motivos descritos nas condições gerais das seguradoras, despesas com aquisição de pacotes turísticos e/ou serviços de viagens, como transporte e hospedagem, na ocorrência de evento coberto que impeça o segurado de viajar. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 40,
+                "category_name": "Seguros",
+                "code": "40",
+                "name": "Interrupção de Viagem",
+                "description": "Interrupção de Viagem",
+                "coverage": "USD 700",
+                "long_description": "Consiste na indenização por meio de reembolso ao Segurado ou ao(s) seu(s) beneficiário(s)Capital Segurado  das  perdas  irrecuperáveis  com  depósitos  ou despesas  antecipadas  para  a  viagem, de acordo com as condições gerais de cada seguradora, observadas, ainda, as condições do contrato assinado pelo Segurado com a agência de viagens e/ou operador turístico (incluindo as políticas de cancelamento e/ou interrupção quando for o caso), quando ocorrer a interrupção da viagem por motivos explícitos nas condições gerais da seguradora escolhida, como por exemplo, internação do segurado, morte de parente de primeiro grau, roubo em sua residência. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 41,
+                "category_name": "Seguros",
+                "code": "41",
+                "name": "Danos à Mala",
+                "description": "Danos à Mala",
+                "coverage": "NÃO",
+                "long_description": "Essa cobertura garante ao segurado o pagamento do valor do capital segurado contratado ou indenização correspondente aos prejuízos sofridos em caso de danos à mala, durante transporte aéreo, respeitando os riscos excluídos. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 42,
+                "category_name": "Seguros",
+                "code": "42",
+                "name": "Seguro de Bagagem Extraviada",
+                "description": "Seguro de Bagagem Extraviada",
+                "coverage": "USD 1.000 (COMPLEMENTAR)",
+                "long_description": "Consiste no pagamento de uma indenização complementar ou suplementar ao valor da indenização já paga ao Segurado pela Companhia Aérea responsável pelo transporte. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 43,
+                "category_name": "Seguros",
+                "code": "43",
+                "name": "Atraso de Bagagem (apenas para voos de ida)",
+                "description": "Reembolso de Gastos Por Demora de Bagagem",
+                "coverage": "USD 200 (8 HORAS)",
+                "long_description": "Consiste no pagamento de despesas com compras de artigos de uso pessoal, em razão de ao atraso ocasionado à(s) bagagem(ns) do Segurado, desde que sob responsabilidade da companhia transportadora, devidamente comprovado através da apresentação do relatório comprobatório de dano (PIR - Property Irregularity Report) e desde que o local do\r\ndesembarque não seja o do país de residência do Segurado. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 44,
+                "category_name": "Seguros",
+                "code": "44",
+                "name": "Seguro de Invalidez Permanente Por Acidente",
+                "description": "Seguro de Invalidez Permanente Por Acidente",
+                "coverage": "R$ 20.000",
+                "long_description": "Consiste no pagamento de indenização ao Segurado, limitada ao Capital Segurado contratado, em caso de perda, redução ou impotência funcional definitiva, total ou parcial, de um membro ou órgão, em decorrência de lesão física sofrida pelo Segurado, provocada por acidente pessoal ocorrido durante o período de viagem. Consulte as Condições Gerais da Seguradora Contratada."
+            },
+            {
+                "subcategory_id": 45,
+                "category_name": "Seguros",
+                "code": "45",
+                "name": "Morte Acidental",
+                "description": "Seguro Por Morte Acidental",
+                "coverage": "R$ 20.000",
+                "long_description": "Consiste no pagamento do Capital Segurado ao(s) beneficiário(s) indicado(s) no Bilhete de Seguro, de uma única vez, em caso de falecimento do Segurado por acidente pessoal coberto, durante o período de viagem. Consulte as Condições Gerais da Seguradora Contratada."
+            }
+        ],
+        "priority": 2
+    }
+]
