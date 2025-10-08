@@ -31,28 +31,29 @@ export class LoggerMiddleware implements NestMiddleware {
       // Extrai informações do usuário autenticado
       const userInfo = await this.extractUserInfo(req)
 
+      // Só salva userId se for válido/existente
+      const logData: any = {
+        userName: userInfo.userName,
+        userEmail: userInfo.userEmail,
+        path: req.path,
+        method: req.method as any,
+        statusCode: res.statusCode,
+        userAgent: req.headers['user-agent'],
+        ip: origin.ip,
+        requestBody: Object.keys(req.body ?? {}).length ? req.body : undefined,
+        responseTime,
+        referer: req.headers.referer,
+        origin: req.headers.origin,
+        xForwardedFor: req.headers['x-forwarded-for'] as string,
+        xRealIp: req.headers['x-real-ip'] as string,
+        host: req.headers.host,
+        acceptLanguage: req.headers['accept-language'],
+      }
+      if (userInfo.userId) {
+        logData.userId = userInfo.userId
+      }
       void prisma.log
-        .create({
-          data: {
-            userId: userInfo.userId,
-            userName: userInfo.userName,
-            userEmail: userInfo.userEmail,
-            path: req.path,
-            method: req.method as any,
-            statusCode: res.statusCode,
-            userAgent: req.headers['user-agent'],
-            ip: origin.ip,
-            requestBody: Object.keys(req.body ?? {}).length ? req.body : undefined,
-            responseTime,
-            // Informações adicionais sobre a origem
-            referer: req.headers.referer,
-            origin: req.headers.origin,
-            xForwardedFor: req.headers['x-forwarded-for'] as string,
-            xRealIp: req.headers['x-real-ip'] as string,
-            host: req.headers.host,
-            acceptLanguage: req.headers['accept-language'],
-          },
-        })
+        .create({ data: logData })
         .catch((err) => {
           console.error('Erro ao salvar log:', err)
         })

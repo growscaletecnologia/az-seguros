@@ -44,22 +44,27 @@ export class QuoteService {
     const startTime = Date.now();
     const requestId = this.generateRequestId();
 
-    this.logger.log(`Starting quote request ${requestId} for ${dto.destination}`);
+  this.logger.log(`Starting quote request ${requestId} for ${dto.destination}`);
+  console.log('[QuoteService] DTO:', dto);
+  console.log('[QuoteService] RequestId:', requestId);
 
     try {
-      await this.validateRequest(dto);
+  await this.validateRequest(dto);
+  console.log('[QuoteService] Request validated');
 
-      const { destination, passengers } = dto;
-      const days = this.calculateDays(dto.travelStart, dto.travelEnd);
-      const avgAge = this.calculateAverageAge(passengers);
-      const ageGroup = this.determineAgeGroup(avgAge);
+  const { destination, passengers } = dto;
+  const days = this.calculateDays(dto.travelStart, dto.travelEnd);
+  const avgAge = this.calculateAverageAge(passengers);
+  const ageGroup = this.determineAgeGroup(avgAge);
+  console.log('[QuoteService] Params:', { destination, passengers, days, avgAge, ageGroup });
 
-      const activeInsurers = await this.getActiveInsurers();
-      const plans: NormalizedPlan[] = [];
-      let successfulInsurers = 0;
-      let failedInsurers = 0;
-      let cacheTime = 0;
-      let externalTime = 0;
+  const activeInsurers = await this.getActiveInsurers();
+  console.log('[QuoteService] Active insurers:', activeInsurers);
+  const plans: NormalizedPlan[] = [];
+  let successfulInsurers = 0;
+  let failedInsurers = 0;
+  let cacheTime = 0;
+  let externalTime = 0;
 
       const results = await Promise.allSettled(
         activeInsurers.map(async (insurer) => {
@@ -74,11 +79,11 @@ export class QuoteService {
           const cacheStartTime = Date.now();
           const cached = await this.cacheService.get<NormalizedPlan[]>(cacheKey);
           cacheTime += Date.now() - cacheStartTime;
-
           if (cached) {
             this.logger.debug(
               `Cache hit for ${insurer.insurerName} - ${requestId}`
             );
+            console.log(`[QuoteService] Cache hit for ${insurer.insurerName}:`, cached);
             plans.push(...cached);
             successfulInsurers++;
             return;
@@ -88,22 +93,25 @@ export class QuoteService {
             const externalStartTime = Date.now();
             const connector = this.getConnector(insurer.id);
             if (!connector) {
+              console.log('[QuoteService] No connector for insurer:', insurer.id);
               failedInsurers++;
               return;
             }
-
+            console.log('[QuoteService] Fetching plans from connector:', connector.constructor.name);
             const insurerPlans = await this.fetchPlansWithRetry(
               connector,
               dto,
               insurer.insurerName ||""
             );
             externalTime += Date.now() - externalStartTime;
-
+            console.log('[QuoteService] External fetch time:', Date.now() - externalStartTime, 'ms');
             if (insurerPlans.length > 0) {
               await this.cacheService.set(cacheKey, insurerPlans);
+              console.log('[QuoteService] Plans fetched and cached:', insurerPlans);
               plans.push(...insurerPlans);
               successfulInsurers++;
             } else {
+              console.log('[QuoteService] No plans returned from connector');
               failedInsurers++;
             }
           } catch (error) {
@@ -112,6 +120,7 @@ export class QuoteService {
               `Error fetching plans from ${insurer.insurerName} - ${requestId}:`,
               error
             );
+            console.log(`[QuoteService] Error fetching plans from ${insurer.insurerName}:`, error);
           }
         })
       );
@@ -143,11 +152,13 @@ export class QuoteService {
       this.logger.log(
         `Completed quote request ${requestId} in ${totalTime}ms with ${successfulInsurers} successful insurers`
       );
+      console.log('[QuoteService] Final response:', response);
 
       return response;
     } catch (error) {
-      this.logger.error(`Error processing quote request ${requestId}:`, error);
-      throw error;
+  this.logger.error(`Error processing quote request ${requestId}:`, error);
+  console.log('[QuoteService] Error:', error);
+  throw error;
     }
   }
 
@@ -177,9 +188,10 @@ export class QuoteService {
     connector: any,
     dto: QuoteRequestDto,
     insurerName: string,
-    attempt = 1
+    attempt = 0
   ): Promise<NormalizedPlan[]> {
     try {
+      console.log( "[fetchPlansWithRetry]", "conector", connector , dto , insurerName)
       return await connector.getPlans(dto);
     } catch (error) {
       if (attempt >= this.maxRetries) {

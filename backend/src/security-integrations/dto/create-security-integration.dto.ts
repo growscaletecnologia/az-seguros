@@ -5,7 +5,7 @@ export class CreateSecurityIntegrationDto {
   @ApiProperty({ description: 'Nome da pergunta de segurança' })
   @IsNotEmpty()
   @IsString()
-  securityName: string
+  insurerName: string
 
   @ApiProperty({ description: 'Tipo de concessão (password, client_credentials, etc.)' })
   @IsNotEmpty()

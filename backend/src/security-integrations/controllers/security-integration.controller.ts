@@ -30,7 +30,6 @@ export class SecurityIntegrationController {
   @ApiOperation({ summary: 'Listar todas as integrações de segurança' })
   @ApiResponse({ status: 200, description: 'Lista de integrações retornada com sucesso' })
   findAll() {
-    console.log("entrou aqui")
     return this.securityIntegrationService.findAll()
   }
 

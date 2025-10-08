@@ -2,7 +2,7 @@ import { api } from '@/lib/api';
 
 export interface SecurityIntegration {
   id?: string;
-  securityName: string;
+  insurerName: string;
   grantType: string;
   clientId: number;
   clientSecret: string;
@@ -19,7 +19,7 @@ export interface SecurityIntegration {
 
 export interface SecurityIntegrationResponse {
   id: string;
-  securityName: string;
+  insurerName: string;
   grantType: string;
   clientId: number;
   clientSecret: string;

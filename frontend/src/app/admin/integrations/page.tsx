@@ -2,7 +2,7 @@
 // import React, { useState } from 'react';
 
 // const IntegrationsPage = () => {
-//   const [securityName, setsecurityName] = useState('');
+//   const [insurerName, setinsurerName] = useState('');
 //   const [token, setToken] = useState('');
 //   const [markup, setMarkup] = useState('');
 //   const [noMarkup, setNoMarkup] = useState(false);
@@ -10,7 +10,7 @@
 //   const handleSubmit = (e: React.FormEvent) => {
 //     e.preventDefault();
 //     console.log({
-//       securityName,
+//       insurerName,
 //       token,
 //       markup: noMarkup ? 'Não configurado' : markup,
 //     });
@@ -25,12 +25,12 @@
 //       <form onSubmit={handleSubmit} className="space-y-5">
 //         <div>
 //           <label className="block text-sm font-medium text-gray-700 mb-1">
-//             Nome da securityName
+//             Nome da insurerName
 //           </label>
 //           <input
 //             type="text"
-//             value={securityName}
-//             onChange={(e) => setsecurityName(e.target.value)}
+//             value={insurerName}
+//             onChange={(e) => setinsurerName(e.target.value)}
 //             required
 //             className="w-full border rounded-lg px-3 py-2 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"
 //             placeholder="Ex: ITA Seguros"
@@ -143,7 +143,7 @@ export default function IntegrationsPage() {
 
 	// form state
 	const [formData, setFormData] = useState<SecurityIntegration>({
-		securityName: "",
+		insurerName: "",
 		grantType: "password",
 		clientId: 0,
 		clientSecret: "",
@@ -158,7 +158,7 @@ export default function IntegrationsPage() {
 
 	const resetForm = () => {
 		setFormData({
-			securityName: "",
+			insurerName: "",
 			grantType: "password",
 			clientId: 0,
 			clientSecret: "",
@@ -208,7 +208,7 @@ export default function IntegrationsPage() {
 						"markUp":dataToSubmit.markUp,
 						"password":dataToSubmit.password,
 						"scope":dataToSubmit.scope,
-						"securityName":dataToSubmit.securityName,
+						"insurerName":dataToSubmit.insurerName,
 						"username":dataToSubmit.username,
 				}
 				// Atualizar integração existente
@@ -260,7 +260,7 @@ export default function IntegrationsPage() {
 		if (!q) return integracoes;
 		return integracoes.filter(
 			(i) =>
-				i.securityName?.toLowerCase().includes(q) ||
+				i.insurerName?.toLowerCase().includes(q) ||
 				i.id?.toLowerCase().includes(q),
 		);
 	}, [integracoes, search]);
@@ -325,7 +325,7 @@ export default function IntegrationsPage() {
 								className="grid grid-cols-12 items-center px-4 py-3"
 							>
 								<div className="col-span-3">
-									<div className="font-medium text-gray-900">{i.securityName}</div>
+									<div className="font-medium text-gray-900">{i.insurerName}</div>
 									<div className="text-xs text-gray-500">{i.id}</div>
 								</div>
 
@@ -433,8 +433,8 @@ export default function IntegrationsPage() {
 								</label>
 								<input
 									type="text"
-									name="securityName"
-									value={formData.securityName}
+									name="insurerName"
+									value={formData.insurerName}
 									onChange={handleInputChange}
 									required
 									className="w-full border rounded-lg px-3 py-2 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"

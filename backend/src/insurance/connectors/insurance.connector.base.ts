@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 import { QuoteRequestDto } from '../dto/quote-request.dto';
 import { NormalizedPlan } from '../dto/normalized-plan.dto';
-import { TokenService } from '../services/token.service';
+//import { TokenService } from '../services/token.service';
 import prisma from 'src/prisma/client';
 
 export abstract class InsuranceConnectorBase {
@@ -11,12 +11,6 @@ export abstract class InsuranceConnectorBase {
   protected axiosInstance: AxiosInstance;
   protected readonly maxRetries = 3;
   protected readonly timeout = 10000; // 10 seconds
-
-  constructor(
-    protected readonly tokenService: TokenService,
-  ) {
-    this.initializeAxios();
-  }
 
   protected initializeAxios(): void {
     this.axiosInstance = axios.create({

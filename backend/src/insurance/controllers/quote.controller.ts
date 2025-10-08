@@ -22,36 +22,34 @@ export class QuoteController {
   @HttpCode(HttpStatus.OK)
   async getQuotes(@Body() dto: QuoteRequestDto): Promise<QuoteResponse> {
     try {
-      // Start timing the request
       const startTime = Date.now();
       this.logger.log(`Received quote request for destination: ${dto.destination}`);
+      console.log('[QuoteController] Request DTO:', dto);
 
-      // Process the request
       const result = await this.quoteService.getQuotes(dto);
+      console.log('[QuoteController] Result from quoteService:', result);
 
-      // Log timing information
       const duration = Date.now() - startTime;
       this.logger.log(
         `Quote request completed in ${duration}ms with ${result.meta.insurers.successful} successful providers`
       );
+      console.log('[QuoteController] Request duration:', duration, 'ms');
 
       return result;
     } catch (error) {
-      // Handle specific error types
+      console.log('[QuoteController] Error:', error);
       if (
         error.message?.includes('validation failed') ||
         error.message?.includes('must be')
       ) {
+        console.log('[QuoteController] BadRequestException:', error.message);
         throw new BadRequestException({
           statusCode: HttpStatus.BAD_REQUEST,
           message: 'Invalid request parameters',
           errors: error.message,
         });
       }
-
-      // Log unexpected errors
       this.logger.error('Error processing quote request:', error);
-
       throw new InternalServerErrorException({
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         message: 'An error occurred while processing your request',
@@ -64,12 +62,12 @@ export class QuoteController {
   @HttpCode(HttpStatus.OK)
   async previewQuotes(@Body() dto: QuoteRequestDto): Promise<QuoteResponse> {
     try {
-      // This endpoint could return cached results only, without hitting external APIs
+      console.log('[QuoteController] Preview request DTO:', dto);
       const result = await this.quoteService.getQuotes({
         ...dto,
         previewMode: true,
       });
-
+      console.log('[QuoteController] Preview result:', result);
       return {
         ...result,
         meta: {
@@ -78,6 +76,7 @@ export class QuoteController {
         },
       };
     } catch (error) {
+      console.log('[QuoteController] Preview error:', error);
       this.logger.error('Error processing preview request:', error);
       throw new BadRequestException('Invalid preview request');
     }
