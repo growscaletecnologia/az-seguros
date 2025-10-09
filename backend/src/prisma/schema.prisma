@@ -414,8 +414,6 @@ model PostMedia {
   @@index([postId])
   @@index([isMain])
 }
-
-
 /**
  * SYSTEM PAGES Model
  * =========================================================
@@ -611,6 +609,8 @@ model InsurerPlan {
   
   securityIntegrationId String?
   securityIntegration   SecurityIntegration? @relation(fields: [securityIntegrationId], references: [id], onDelete: SetNull)
+  
+  coverages PlanCoverage[]
 
   destinies      InsurerPlanDestiny[]
   createdAt      DateTime  @default(now())
@@ -674,4 +674,53 @@ model PlanBenefit {
   longDescription String?  @db.Text
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+}
+
+model Coverage {
+  id             Int            @id @default(autoincrement())
+  title          String
+  name           String
+  slug           String         @unique
+  highlight      String?
+  content        String?        @db.Text
+  displayOrder   Int?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  // Relacionamento reverso
+  planCoverages  PlanCoverage[]
+}
+
+model PlanCoverage {
+  id               Int           @id @default(autoincrement())
+  insurerPlanId    Int           // FK para o plano
+  coverageId       Int           // FK para o tipo de cobertura
+  value            String        // Ex: "80000,00"
+  coverageType     String        // Ex: "USD", "BRL", "INCLUSO"
+
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  // Relacionamentos
+  insurerPlan      InsurerPlan   @relation(fields: [insurerPlanId], references: [id], onDelete: Cascade)
+  coverage         Coverage      @relation(fields: [coverageId], references: [id], onDelete: Cascade)
+
+  @@index([insurerPlanId])
+  @@index([coverageId])
+}
+
+model DollarCotation {
+   id               Int           @id @default(1) // Define o ID como chave primária e valor padrão fixo
+   price            String
+   priceRaw         String
+   createdAt        DateTime      @default(now())
+   updatedAt        DateTime      @updatedAt
+}
+
+model EuroCotation{
+   id               Int            @id @default(1)
+   price            String
+   priceRaw         String
+   createdAt        DateTime      @default(now())
+   updatedAt        DateTime      @updatedAt
 }

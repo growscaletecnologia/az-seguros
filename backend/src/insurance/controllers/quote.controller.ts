@@ -20,18 +20,18 @@ export class QuoteController {
 
   @Post()
   @HttpCode(HttpStatus.OK)
-  async getQuotes(@Body() dto: QuoteRequestDto): Promise<QuoteResponse> {
+  async getQuotes(@Body() dto: QuoteRequestDto): Promise<any[]> {
     try {
       const startTime = Date.now()
-      this.logger.log(`Received quote request for destination: ${dto.destinyGroup}`)
+      this.logger.log(`Received quote request for destination slug: ${dto.slug}`) // Alterado para slug
 
-      const result = await this.quoteService.getQuotes(dto)
+      const result = await this.quoteService.calculateQuote(dto)
       console.log('[QuoteController] Result from quoteService:', result)
 
       const duration = Date.now() - startTime
-      this.logger.log(
-        `Quote request completed in ${duration}ms with ${result.meta.insurers.successful} successful providers`,
-      )
+      // this.logger.log(
+      //   `Quote request completed in ${duration}ms with ${result.meta.insurers.successful} successful providers`,
+      // )
       console.log('[QuoteController] Request duration:', duration, 'ms')
 
       return result
@@ -54,26 +54,4 @@ export class QuoteController {
     }
   }
 
-  @Post('preview')
-  @HttpCode(HttpStatus.OK)
-  async previewQuotes(@Body() dto: QuoteRequestDto): Promise<QuoteResponse> {
-    try {
-      console.log('[QuoteController] Preview request DTO:', dto)
-      const result = await this.quoteService.getQuotes({
-        ...dto,
-      })
-      console.log('[QuoteController] Preview result:', result)
-      return {
-        ...result,
-        meta: {
-          ...result.meta,
-          preview: true,
-        },
-      }
-    } catch (error) {
-      console.log('[QuoteController] Preview error:', error)
-      this.logger.error('Error processing preview request:', error)
-      throw new BadRequestException('Invalid preview request')
-    }
-  }
 }

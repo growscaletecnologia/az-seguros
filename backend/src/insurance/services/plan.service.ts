@@ -152,6 +152,7 @@ export class PlanService {
    */
   private async fetchPlansWithRetry(connector: any, insurerId: string, attempt = 0) {
     try {
+      await connector.getTodayCotation()
       return await connector.getPlans(insurerId)
     } catch (error) {
       if (attempt >= this.maxRetries) throw error

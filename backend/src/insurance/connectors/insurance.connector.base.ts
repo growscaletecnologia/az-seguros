@@ -48,6 +48,7 @@ export abstract class InsuranceConnectorBase {
 
   abstract authenticate(id?: string): Promise<string>
   abstract getPlans(id?: string): Promise<NormalizedPlan[]>
+  abstract getTodayCotation ()
   abstract getCotation(params: QuoteRequestDto, id?: string): Promise<NormalizedPlan[]>
   protected abstract normalizePlans(rawData: any, id?: string): Promise<NormalizedPlan[]>
 

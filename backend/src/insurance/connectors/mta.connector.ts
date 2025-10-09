@@ -5,7 +5,8 @@ import { NormalizedPlan } from '../dto/normalized-plan.dto'
 import prisma from 'src/prisma/client'
 import { TokenService } from '../services/token.service'
 import { BadRequestError } from 'src/common/errors/http-errors'
-import { HeroAgeGroup, HeroDestiny, HeroPlan } from 'src/types/types'
+import { InsurerAgeGroup, InsurerDestiny, InsurerPlan } from 'src/types/types'
+import { InsurerCodeEnum } from '@prisma/client'
 
 @Injectable()
 export class MTAConnector extends InsuranceConnectorBase {
@@ -84,12 +85,12 @@ export class MTAConnector extends InsuranceConnectorBase {
       this.initializeAxios()
 
       if (!credentials.accessToken) {
-        console.log('[HEROConnector] No accessToken, authenticating...')
+        console.log('[MTAConnector] No accessToken, authenticating...')
         credentials.accessToken = await this.authenticate(id)
       }
 
       const fullPlansUrl = `${fullBaseUrl}getPlans`
-      console.log('[HEROConnector] fullPlansUrl:', fullPlansUrl)
+      console.log('[MTAConnector] fullPlansUrl:', fullPlansUrl)
 
       try {
         if (!credentials.accessToken) throw new BadRequestError('No accessToken found')
@@ -105,103 +106,364 @@ export class MTAConnector extends InsuranceConnectorBase {
 
         // 🔹 Sincronização com o banco de dados
 
-        for (const plan of plansArray as HeroPlan[]) {
-          const existingPlan = await prisma.insurerPlan.findFirst({
-            where: { externalId: plan.id, securityIntegrationId: credentials.id },
-            include: { destinies: { include: { ageGroups: true } } },
-          })
+        // for (const plan of plansArray as InsurerPlan[]) {
+        //   const existingPlan = await prisma.insurerPlan.findFirst({
+        //     where: { externalId: plan.id, securityIntegrationId: credentials.id },
+        //     include: { destinies: { include: { ageGroups: true } } },
+        //   })
 
-          if (!existingPlan) {
-            await prisma.insurerPlan.create({
+        //   if (!existingPlan) {
+        //     await prisma.insurerPlan.create({
+        //       data: {
+        //         externalId: plan.id,
+        //         additionalId: plan.additional_id,
+        //         ref: plan.ref,
+        //         slug: plan.slug,
+        //         is: plan.is,
+        //         isShow: plan.is_show,
+        //         name: plan.name,
+        //         multitrip: Boolean(plan.multitrip),
+        //         securityIntegrationId: credentials.id,
+        //         destinies: {
+        //           create: plan.destinies.map((dest: HeroDestiny) => ({
+        //             name: dest.destiny.name,
+        //             slug: dest.destiny.slug,
+        //             displayOrder: dest.destiny.display_order,
+        //             destinyCode: dest.destiny.destiny_code,
+        //             crmBonusValue: dest.destiny.crm_bonus_value,
+        //             ageGroups: {
+        //               create: dest.age.map((a: HeroAgeGroup) => ({
+        //                 start: a.start,
+        //                 end: a.end,
+        //                 price: parseFloat(a.price.replace(',', '.')),
+        //                 priceIof: parseFloat(a.price_iof),
+        //               })),
+        //             },
+        //           })),
+        //         },
+        //       },
+        //     })
+        //     console.log(`[DB] Plano ${plan.name} criado.`)
+        //   } else {
+        //     // 👉 Plano já existe — vamos comparar as faixas etárias
+        //     let needsUpdate = false
+
+        //     for (const dest of plan.destinies) {
+        //       const existingDest = existingPlan.destinies.find((d) => d.slug === dest.destiny.slug)
+        //       if (!existingDest) {
+        //         needsUpdate = true
+        //         break
+        //       }
+
+        //       const newAges = dest.age.map((a: any) => ({
+        //         start: a.start,
+        //         end: a.end,
+        //         price: parseFloat(a.price.replace(',', '.')),
+        //         priceIof: parseFloat(a.price_iof),
+        //       }))
+
+        //       const oldAges = existingDest.ageGroups.map((ag) => ({
+        //         start: ag.start,
+        //         end: ag.end,
+        //         price: parseFloat(ag.price.toString()),
+        //         priceIof: parseFloat(ag.priceIof?.toString() || '0'),
+        //       }))
+
+        //       const diff = JSON.stringify(newAges) !== JSON.stringify(oldAges)
+        //       if (diff) {
+        //         needsUpdate = true
+        //         // atualiza os valores dessa faixa
+        //         await prisma.insurerPlanAgeGroup.deleteMany({
+        //           where: { insurerPlanDestinyId: existingDest.id },
+        //         })
+        //         await prisma.insurerPlanAgeGroup.createMany({
+        //           data: newAges.map((a) => ({
+        //             insurerPlanDestinyId: existingDest.id,
+        //             start: a.start,
+        //             end: a.end,
+        //             price: a.price,
+        //             priceIof: a.priceIof,
+        //           })),
+        //         })
+        //         console.log(`[DB] Atualizado valores de idade para destino ${existingDest.slug}`)
+        //       }
+        //     }
+
+        //     if (!needsUpdate) {
+        //       console.log(`[DB] Plano ${plan.name} sem alterações, ignorado.`)
+        //     }
+        //   }
+        // }
+  for (const plan of plansArray as InsurerPlan[]) {
+    const existingPlan = await prisma.insurerPlan.findFirst({
+      where: { externalId: plan.id, securityIntegrationId: credentials.id },
+      include: {
+        destinies: { include: { ageGroups: true } },
+        coverages: { include: { coverage: true } },
+      },
+    })
+
+    if (!existingPlan) {
+      // 🔹 Cria o plano novo
+      const createdPlan = await prisma.insurerPlan.create({
+        data: {
+          externalId: plan.id,
+          additionalId: plan.additional_id,
+          ref: plan.ref,
+          slug: plan.slug,
+          is: plan.is,
+          isShow: plan.is_show,
+          name: plan.name,
+          multitrip: Boolean(plan.multitrip),
+          securityIntegrationId: credentials.id,
+          destinies: {
+            create: plan.destinies.map((dest: InsurerDestiny) => ({
+              name: dest.destiny.name,
+              slug: dest.destiny.slug,
+              displayOrder: dest.destiny.display_order,
+              destinyCode: dest.destiny.destiny_code,
+              crmBonusValue: dest.destiny.crm_bonus_value,
+              ageGroups: {
+                create: dest.age.map((a: InsurerAgeGroup) => ({
+                  start: a.start,
+                  end: a.end,
+                  price: parseFloat(a.price.replace(',', '.')),
+                  priceIof: parseFloat(a.price_iof),
+                })),
+              },
+            })),
+          },
+        },
+      })
+      console.log(`[DB] Plano ${plan.name} criado.`)
+
+      // 🔹 Cria as coberturas (se existirem)
+      if (plan.coverages && plan.coverages.length > 0) {
+        for (const c of plan.coverages) {
+          const cov = c.coverage
+          if (!cov?.slug) continue
+
+          // verifica se a cobertura já existe
+          let coverage = await prisma.coverage.findUnique({ where: { slug: cov.slug } })
+          if (!coverage) {
+            coverage = await prisma.coverage.create({
               data: {
-                externalId: plan.id,
-                additionalId: plan.additional_id,
-                ref: plan.ref,
-                slug: plan.slug,
-                is: plan.is,
-                isShow: plan.is_show,
-                name: plan.name,
-                multitrip: Boolean(plan.multitrip),
-                securityIntegrationId: credentials.id,
-                destinies: {
-                  create: plan.destinies.map((dest: HeroDestiny) => ({
-                    name: dest.destiny.name,
-                    slug: dest.destiny.slug,
-                    displayOrder: dest.destiny.display_order,
-                    destinyCode: dest.destiny.destiny_code,
-                    crmBonusValue: dest.destiny.crm_bonus_value,
-                    ageGroups: {
-                      create: dest.age.map((a: HeroAgeGroup) => ({
-                        start: a.start,
-                        end: a.end,
-                        price: parseFloat(a.price.replace(',', '.')),
-                        priceIof: parseFloat(a.price_iof),
-                      })),
-                    },
-                  })),
-                },
+                title: cov.title || cov.name,
+                name: cov.name,
+                slug: cov.slug,
+                highlight: cov.highlight,
+                content: cov.content,
+                displayOrder: cov.display_order,
               },
             })
-            console.log(`[DB] Plano ${plan.name} criado.`)
-          } else {
-            // 👉 Plano já existe — vamos comparar as faixas etárias
-            let needsUpdate = false
+            console.log(`[DB] Coverage ${cov.name} criada.`)
+          }
 
-            for (const dest of plan.destinies) {
-              const existingDest = existingPlan.destinies.find((d) => d.slug === dest.destiny.slug)
-              if (!existingDest) {
-                needsUpdate = true
-                break
-              }
+          // cria o vínculo com o plano
+          await prisma.planCoverage.create({
+            data: {
+              insurerPlanId: createdPlan.id,
+              coverageId: coverage.id,
+              value: c.is,
+              coverageType: c.coverage_type,
+            },
+          })
+        }
+      }
+    } else {
+      // 🔹 Plano já existe — atualiza se necessário
+      let needsUpdate = false
 
-              const newAges = dest.age.map((a: any) => ({
-                start: a.start,
-                end: a.end,
-                price: parseFloat(a.price.replace(',', '.')),
-                priceIof: parseFloat(a.price_iof),
-              }))
+      // verifica atualizações nas faixas etárias
+      for (const dest of plan.destinies) {
+        const existingDest = existingPlan.destinies.find((d) => d.slug === dest.destiny.slug)
+        if (!existingDest) {
+          needsUpdate = true
+          break
+        }
 
-              const oldAges = existingDest.ageGroups.map((ag) => ({
-                start: ag.start,
-                end: ag.end,
-                price: parseFloat(ag.price.toString()),
-                priceIof: parseFloat(ag.priceIof?.toString() || '0'),
-              }))
+        const newAges = dest.age.map((a: any) => ({
+          start: a.start,
+          end: a.end,
+          price: parseFloat(a.price.replace(',', '.')),
+          priceIof: parseFloat(a.price_iof),
+        }))
 
-              const diff = JSON.stringify(newAges) !== JSON.stringify(oldAges)
-              if (diff) {
-                needsUpdate = true
-                // atualiza os valores dessa faixa
-                await prisma.insurerPlanAgeGroup.deleteMany({
-                  where: { insurerPlanDestinyId: existingDest.id },
-                })
-                await prisma.insurerPlanAgeGroup.createMany({
-                  data: newAges.map((a) => ({
-                    insurerPlanDestinyId: existingDest.id,
-                    start: a.start,
-                    end: a.end,
-                    price: a.price,
-                    priceIof: a.priceIof,
-                  })),
-                })
-                console.log(`[DB] Atualizado valores de idade para destino ${existingDest.slug}`)
-              }
-            }
+        const oldAges = existingDest.ageGroups.map((ag) => ({
+          start: ag.start,
+          end: ag.end,
+          price: parseFloat(ag.price.toString()),
+          priceIof: parseFloat(ag.priceIof?.toString() || '0'),
+        }))
 
-            if (!needsUpdate) {
-              console.log(`[DB] Plano ${plan.name} sem alterações, ignorado.`)
-            }
+        const diff = JSON.stringify(newAges) !== JSON.stringify(oldAges)
+        if (diff) {
+          needsUpdate = true
+          await prisma.insurerPlanAgeGroup.deleteMany({
+            where: { insurerPlanDestinyId: existingDest.id },
+          })
+          await prisma.insurerPlanAgeGroup.createMany({
+            data: newAges.map((a) => ({
+              insurerPlanDestinyId: existingDest.id,
+              start: a.start,
+              end: a.end,
+              price: a.price,
+              priceIof: a.priceIof,
+            })),
+          })
+          console.log(`[DB] Atualizado valores de idade para destino ${existingDest.slug}`)
+        }
+      }
+
+      // 🔹 Atualiza ou insere coberturas (se vierem)
+      if (plan.coverages && plan.coverages.length > 0) {
+        for (const c of plan.coverages) {
+          const cov = c.coverage
+          if (!cov?.slug) continue
+
+          // procura cobertura no catálogo
+          let coverage = await prisma.coverage.findUnique({ where: { slug: cov.slug } })
+          if (!coverage) {
+            coverage = await prisma.coverage.create({
+              data: {
+                title: cov.title || cov.name,
+                name: cov.name,
+                slug: cov.slug,
+                highlight: cov.highlight,
+                content: cov.content,
+                displayOrder: cov.display_order,
+              },
+            })
+            console.log(`[DB] Coverage ${cov.name} criada.`)
+          }
+
+          // verifica se o plano já possui essa cobertura
+          const existingCoverage = existingPlan.coverages.find((pc) => pc.coverage.slug === cov.slug)
+
+          if (!existingCoverage) {
+            await prisma.planCoverage.create({
+              data: {
+                insurerPlanId: existingPlan.id,
+                coverageId: coverage.id,
+                value: c.is,
+                coverageType: c.coverage_type,
+              },
+            })
+            console.log(`[DB] Coverage ${cov.name} vinculada ao plano ${existingPlan.name}`)
+          } else if (
+            existingCoverage.value !== c.is ||
+            existingCoverage.coverageType !== c.coverage_type
+          ) {
+            await prisma.planCoverage.update({
+              where: { id: existingCoverage.id },
+              data: {
+                value: c.is,
+                coverageType: c.coverage_type,
+              },
+            })
+            console.log(`[DB] Coverage ${cov.name} atualizada para plano ${existingPlan.name}`)
           }
         }
+      }
+
+    if (!needsUpdate) {
+      console.log(`[DB] Plano ${plan.name} sem alterações relevantes.`)
+    }
+  }
+}
+
 
         // Normalização continua igual
         const processedData = { plans: plansArray, metadata: data.metadata || {} }
         const normalizedPlans = this.normalizePlans(processedData, credentials.id)
+
+        await this.getTodayCotation()
+
         return normalizedPlans
       } catch (err) {
-        console.error('[HEROConnector] Error during getPlans:', err)
+        console.error('[MTAConnector] Error during getPlans:', err)
         throw err
       }
+    })
+  }
+
+  async getTodayCotation() {
+    console.log('[CURRENCYCONECTOR] - querying data...')
+    return this.withErrorHandling(async () => {
+         const credentials = await prisma.securityIntegration.findFirst({where: {insurerCode: InsurerCodeEnum.mta}})
+      if (!credentials) throw new Error('mta credentials not found')
+
+      const fullBaseUrl = credentials.baseUrl
+      if (!fullBaseUrl) throw new Error('baseUrl is not defined in credentials')
+
+      this.initializeAxios()
+
+      if (!credentials.accessToken) {
+        console.log('[MTAConnector] No accessToken, authenticating...')
+        credentials.accessToken = await this.authenticate(credentials.id)
+      }
+
+      const fullPlansUrl = `${fullBaseUrl}getCotationUsd`
+      console.log('[MTAConnector] fullPlansUrl:', fullPlansUrl)
+
+      try {
+        if (!credentials.accessToken) throw new BadRequestError('No accessToken found')
+
+        const { data } = await this.axiosInstance.get(fullPlansUrl, {
+          headers: {
+            Authorization: `Bearer ${credentials.accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        })
+        console.log(data)
+        console.log('[CURRENCYCONECTOR] - upsertting data')
+        await prisma.dollarCotation.upsert({
+          where: {
+            id: 1, // Supondo que o registro tenha um ID fixo (por exemplo, 1)
+          },
+          update: {
+            price: data.data?.price || '0.00',
+            priceRaw: data.data?.price_raw || '0',
+            updatedAt: new Date(),
+          },
+          create: {
+            id: 1, // Certifique-se de que o ID seja único
+            price: data.data?.price || '0.00',
+            priceRaw: data.data?.price_raw || '0',
+            updatedAt: new Date(),
+          },
+        })
+
+         const EuroUrl = `${fullBaseUrl}getCotationEur`
+         const { data:euroData } = await this.axiosInstance.get(EuroUrl, {
+          headers: {
+            Authorization: `Bearer ${credentials.accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        })
+
+        await prisma.euroCotation.upsert({
+          where: {
+            id: 1, // Supondo que o registro tenha um ID fixo (por exemplo, 1)
+          },
+          update: {
+            price: euroData?.data?.price || '0.00',
+            priceRaw: euroData?.data?.price_raw || '0',
+            updatedAt: new Date(),
+          },
+          create: {
+            id: 1, // Certifique-se de que o ID seja único
+            price: euroData?.data?.price || '0.00',
+            priceRaw: euroData?.data?.price_raw || '0',
+            updatedAt: new Date(),
+          },
+        })
+      } catch (err) {
+        console.error('[MTAConnector] Error during getPlans:', err)
+        throw err
+      }
+
+      
     })
   }
   protected async normalizePlans(

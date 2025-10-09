@@ -8,6 +8,7 @@ import {
   IsBoolean,
 } from 'class-validator'
 import { Type } from 'class-transformer'
+import { IsAfterOrEqualToday } from 'src/common/validators/is-after-or-equal-today.validator'
 
 class PassengerDto {
   @IsString()
@@ -22,22 +23,25 @@ export class QuoteRequestDto {
   dateFormat: string
 
   @IsOptional()
+  @IsBoolean()
   multitrip?: boolean
 
   @IsOptional()
   multitrip_days?: number
 
   @IsDateString()
+  @IsAfterOrEqualToday({ message: 'A data de partida deve ser hoje ou posterior.' })
   departure: string
 
   @IsDateString()
+  @IsAfterOrEqualToday({ message: 'A data de chegada deve ser hoje ou posterior.' })
   arrival: string
 
   @IsString()
-  destinyGroup: string
+  slug: string 
 
-  @IsBoolean()
   @IsOptional()
+  @IsBoolean()
   priceDetails?: boolean
 
   @IsArray()
@@ -45,11 +49,4 @@ export class QuoteRequestDto {
   @ValidateNested({ each: true })
   @Type(() => PassengerDto)
   passengers: PassengerDto[]
-
-  // @IsString()
-  // @IsOptional()
-  // currency?: string
-
-  // @IsOptional()
-  // previewMode?: boolean
 }

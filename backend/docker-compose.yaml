@@ -24,7 +24,7 @@ services:
       - az_network
 
   redis:
-    image: redis:7-alpine
+    image: redis:8.2.2-alpine
     container_name: az_redis
     restart: unless-stopped
     command: ["redis-server", "--appendonly", "yes", "--save", "60", "1"]
