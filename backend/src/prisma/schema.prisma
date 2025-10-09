@@ -543,9 +543,9 @@ enum InsurerCodeEnum {
 
 model SecurityIntegration {
   id              String   @id @default(cuid())
-  insurerName     String? @default("")
+  insurerName     String?  @default("")
   insurerCode     InsurerCodeEnum?
-  baseUrl         String? @default("")
+  baseUrl         String?  @default("")
   authUrl         String?
   grantType       String
   clientId        Int
@@ -562,8 +562,10 @@ model SecurityIntegration {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  InsuranceCache InsuranceCache[]
+  InsuranceCache  InsuranceCache[]
   InsurerProvider InsurerProvider?
+
+  plans           InsurerPlan[]
 }
 
 model InsuranceCache {
@@ -577,7 +579,6 @@ model InsuranceCache {
   updatedAt   DateTime @default(now())
 
   insurer SecurityIntegration @relation(fields: [insurerId], references: [id], onDelete: Cascade)
-
   @@index([insurerId])
   @@index([destination])
 }
@@ -597,65 +598,80 @@ model InsurerProvider {
 
 
 model InsurerPlan {
-  id            Int                 @id @default(autoincrement()) // ID numérico para o plano
-  additionalId  Int                 @default(0)                  // ID adicional
-  ref           String              // Referência do plano
-  slug          String              @unique                      // Slug único do plano
-  is            String              // Valor do plano (ex.: "8000000")
-  isShow        String              // Valor formatado para exibição (ex.: "80000,00")
-  name          String              // Nome do plano
-  multitrip     Boolean             @default(false)              // Indica se é multitrip
-  destinies     InsurerPlanDestiny[]                             // Relacionamento com destinos
-  createdAt     DateTime            @default(now())              // Data de criação
-  updatedAt     DateTime            @updatedAt                   // Data de atualização
+  id             Int       @id @default(autoincrement())
+  externalId     Int?
+  additionalId   Int?      @default(0)
+  ref            String
+  slug           String    @unique
+  is             String
+  isShow         String
+  name           String
+  multitrip      Boolean   @default(false)
+
+  
+  securityIntegrationId String?
+  securityIntegration   SecurityIntegration? @relation(fields: [securityIntegrationId], references: [id], onDelete: SetNull)
+
+  destinies      InsurerPlanDestiny[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([securityIntegrationId])
 }
 
+
 model InsurerPlanDestiny {
-  id             Int                 @id @default(autoincrement()) // ID numérico para o destino
-  insurerPlanId  Int                                                // ID do plano pai
-  destinyId      Int                                                // ID do destino
-  name           String                                              // Nome do destino
-  slug           String                                              // Slug do destino
-  displayOrder   Int                                                // Ordem de exibição
-  destinyCode    String                                              // Código do destino
-  crmBonusValue  Int                                                // Valor bônus do CRM
-  ageGroups      InsurerPlanAgeGroup[]                              // Relacionamento com faixas etárias
-  createdAt      DateTime            @default(now())                // Data de criação
-  updatedAt      DateTime            @updatedAt                     // Data de atualização
+  id             Int                 @id @default(autoincrement())
+  insurerPlanId  Int
+  destinyId      Int?
+  name           String
+  slug           String
+  displayOrder   Int
+  destinyCode    String
+  crmBonusValue  Float
+  ageGroups      InsurerPlanAgeGroup[]
+
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
 
   insurerPlan    InsurerPlan         @relation(fields: [insurerPlanId], references: [id], onDelete: Cascade)
+  destiny        Destiny?            @relation(fields: [destinyId], references: [id], onDelete: SetNull)
 }
 
 model InsurerPlanAgeGroup {
-  id             Int                 @id @default(autoincrement()) // ID numérico para a faixa etária
-  insurerPlanDestinyId Int                                           // ID do destino pai
-  start          Int                                                // Idade inicial
-  end            Int                                                // Idade final
-  price          Float                                               // Preço
-  priceIof       Float                                               // IOF do preço
-  createdAt      DateTime            @default(now())                // Data de criação
-  updatedAt      DateTime            @updatedAt                     // Data de atualização
+  id                    Int                 @id @default(autoincrement())
+  insurerPlanDestinyId  Int
+  start                 Int
+  end                   Int
+  price                 Decimal             @db.Decimal(10, 2)
+  priceIof              Decimal?            @db.Decimal(10, 6)
 
-  insurerPlanDestiny InsurerPlanDestiny @relation(fields: [insurerPlanDestinyId], references: [id], onDelete: Cascade)
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+
+  insurerPlanDestiny    InsurerPlanDestiny  @relation(fields: [insurerPlanDestinyId], references: [id], onDelete: Cascade)
 }
 
-
 model Destiny {
-  id           Int      @id @default(autoincrement()) // ID numérico do destino
-  name         String                                   // Nome do destino
-  slug         String   @unique                        // Slug único do destino
-  displayOrder Int                                     // Ordem de exibição
-  destinyCode  String                                  // Código do destino
-  createdAt    DateTime @default(now())                // Data de criação
-  updatedAt    DateTime @updatedAt                     // Data de atualização
+  id             Int        @id @default(autoincrement())
+  externalId     Int?       // id vindo da seguradora
+  name           String
+  slug           String     @unique
+  displayOrder   Int
+  destinyCode    String
+  crmBonusValue  Float?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  plans          InsurerPlanDestiny[]
 }
 
 model PlanBenefit {
-  id              Int      @id @default(autoincrement()) // ID numérico do benefício
-  code            String                                   // Código do benefício
-  categoryName    String                                   // Nome da categoria (ex.: "Coberturas Médicas")
-  name            String                                   // Nome do benefício
-  longDescription String?  @db.Text                       // Descrição longa do benefício
-  createdAt       DateTime @default(now())                // Data de criação
-  updatedAt       DateTime @updatedAt                     // Data de atualização
+  id              Int      @id @default(autoincrement())
+  code            String
+  categoryName    String
+  name            String
+  longDescription String?  @db.Text
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }

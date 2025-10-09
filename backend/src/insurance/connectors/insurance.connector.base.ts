@@ -6,15 +6,11 @@ import prisma from 'src/prisma/client'
 import { TokenService } from '../services/token.service'
 
 export abstract class InsuranceConnectorBase {
-
   protected axiosInstance: AxiosInstance
   protected readonly maxRetries = 1
   protected readonly timeout = 10000 // 10 seconds
 
-   constructor(
-      public tokenService: TokenService,
-    ) {}
-  
+  constructor(public tokenService: TokenService) {}
 
   protected initializeAxios(): void {
     this.axiosInstance = axios.create({
@@ -50,10 +46,10 @@ export abstract class InsuranceConnectorBase {
     )
   }
 
-  abstract authenticate(id?:string): Promise<string>
-  abstract getPlans(params: QuoteRequestDto, id?:string): Promise<NormalizedPlan[]>
-  abstract getCotation(params: QuoteRequestDto, id?:string): Promise<NormalizedPlan[]>
-  protected abstract normalizePlans(rawData: any , id?:string): Promise<NormalizedPlan[]>
+  abstract authenticate(id?: string): Promise<string>
+  abstract getPlans(id?: string): Promise<NormalizedPlan[]>
+  abstract getCotation(params: QuoteRequestDto, id?: string): Promise<NormalizedPlan[]>
+  protected abstract normalizePlans(rawData: any, id?: string): Promise<NormalizedPlan[]>
 
   protected shouldRetry(error: any): boolean {
     // Retry on network errors and 5xx responses
@@ -74,7 +70,10 @@ export abstract class InsuranceConnectorBase {
     }
   }
 
-  protected async applyMarkup(plans: NormalizedPlan[], insurerId: string): Promise<NormalizedPlan[]> {
+  protected async applyMarkup(
+    plans: NormalizedPlan[],
+    insurerId: string,
+  ): Promise<NormalizedPlan[]> {
     const insurer = await prisma.securityIntegration.findFirst({
       where: { id: insurerId },
       select: { markUp: true },
@@ -83,7 +82,7 @@ export abstract class InsuranceConnectorBase {
     if (!insurer?.markUp) {
       return plans
     }
- 
+
     //@ts-ignore
     return plans.map((plan) => ({
       ...plan,

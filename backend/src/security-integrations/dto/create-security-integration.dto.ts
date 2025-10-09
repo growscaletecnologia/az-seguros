@@ -57,7 +57,7 @@ export class CreateSecurityIntegrationDto {
   @IsOptional()
   @IsString()
   authUrl?: string
-  
+
   @ApiProperty({ description: 'Código da Seguradora', required: false })
   @IsOptional()
   @IsString()

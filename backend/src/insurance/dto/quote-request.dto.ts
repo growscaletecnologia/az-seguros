@@ -18,7 +18,6 @@ class PassengerDto {
 }
 
 export class QuoteRequestDto {
-  
   @IsString()
   dateFormat: string
 
@@ -53,6 +52,4 @@ export class QuoteRequestDto {
 
   // @IsOptional()
   // previewMode?: boolean
-
-
 }

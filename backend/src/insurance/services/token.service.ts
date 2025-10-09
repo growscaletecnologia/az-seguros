@@ -110,14 +110,19 @@ export class TokenService implements OnModuleInit {
     refreshToken?: string,
     expiresIn?: number,
   ): Promise<void> {
-    console.log("chamou aqui")
-    console.log("fileds to update", {
-      accessToken,
-      refreshToken,
-      expiresIn,
-    } , "id", insurerId)
+    console.log('chamou aqui')
+    console.log(
+      'fileds to update',
+      {
+        accessToken,
+        refreshToken,
+        expiresIn,
+      },
+      'id',
+      insurerId,
+    )
     try {
-        await prisma.securityIntegration.update({
+      await prisma.securityIntegration.update({
         where: { id: insurerId },
         data: {
           accessToken: accessToken,

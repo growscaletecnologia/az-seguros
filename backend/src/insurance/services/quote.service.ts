@@ -37,9 +37,9 @@ export class QuoteService {
   private readonly defaultCurrency = 'BRL'
 
   constructor(
-    private readonly cacheService:  CacheService,
+    private readonly cacheService: CacheService,
     private readonly heroConnector: HeroConnector,
-    private readonly mtaConnector:  MTAConnector,
+    private readonly mtaConnector: MTAConnector,
     private readonly configService: ConfigService,
   ) {}
 
@@ -97,11 +97,7 @@ export class QuoteService {
               return
             }
             console.log('[QuoteService] Fetching plans from connector:', connector.constructor.name)
-            const insurerPlans = await this.fetchPlansWithRetry(
-              connector,
-              dto,
-              insurer.id ,
-            )
+            const insurerPlans = await this.fetchPlansWithRetry(connector, dto, insurer.id)
             externalTime += Date.now() - externalStartTime
             console.log('[QuoteService] External fetch time:', Date.now() - externalStartTime, 'ms')
             if (insurerPlans.length > 0) {
@@ -161,29 +157,29 @@ export class QuoteService {
     }
   }
 
-  async setContation(dto:QuoteRequestDto): Promise<any>{
-      const startTime = Date.now()
-      const requestId = this.generateRequestId()
-      this.logger.log(`Starting quote request ${requestId} for ${dto.destinyGroup}`)
+  async setContation(dto: QuoteRequestDto): Promise<any> {
+    const startTime = Date.now()
+    const requestId = this.generateRequestId()
+    this.logger.log(`Starting quote request ${requestId} for ${dto.destinyGroup}`)
 
-     try {
-        await this.validateRequest(dto)
-        console.log('[QuoteService] Request validated')
-        
-        const { destinyGroup, passengers } = dto
-        const days = this.calculateDays(dto.departure, dto.arrival)
-        const avgAge = this.calculateAverageAge(passengers)
-        const ageGroup = this.determineAgeGroup(avgAge)
+    try {
+      await this.validateRequest(dto)
+      console.log('[QuoteService] Request validated')
 
-        const activeInsurers = await this.getActiveInsurers()
-        console.log('[QuoteService] Active insurers:', activeInsurers)
-        const plans: NormalizedPlan[] = []
-        let successfulInsurers = 0
-        let failedInsurers = 0
-        let cacheTime = 0
-        let externalTime = 0
+      const { destinyGroup, passengers } = dto
+      const days = this.calculateDays(dto.departure, dto.arrival)
+      const avgAge = this.calculateAverageAge(passengers)
+      const ageGroup = this.determineAgeGroup(avgAge)
 
-         const results = await Promise.allSettled(
+      const activeInsurers = await this.getActiveInsurers()
+      console.log('[QuoteService] Active insurers:', activeInsurers)
+      const plans: NormalizedPlan[] = []
+      let successfulInsurers = 0
+      let failedInsurers = 0
+      let cacheTime = 0
+      let externalTime = 0
+
+      const results = await Promise.allSettled(
         activeInsurers.map(async (insurer) => {
           const cacheKey = this.cacheService.generateQuoteKey({
             destinyGroup,
@@ -213,11 +209,7 @@ export class QuoteService {
               return
             }
             console.log('[QuoteService] Fetching plans from connector:', connector.constructor.name)
-            const insurerPlans = await this.fetchPlansWithRetry(
-              connector,
-              dto,
-              insurer.id ,
-            )
+            const insurerPlans = await this.fetchPlansWithRetry(connector, dto, insurer.id)
             externalTime += Date.now() - externalStartTime
             console.log('[QuoteService] External fetch time:', Date.now() - externalStartTime, 'ms')
             if (insurerPlans.length > 0) {
@@ -239,7 +231,7 @@ export class QuoteService {
           }
         }),
       )
-      
+
       const totalTime = Date.now() - startTime
 
       const response: QuoteResponse = {
@@ -275,7 +267,6 @@ export class QuoteService {
       console.log('[QuoteService] Error:', error)
       throw error
     }
- 
   }
 
   private async validateRequest(dto: QuoteRequestDto): Promise<void> {
@@ -307,7 +298,7 @@ export class QuoteService {
     attempt = 0,
   ): Promise<NormalizedPlan[]> {
     try {
-      return await connector.getCotation(dto, insurerId) 
+      return await connector.getCotation(dto, insurerId)
     } catch (error) {
       if (attempt >= this.maxRetries) {
         throw error
@@ -322,9 +313,9 @@ export class QuoteService {
   }
 
   private getConnector(insurerCode: string) {
-    if (insurerCode === "hero") {
+    if (insurerCode === 'hero') {
       return this.heroConnector
-    } else if (insurerCode === "mta") {
+    } else if (insurerCode === 'mta') {
       return this.mtaConnector
     } else {
       throw new Error(`No connector found for insurer code: ${insurerCode}`)

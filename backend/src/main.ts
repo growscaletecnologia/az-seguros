@@ -9,8 +9,7 @@ import helmet from 'helmet'
 import { NestExpressApplication } from '@nestjs/platform-express'
 import { join } from 'path'
 
-
-process.env.TZ = process.env.TZ || 'America/Sao_Paulo'; // Define o fuso horário padrão
+process.env.TZ = process.env.TZ || 'America/Sao_Paulo' // Define o fuso horário padrão
 
 function normalizeOrigins(envVal?: string | string[]) {
   if (!envVal) return []
