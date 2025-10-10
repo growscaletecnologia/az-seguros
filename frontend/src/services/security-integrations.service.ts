@@ -1,38 +1,6 @@
 import { api } from '@/lib/api';
+import { SecurityIntegration } from '@/types/types';
 
-export interface SecurityIntegration {
-  id?: string;
-  insurerName: string;
-  grantType: string;
-  clientId: number;
-  clientSecret: string;
-  username: string;
-  password: string;
-  scope?: string;
-  ativa?: boolean;
-  markUp?: number | null;
-  refreshToken?: string;
-  expiresIn?: number;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
-export interface SecurityIntegrationResponse {
-  id: string;
-  insurerName: string;
-  grantType: string;
-  clientId: number;
-  clientSecret: string;
-  username: string;
-  password: string;
-  scope?: string;
-  ativa: boolean;
-  markUp?: number;
-  refreshToken?: string;
-  expiresIn?: number;
-  createdAt: string;
-  updatedAt: string;
-}
 
 const BASE_URL = '/security-integrations';
 
@@ -40,9 +8,9 @@ const BASE_URL = '/security-integrations';
  * Busca todas as integrações de segurança
  * @returns Lista de integrações de segurança
  */
-export async function getAllSecurityIntegrations(): Promise<SecurityIntegrationResponse[]> {
-  const response = await api.get<SecurityIntegrationResponse[]>(BASE_URL);
-  return response.data;
+export async function getAllSecurityIntegrations(): Promise<SecurityIntegration[]> {
+  const response = await api.get<SecurityIntegration[]>(BASE_URL)
+  return response.data
 }
 
 /**
@@ -50,9 +18,9 @@ export async function getAllSecurityIntegrations(): Promise<SecurityIntegrationR
  * @param id ID da integração
  * @returns Dados da integração de segurança
  */
-export async function getSecurityIntegrationById(id: string): Promise<SecurityIntegrationResponse> {
-  const response = await api.get<SecurityIntegrationResponse>(`${BASE_URL}/${id}`);
-  return response.data;
+export async function getSecurityIntegrationById(id: string): Promise<SecurityIntegration> {
+  const response = await api.get<SecurityIntegration>(`${BASE_URL}/${id}`)
+  return response.data
 }
 
 /**
@@ -60,9 +28,9 @@ export async function getSecurityIntegrationById(id: string): Promise<SecurityIn
  * @param data Dados da nova integração
  * @returns Integração criada
  */
-export async function createSecurityIntegration(data: SecurityIntegration): Promise<SecurityIntegrationResponse> {
-  const response = await api.post<SecurityIntegrationResponse>(BASE_URL, data);
-  return response.data;
+export async function createSecurityIntegration(data: SecurityIntegration): Promise<SecurityIntegration> {
+  const response = await api.post<SecurityIntegration>(BASE_URL, data)
+  return response.data
 }
 
 /**
@@ -71,9 +39,9 @@ export async function createSecurityIntegration(data: SecurityIntegration): Prom
  * @param data Dados a serem atualizados
  * @returns Integração atualizada
  */
-export async function updateSecurityIntegration(id: string, data: Partial<SecurityIntegration>): Promise<SecurityIntegrationResponse> {
-  const response = await api.patch<SecurityIntegrationResponse>(`${BASE_URL}/${id}`, data);
-  return response.data;
+export async function updateSecurityIntegration(id: string, data: Partial<SecurityIntegration>): Promise<SecurityIntegration> {
+  const response = await api.patch<SecurityIntegration>(`${BASE_URL}/${id}`, data)
+  return response.data
 }
 
 /**

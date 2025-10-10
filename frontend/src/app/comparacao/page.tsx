@@ -125,8 +125,11 @@ const ComparacaoPage = () => {
 														{formatPrice(product.preco)}
 													</p>
 													<p className="text-xs text-gray-600">10x sem juros</p>
-													<div className="bg-orange-100 text-orange-800 px-2 py-1 rounded text-xs">
-														5% off no PIX
+													<div
+														className="relative bg-no-repeat bg-cover 	h-[18px] mt-2 bg-center w-28"
+														style={{ backgroundImage: `url(/images/icons/pixDiscount.svg)` }}
+													>
+															<span className="text-xs font-medium text-white relative left-6 bottom-1">5% off no PIX</span>
 													</div>
 												</div>
 												<button className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">

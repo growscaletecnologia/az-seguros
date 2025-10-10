@@ -186,7 +186,7 @@ export function DateRangePicker({
               <CalendarIcon className="flex relative right-1.5 h-5 w-5" />
               {startDate ? (
                 <div className="text-[16px]">
-                  {startDate.toLocaleDateString("pt-BR")}
+                  {new Date(startDate).toLocaleDateString("pt-BR")}
                 </div>
               ) : (
                 <span className="text-white/90 text-[14px] font-semibold">
@@ -205,7 +205,7 @@ export function DateRangePicker({
               <CalendarIcon className="flex relative right-1.5 h-5 w-5" />
               {endDate ? (
                 <div className="text-[16px]">
-                  {endDate.toLocaleDateString("pt-BR")}
+                  {new Date(endDate)?.toLocaleDateString("pt-BR")}
                 </div>
               ) : (
                 <span className="text-white/90 text-[14px] font-semibold">
@@ -236,19 +236,30 @@ export function DateRangePicker({
 						"flex flex-row gap-2",
 					)
 				}
-				dayClassName={(date) =>
-					cn(
-					startDate && endDate && date >= startDate && date <= endDate
-						? "bg-blue-100 text-blue-400"
-						: "",
-					date.getTime() === startDate?.getTime()
-						? "bg-blue-50 text-white"
-						: "",
-					date.getTime() === endDate?.getTime()
-						? "bg-blue-100 text-white"
-						: "",
-					)
-				}
+				dayClassName={(date) => {
+          const isStart =
+            startDate instanceof Date && !isNaN(startDate.getTime()) &&
+            date.getTime() === startDate.getTime();
+
+          const isEnd =
+            endDate instanceof Date && !isNaN(endDate.getTime()) &&
+            date.getTime() === endDate.getTime();
+
+          const isInRange =
+            startDate instanceof Date &&
+            endDate instanceof Date &&
+            !isNaN(startDate.getTime()) &&
+            !isNaN(endDate.getTime()) &&
+            date >= startDate &&
+            date <= endDate;
+
+          return cn(
+            isInRange ? "bg-blue-100 text-blue-400" : "",
+            isStart ? "bg-blue-600 text-white" : "",
+            isEnd ? "bg-blue-500 text-white" : "",
+          );
+        }}
+
 				/>
         </PopoverContent>
       </Popover>

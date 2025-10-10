@@ -5,9 +5,17 @@ export const PlansRepository = {
   /**
    * Retorna todos os planos com paginação
    */
+   
   async findAll(page = 1, perPage = 10) {
+     const where: Prisma.InsurerPlanWhereInput = {
+        securityIntegration: {
+          ativa: true, // ✅ só planos com integração ativa
+        },
+      }
     const [items, total] = await Promise.all([
+      
       prisma.insurerPlan.findMany({
+        where,
         skip: (page - 1) * perPage,
         take: perPage,
         include: {
@@ -46,8 +54,12 @@ export const PlansRepository = {
    * Retorna um plano específico por ID
    */
   async findOne(id: number) {
-    return prisma.insurerPlan.findUnique({
-      where: { id },
+    return prisma.insurerPlan.findFirst({
+      where: { id,
+        securityIntegration: {
+          ativa: true, 
+        },
+       },
       include: {
         destinies: {
           include: {
@@ -72,8 +84,12 @@ export const PlansRepository = {
    * (placeholder — depois você pode relacionar PlanBenefit)
    */
   async findWithBenefits(id: number) {
-    return prisma.insurerPlan.findUnique({
-      where: { id },
+    return prisma.insurerPlan.findFirst({
+      where: { id,
+        securityIntegration: {
+          ativa: true, 
+        }
+       },
       include: {
         destinies: {
           include: {
@@ -112,7 +128,12 @@ export const PlansRepository = {
     perPage = 30
   ) {
     const { slug, age } = filters
-    const where: Prisma.InsurerPlanWhereInput = {}
+    const where: Prisma.InsurerPlanWhereInput = {
+
+       securityIntegration: {
+        ativa: true,
+       },
+    }
 
     console.log('[PlansRepository] Filtro recebido:', { slug, age })
 

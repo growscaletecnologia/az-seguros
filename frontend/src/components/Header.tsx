@@ -98,12 +98,7 @@ export default function Header() {
 
 					{/* Desktop Navigation */}
 					<nav className="hidden md:flex items-center space-x-4 lg:space-x-8">
-						<Link
-							href="/planos"
-							className="text-gray-700 hover:text-blue-600 font-medium text-sm lg:text-base"
-						>
-							Seguro Viagem
-						</Link>
+						
 						<Link
 							href="/faq"
 							className="text-gray-700 hover:text-blue-600 font-medium text-sm lg:text-base"

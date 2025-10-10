@@ -2,13 +2,81 @@ import { api } from '@/lib/api';
 
 export interface Plan {
   id: number;
+  externalId: number;
+  additionalId: number;
+  ref: string;
+  slug: string;
+  is: string; // valor numérico como string
+  isShow: string; // ex: "250000,00"
   name: string;
-  price: number;
-  destinies: string[];
-  ageGroups: string[];
-  active: boolean;
+  multitrip: boolean;
+  securityIntegrationId: string;
   createdAt: string;
   updatedAt: string;
+
+  destinies: PlanDestiny[];
+  coverages: Coverage[];
+  securityIntegration: SecurityIntegration;
+  highlight?: boolean;
+}
+
+export interface NormalizedPlan {
+  id: number;
+  name: string;
+  price: number; // já com markup
+  destiny: string; // destino selecionado
+  ageGroup: string; // ex: "0 a 64"
+  insurerName: string;
+  markUp: number;
+  coverageValue: number; // ex: 250000
+  benefits: string[]; // nomes das coberturas
+  createdAt: string;
+  updatedAt: string;
+}
+
+
+export interface PlanDestiny {
+  id: number;
+  insurerPlanId: number;
+  destinyId: number | null;
+  name: string;
+  slug: string;
+  displayOrder: number;
+  destinyCode: string;
+  crmBonusValue: number;
+  createdAt: string;
+  updatedAt: string;
+  ageGroups: AgeGroup[];
+}
+
+export interface AgeGroup {
+  id: number;
+  insurerPlanDestinyId: number;
+  start: number;
+  end: number;
+  price: string; // backend envia como string
+  priceIof: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Coverage {
+  id: number;
+  title: string;
+  name: string;
+  slug: string;
+  highlight?: string;
+  content?: string;
+  displayOrder?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SecurityIntegration {
+  insurerName: string;
+  insurerCode: string;
+  markUp: number;
+  ativa: boolean;
 }
 
 export interface FilterPlansDto {
@@ -43,7 +111,7 @@ export const PlanService = {
     const response = await api.get(
       `/insurer/plans/filter?slug=${slug || ''}&age=${age || ''}&page=${page}&perPage=${perPage}`
     );
-    return response.data;
+    return response.data.data;
   },
 
   /**

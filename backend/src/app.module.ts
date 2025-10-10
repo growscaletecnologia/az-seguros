@@ -21,6 +21,7 @@ import { FrontsectionsModule } from './frontsections/frontsections.module'
 import { SecurityIntegrationsModule } from './security-integrations/security-integrations.module'
 import { InsuranceModule } from './insurance/insurance.module'
 import { RedisModule } from './redis/redis.module'
+import { BenefitsModule } from './benefits/benefits.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { RedisModule } from './redis/redis.module'
     SecurityIntegrationsModule,
     InsuranceModule,
     RedisModule,
+    BenefitsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
