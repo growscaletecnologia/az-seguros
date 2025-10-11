@@ -15,6 +15,7 @@ import { DateRangePicker } from "@/components/Inputs/CustomCalendar";
 import { Button } from "@/components/ui/button";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { mock } from "node:test";
+import { PlanDetailsModal } from "@/components/planos/PlanDetialsModal";
 
 /* ============================== */
 /*           MOCK DATA            */
@@ -67,7 +68,7 @@ const mockCoberturas = [
   },
 ];
 /* Benefícios detalhados por plano (mock configurável). */
-type BenefitItem = { titulo: string; valor?: string; extra?: string };
+export type BenefitItem = { titulo: string; valor?: string; extra?: string };
 
 const benefitsByPlan: Record<number, BenefitItem[]> = {
 	1: [
@@ -121,6 +122,52 @@ const benefitsByPlan: Record<number, BenefitItem[]> = {
 		{ titulo: "Validade Geográfica", valor: "EUROPA" },
 		{ titulo: "Despesa Médica Hospitalar Total", valor: "USD 60,000" },
 		{ titulo: "Prática de Esportes", valor: "DENTRO DMH" },
+	],
+	6: [
+		{ titulo: "Permite emissão em viagem?", valor: "NÃO" },
+		{ titulo: "Validade Geográfica", valor: "EUROPA" },
+		{ titulo: "Franquia de DMH", valor: "NÃO" },
+		{
+			titulo: "Despesa Médica Hospitalar Total",
+			valor: "USD 60,000",
+			extra: "Valor total de despesas médicas hospitalares.",
+		},
+		{ titulo: "Despesa Médica Hospitalar", valor: "USD 60,000" },
+		{
+			titulo: "Cobertura Médica para Prática de Esportes",
+			valor: "USD 10.000",
+		},
+		{ titulo: "Cobertura Médica para Gestante", valor: "USD 30.000" },
+		{ titulo: "Telemedicina", valor: "SIM" },
+		{ titulo: "Cobertura Odontológica", valor: "USD 1.000" },
+	],
+	7: [
+		{ titulo: "Permite emissão em viagem?", valor: "SIM (verificar carência)" },
+		{
+			titulo: "Validade Geográfica",
+			valor: "INTERNACIONAL (exceto EUA e Canadá)",
+		},
+		{ titulo: "Franquia de DMH", valor: "NÃO" },
+		{ titulo: "Despesa Médica Hospitalar Total", valor: "USD 40.000" },
+		{ titulo: "Despesa Médica Hospitalar", valor: "USD 40.000" },
+		{ titulo: "Telemedicina", valor: "SIM" },
+	],
+	8: [
+		{ titulo: "Permite emissão em viagem?", valor: "NÃO" },
+		{ titulo: "Validade Geográfica", valor: "EUROPA" },
+		{ titulo: "Franquia de DMH", valor: "NÃO" },
+		{
+			titulo: "Despesa Médica Hospitalar Total",
+			valor: "USD 75.000",
+			extra: "Inclui atendimento ambulatorial e hospitalar.",
+		},
+		{ titulo: "Telemedicina", valor: "SIM" },
+		{ titulo: "Cobertura Odontológica", valor: "USD 2.000" },
+	],
+	9: [
+		{ titulo: "Permite emissão em viagem?", valor: "NÃO" },
+		{ titulo: "Validade Geográfica", valor: "EUROPA" },
+		{ titulo: "Despesa Médica Hospitalar Total", valor: "USD 30.000" },
 	],
 };
 
@@ -200,7 +247,6 @@ export default function PlanosPage() {
 	}
    
 
-    console.log("Payload corrigido:", quoteDto);
 
     const response = await QuoteService.calculate(quoteDto);
     setPlans(response);
@@ -211,7 +257,7 @@ export default function PlanosPage() {
     setLoading(false);
   }
   };
-
+   console.log(plans)
   /** ⚡ useEffect dispara só quando o formData está pronto */
   useEffect(() => {
     if (formData?.destination && formData?.range?.from && formData?.range?.to) {
@@ -671,8 +717,10 @@ const planHasCovid = (p: QuoteResponse) =>
 													}`
 												: ""}
 											</p>
-											<button className="text-normal cursor-pointer text-blue-700 font-medium mt-1 hover:underline">
-											Ver a cobertura completa
+											<button
+											onClick={() => setViewPlanId(plan.code)}
+											className="text-normal cursor-pointer text-blue-700 font-medium mt-1 hover:underline">
+												Ver a cobertura completa
 											</button>
 										</div>
 
@@ -974,13 +1022,13 @@ const planHasCovid = (p: QuoteResponse) =>
 									</div>
 								</div>
 							)}
-							{/* Modal de Detalhes
+							 Modal de Detalhes
 							{viewPlan && (
 								<PlanDetailsModal
 									plan={viewPlan}
 									onClose={() => setViewPlanId(null)}
 								/>
-							)} */}
+							)} 
 						</div>
 					</div>
 				</div>
