@@ -1,11 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger'
+import { InsurerCodeEnum } from '@prisma/client'
 import { IsNotEmpty, IsString, IsInt, IsOptional, IsBoolean } from 'class-validator'
 
 export class CreateSecurityIntegrationDto {
-  @ApiProperty({ description: 'Nome da pergunta de segurança' })
+  @ApiProperty({ description: 'Nome da Seguradora' })
   @IsNotEmpty()
   @IsString()
-  securityName: string
+  insurerName: string
 
   @ApiProperty({ description: 'Tipo de concessão (password, client_credentials, etc.)' })
   @IsNotEmpty()
@@ -46,4 +47,19 @@ export class CreateSecurityIntegrationDto {
   @IsOptional()
   @IsInt()
   markUp?: number
+
+  @ApiProperty({ description: 'URL base para autenticação', required: false })
+  @IsOptional()
+  @IsString()
+  baseUrl?: string
+
+  @ApiProperty({ description: 'URL de autenticação', required: false })
+  @IsOptional()
+  @IsString()
+  authUrl?: string
+
+  @ApiProperty({ description: 'Código da Seguradora', required: false })
+  @IsOptional()
+  @IsString()
+  insurerCode?: InsurerCodeEnum
 }

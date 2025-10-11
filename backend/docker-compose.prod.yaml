@@ -75,7 +75,7 @@ services:
   # Redis Cache
   # ===============================================
   redis:
-    image: redis:7-alpine
+    image: redis:8.2.2-alpine
     container_name: az_redis
     restart: unless-stopped
     env_file:

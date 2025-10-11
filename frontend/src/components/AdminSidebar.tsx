@@ -102,7 +102,7 @@ const AdminSidebar = () => {
 		// },
 
 		{
-			id: "activities",
+			id: "logs",
 			label: "Atividades do Sistema",
 			href: "/admin/logs",
 			icon: <Activity className="h-5 w-5" />,

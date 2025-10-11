@@ -14,11 +14,14 @@ import { SystemPagesModule } from './system-pages/system-pages.module'
 
 import { LoggerMiddleware } from './middleware/logger'
 import { AutoPermissionMiddleware } from './rbac/middleware/auto-permission.middleware'
-import { SettingsModule } from './modules/settings/settings.module'
+import { SettingsModule } from './settings/settings.module'
 import { AvaliationsModule } from './avaliations/avaliations.module'
 import { LogsModule } from './logs/logs.module'
 import { FrontsectionsModule } from './frontsections/frontsections.module'
 import { SecurityIntegrationsModule } from './security-integrations/security-integrations.module'
+import { InsuranceModule } from './insurance/insurance.module'
+import { RedisModule } from './redis/redis.module'
+import { BenefitsModule } from './benefits/benefits.module';
 
 @Module({
   imports: [
@@ -37,6 +40,9 @@ import { SecurityIntegrationsModule } from './security-integrations/security-int
     AvaliationsModule,
     FrontsectionsModule,
     SecurityIntegrationsModule,
+    InsuranceModule,
+    RedisModule,
+    BenefitsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

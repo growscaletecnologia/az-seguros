@@ -1,49 +1,29 @@
-import { IsOptional, IsString } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger'
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator'
 
 export class CreateSettingDto {
-  @ApiProperty({
-    description: 'Chave única da configuração',
-    example: 'site_title',
-    required: false,
-  })
-  @IsOptional()
+  @ApiProperty({ description: 'Chave única da configuração' })
   @IsString()
-  key?: string
+  @IsNotEmpty()
+  key: string
 
-  @ApiProperty({
-    description: 'Valor da configuração',
-    example: 'AZ Seguros - Sua proteção em viagem',
-    required: false,
-  })
-  @IsOptional()
+  @ApiProperty({ description: 'Valor da configuração' })
   @IsString()
-  value?: string
+  @IsNotEmpty()
+  value: string
 
-  @ApiProperty({
-    description: 'Descrição da configuração',
-    example: 'Título principal do site',
-    required: false,
-  })
-  @IsOptional()
+  @ApiProperty({ description: 'Descrição da configuração', required: false })
   @IsString()
+  @IsOptional()
   description?: string
 
-  @ApiProperty({
-    description: 'Código GTM para o head',
-    example: '<!-- Google Tag Manager -->...',
-    required: false,
-  })
-  @IsOptional()
+  @ApiProperty({ description: 'Código GTM para o head', required: false })
   @IsString()
+  @IsOptional()
   gtm_head_code?: string
 
-  @ApiProperty({
-    description: 'Código GTM para o body',
-    example: '<!-- Google Tag Manager (noscript) -->...',
-    required: false,
-  })
-  @IsOptional()
+  @ApiProperty({ description: 'Código GTM para o body', required: false })
   @IsString()
+  @IsOptional()
   gtm_body_code?: string
 }

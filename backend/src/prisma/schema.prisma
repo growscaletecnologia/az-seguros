@@ -313,7 +313,7 @@ enum PostStatus {
 }
 
 model Post {
-  id          String     @id @default(cuid())
+id          String     @id @default(cuid())
   title       String
   slug        String     @unique
   description String?
@@ -344,7 +344,7 @@ model Category {
   id          String   @id @default(cuid())
   name        String
   slug        String   @unique
-  description String?
+description String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -414,8 +414,6 @@ model PostMedia {
   @@index([postId])
   @@index([isMain])
 }
-
-
 /**
  * SYSTEM PAGES Model
  * =========================================================
@@ -528,20 +526,213 @@ model FrontSection {
 }
 
 
+/**
+ * ==========================================================
+ * Insurance Integration Models
+ * =========================================================
+ * - SecurityIntegration: Represents API credentials and config for each insurance provider
+ * - InsuranceCache: Caches insurance quotes for better performance and rate limiting
+ */
+
+enum InsurerCodeEnum {
+  hero 
+  mta
+}
+
+enum PlanTagEnum {
+  vendido
+  popular
+  escolhido
+  preco
+  premium
+  economico
+  indicado
+}
+
 model SecurityIntegration {
-  id        String   @id @default(cuid())
-  securityName String   // Pergunta de segurança
-  grantType String   // Tipo de concessão (password, client_credentials, etc.)
-  clientId  Int      // ID do cliente
-  clientSecret String // Segredo do cliente
-  username     String   // Nome de usuário para autenticação
-  password     String   // Senha do usuário para autenticação
-  scope        String?  // Escopo de acesso solicitado (opcional)
-  ativa        Boolean? @default(true) // Status ativo/inativo da integração
-  markUp    Int?
-  accessToken String? // Token de acesso obtido após a autenticação
-  refreshToken String? // Token de atualização obtido após a autenticação
-  expiresIn    Int?     // Tempo de expiração do token de acesso em segundos
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              String   @id @default(cuid())
+  insurerName     String?  @default("")
+  insurerCode     InsurerCodeEnum?
+  baseUrl         String?  @default("")
+  authUrl         String?
+  grantType       String
+  clientId        Int
+  clientSecret    String
+  username        String?
+  password        String?
+  scope           String?
+  ativa           Boolean  @default(true)
+  markUp          Int?
+  accessToken     String?
+  refreshToken    String?
+  expiresIn       Int?
+  tokenExpiresAt  DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  InsuranceCache  InsuranceCache[]
+  InsurerProvider InsurerProvider?
+
+  plans           InsurerPlan[]
+}
+
+model InsuranceCache {
+  id          String   @id @default(cuid())
+  insurerId   String
+  destination String
+  paxCount    Int
+  ageGroup    String
+  days        Int
+  data        Json
+  updatedAt   DateTime @default(now())
+
+  insurer SecurityIntegration @relation(fields: [insurerId], references: [id], onDelete: Cascade)
+  @@index([insurerId])
+  @@index([destination])
+}
+
+model InsurerProvider {
+ 
+  id          String   @id @default(cuid())
+  slug        String   @default("")
+  name        String   @default("")
+  logo        String?   @default("")
+  terms_url   String?  @default("")
+  insurerId   String   @unique
+  insurer     SecurityIntegration  @relation(fields: [insurerId], references: [id])
+
+  @@index([insurerId])
+}
+
+
+model InsurerPlan {
+  id             Int       @id @default(autoincrement())
+  externalId     Int?
+  additionalId   Int?      @default(0)
+  ref            String
+  slug           String    @unique
+  is             String
+  isShow         String
+  name           String
+  multitrip      Boolean   @default(false)
+  is_highlight   Boolean   @default(false)
+  is_specialist_indication Boolean  @default(false)
+  tag           PlanTagEnum?
+  
+  securityIntegrationId String?
+  securityIntegration   SecurityIntegration? @relation(fields: [securityIntegrationId], references: [id], onDelete: SetNull)
+  
+  coverages PlanCoverage[]
+
+  destinies      InsurerPlanDestiny[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([securityIntegrationId])
+}
+
+
+model InsurerPlanDestiny {
+  id             Int                 @id @default(autoincrement())
+  insurerPlanId  Int
+  destinyId      Int?
+  name           String
+  slug           String
+  displayOrder   Int
+  destinyCode    String
+  crmBonusValue  Float
+  ageGroups      InsurerPlanAgeGroup[]
+
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+
+  insurerPlan    InsurerPlan         @relation(fields: [insurerPlanId], references: [id], onDelete: Cascade)
+  destiny        Destiny?            @relation(fields: [destinyId], references: [id], onDelete: SetNull)
+}
+
+model InsurerPlanAgeGroup {
+  id                    Int                 @id @default(autoincrement())
+  insurerPlanDestinyId  Int
+  start                 Int
+  end                   Int
+  price                 Decimal             @db.Decimal(10, 2)
+  priceIof              Decimal?            @db.Decimal(10, 6)
+
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+
+  insurerPlanDestiny    InsurerPlanDestiny  @relation(fields: [insurerPlanDestinyId], references: [id], onDelete: Cascade)
+}
+
+model Destiny {
+  id             Int        @id @default(autoincrement())
+  externalId     Int?       // id vindo da seguradora
+  name           String
+  slug           String     @unique
+  displayOrder   Int
+  destinyCode    String
+  crmBonusValue  Float?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  plans          InsurerPlanDestiny[]
+}
+
+model PlanBenefit {
+  id              Int      @id @default(autoincrement())
+  code            String
+  categoryName    String
+  name            String
+  longDescription String?  @db.Text
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Coverage {
+  id             Int            @id @default(autoincrement())
+  title          String
+  name           String
+  slug           String         @unique
+  highlight      String?
+  content        String?        @db.Text
+  displayOrder   Int?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  // Relacionamento reverso
+  planCoverages  PlanCoverage[]
+}
+
+model PlanCoverage {
+  id               Int           @id @default(autoincrement())
+  insurerPlanId    Int           // FK para o plano
+  coverageId       Int           // FK para o tipo de cobertura
+  value            String        // Ex: "80000,00"
+  coverageType     String        // Ex: "USD", "BRL", "INCLUSO"
+
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  // Relacionamentos
+  insurerPlan      InsurerPlan   @relation(fields: [insurerPlanId], references: [id], onDelete: Cascade)
+  coverage         Coverage      @relation(fields: [coverageId], references: [id], onDelete: Cascade)
+
+  @@index([insurerPlanId])
+  @@index([coverageId])
+}
+
+model DollarCotation {
+   id               Int           @id @default(1) // Define o ID como chave primária e valor padrão fixo
+   price            String
+   priceRaw         String
+   createdAt        DateTime      @default(now())
+   updatedAt        DateTime      @updatedAt
+}
+
+model EuroCotation{
+   id               Int            @id @default(1)
+   price            String
+   priceRaw         String
+   createdAt        DateTime      @default(now())
+   updatedAt        DateTime      @updatedAt
 }

@@ -3,15 +3,23 @@ import Redis from 'ioredis'
 
 @Injectable()
 export class RedisService implements OnModuleDestroy {
-  private client: Redis
+  private readonly client: Redis
 
   constructor() {
+    const isDev = process.env.API_MODE === 'DEV'
+    const host = isDev ? 'localhost' : 'redis'
+    const port = isDev ? 6380 : 6379
+    const password = process.env.REDIS_PASSWORD
+
     this.client = new Redis({
-      host: process.env.REDIS_HOST || 'redis',
-      port: parseInt(process.env.REDIS_PORT || '6380'),
-      password: process.env.REDIS_PASSWORD,
+      host,
+      port,
+      password,
+      retryStrategy: (times) => Math.min(times * 100, 2000),
     })
-    console.log('Redis connected', this.client)
+
+    this.client.on('connect', () => console.log(`✅ Redis conectado: ${host}:${port}`))
+    this.client.on('error', (err) => console.error(`❌ Redis erro:`, err.message))
   }
 
   getClient(): Redis {
