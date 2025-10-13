@@ -1,0 +1,8 @@
+-> colocar a filtragem 
+
+-> colocar highlight  mostrar os  benefícios
+
+bugs a fixar: 
+
+ativar e desativar integração quebrando
+

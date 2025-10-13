@@ -112,8 +112,11 @@ export class QuoteService {
         .map(p => {
           const price = Number(group.price);
           const iof = Number(group.priceIof);
-          const isBrazil = slug.toLowerCase() === 'brasil';
-          const baseValue = price * days * (isBrazil ? 1 : dolar);
+            const isBrazil = slug.toLowerCase() === 'brasil';
+          const baseValue = isBrazil
+            ? price * days // já em reais
+        : (price * days) * dolar; // converter de USD para BRL
+
           const valorFinal = baseValue + (baseValue * iof);
 
           let valorComMarkup = valorFinal;
