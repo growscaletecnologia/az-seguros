@@ -469,16 +469,7 @@ export default function IntegrationsPage() {
 								</label>
 							</div>
 							{/* Ativa */}
-							<label className="flex items-center gap-2 text-sm">
-								<input
-									type="checkbox"
-									name="ativa"
-									checked={formData.ativa}
-									onChange={handleInputChange}
-								/>
-								Ativa
-							</label>
-
+						
 							<div className="flex justify-end gap-2">
 								<button
 									type="button"
