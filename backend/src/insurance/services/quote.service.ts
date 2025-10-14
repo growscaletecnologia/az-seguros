@@ -121,7 +121,8 @@ export class QuoteService {
 
           let valorComMarkup = valorFinal;
           if (plan.markUp && plan.markUp > 0) {
-            valorComMarkup += valorFinal * (plan.markUp / 100);
+            const margem = plan.markUp / 100;
+            valorComMarkup = valorFinal / (1 - margem);
           }
 
           return valorComMarkup;
