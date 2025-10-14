@@ -1,26 +1,63 @@
 import { Injectable } from '@nestjs/common';
 import { CreateBenefitDto } from './dto/create-benefit.dto';
 import { UpdateBenefitDto } from './dto/update-benefit.dto';
+import { BenefitsRepository } from './benefits.repository';
 
 @Injectable()
 export class BenefitsService {
-  create(createBenefitDto: CreateBenefitDto) {
-    return 'This action adds a new benefit';
+  constructor(private readonly benefitsRepository: BenefitsRepository) {}
+
+  /**
+   * Cria um novo benefício.
+   * @param createBenefitDto Dados do benefício a ser criado.
+   * @returns O benefício criado.
+   */
+  async create(createBenefitDto: CreateBenefitDto) {
+    return this.benefitsRepository.create(createBenefitDto);
   }
 
-  findAll() {
-    return `This action returns all benefits`;
+  /**
+   * Cria múltiplos benefícios.
+   * @param createBenefitDto Lista de benefícios a serem criados.
+   * @returns Resultado da operação de criação em massa.
+   */
+  async createMany(createBenefitDto: CreateBenefitDto[]) {
+    return this.benefitsRepository.createMany(createBenefitDto);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} benefit`;
+  /**
+   * Retorna todos os benefícios cadastrados.
+   * @returns Lista de benefícios.
+   */
+  async findAll() {
+    return this.benefitsRepository.findAll();
   }
 
-  update(id: number, updateBenefitDto: UpdateBenefitDto) {
-    return `This action updates a #${id} benefit`;
+  /**
+   * Retorna um benefício específico pelo ID.
+   * @param id ID do benefício.
+   * @returns O benefício encontrado ou null.
+   */
+  async findOne(id: number) {
+    return this.benefitsRepository.findOne(id);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} benefit`;
+  /**
+   * Atualiza um benefício existente.
+   * @param id ID do benefício a ser atualizado.
+   * @param updateBenefitDto Dados atualizados do benefício.
+   * @returns O benefício atualizado.
+   */
+  async update(id: number, updateBenefitDto: UpdateBenefitDto) {
+    return this.benefitsRepository.update(id, updateBenefitDto);
+  }
+
+  /**
+   * Remove um benefício pelo ID.
+   * @param id ID do benefício a ser removido.
+   * @returns O benefício removido.
+   */
+  async remove(id: number) {
+    return this.benefitsRepository.remove(id);
   }
 }
