@@ -14,8 +14,6 @@ import DestinationSelect from "@/components/Inputs/DestinationSelect";
 import { DateRangePicker } from "@/components/Inputs/CustomCalendar";
 import { Button } from "@/components/ui/button";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
-import { mock } from "node:test";
-import { PlanDetailsModal } from "@/components/planos/PlanDetialsModal";
 
 /* ============================== */
 /*           MOCK DATA            */
@@ -33,42 +31,9 @@ const coberturaDescriptions: Record<string, string> = {
 	Bagagem: "Indenização em caso de perda ou extravio de bagagem.",
 };
 
-const mockCoberturas = [
-  {
-    despesa: "USD 60.000",
-    bagagem: "USD 1.000 (COMPLEMENTAR)",
-  },
-  {
-    despesa: "USD 150.000",
-    bagagem: "USD 1.200 (COMPLEMENTAR)",
-  },
-  {
-    despesa: "USD 40.000",
-    bagagem: "USD 800 (COMPLEMENTAR)",
-  },
-  {
-    despesa: "USD 80.000",
-    bagagem: "USD 1.200 (COMPLEMENTAR)",
-  },
-  {
-    despesa: "USD 100.000",
-    bagagem: "USD 1.000 (COMPLEMENTAR)",
-  },
-  {
-    despesa: "USD 200.000",
-    bagagem: "USD 1.500 (COMPLEMENTAR)",
-  },
-  {
-    despesa: "USD 75.000",
-    bagagem: "USD 900 (COMPLEMENTAR)",
-  },
-  {
-    despesa: "USD 120.000",
-    bagagem: "USD 1.300 (COMPLEMENTAR)",
-  },
-];
+
 /* Benefícios detalhados por plano (mock configurável). */
-export type BenefitItem = { titulo: string; valor?: string; extra?: string };
+type BenefitItem = { titulo: string; valor?: string; extra?: string };
 
 const benefitsByPlan: Record<number, BenefitItem[]> = {
 	1: [
@@ -123,52 +88,6 @@ const benefitsByPlan: Record<number, BenefitItem[]> = {
 		{ titulo: "Despesa Médica Hospitalar Total", valor: "USD 60,000" },
 		{ titulo: "Prática de Esportes", valor: "DENTRO DMH" },
 	],
-	6: [
-		{ titulo: "Permite emissão em viagem?", valor: "NÃO" },
-		{ titulo: "Validade Geográfica", valor: "EUROPA" },
-		{ titulo: "Franquia de DMH", valor: "NÃO" },
-		{
-			titulo: "Despesa Médica Hospitalar Total",
-			valor: "USD 60,000",
-			extra: "Valor total de despesas médicas hospitalares.",
-		},
-		{ titulo: "Despesa Médica Hospitalar", valor: "USD 60,000" },
-		{
-			titulo: "Cobertura Médica para Prática de Esportes",
-			valor: "USD 10.000",
-		},
-		{ titulo: "Cobertura Médica para Gestante", valor: "USD 30.000" },
-		{ titulo: "Telemedicina", valor: "SIM" },
-		{ titulo: "Cobertura Odontológica", valor: "USD 1.000" },
-	],
-	7: [
-		{ titulo: "Permite emissão em viagem?", valor: "SIM (verificar carência)" },
-		{
-			titulo: "Validade Geográfica",
-			valor: "INTERNACIONAL (exceto EUA e Canadá)",
-		},
-		{ titulo: "Franquia de DMH", valor: "NÃO" },
-		{ titulo: "Despesa Médica Hospitalar Total", valor: "USD 40.000" },
-		{ titulo: "Despesa Médica Hospitalar", valor: "USD 40.000" },
-		{ titulo: "Telemedicina", valor: "SIM" },
-	],
-	8: [
-		{ titulo: "Permite emissão em viagem?", valor: "NÃO" },
-		{ titulo: "Validade Geográfica", valor: "EUROPA" },
-		{ titulo: "Franquia de DMH", valor: "NÃO" },
-		{
-			titulo: "Despesa Médica Hospitalar Total",
-			valor: "USD 75.000",
-			extra: "Inclui atendimento ambulatorial e hospitalar.",
-		},
-		{ titulo: "Telemedicina", valor: "SIM" },
-		{ titulo: "Cobertura Odontológica", valor: "USD 2.000" },
-	],
-	9: [
-		{ titulo: "Permite emissão em viagem?", valor: "NÃO" },
-		{ titulo: "Validade Geográfica", valor: "EUROPA" },
-		{ titulo: "Despesa Médica Hospitalar Total", valor: "USD 30.000" },
-	],
 };
 
 /* ============================== */
@@ -207,7 +126,7 @@ export default function PlanosPage() {
     toast.error("Informe destino e datas antes de cotar");
     return;
   }
-  let quoteDto;	
+  let quoteDto;
   try {
     setLoading(true);
 	if(!form?.destination || !form?.range?.from || !form?.range?.to){
@@ -247,6 +166,7 @@ export default function PlanosPage() {
 	}
    
 
+    console.log("Payload corrigido:", quoteDto);
 
     const response = await QuoteService.calculate(quoteDto);
     setPlans(response);
@@ -257,7 +177,7 @@ export default function PlanosPage() {
     setLoading(false);
   }
   };
-   console.log(plans)
+
   /** ⚡ useEffect dispara só quando o formData está pronto */
   useEffect(() => {
     if (formData?.destination && formData?.range?.from && formData?.range?.to) {
@@ -276,8 +196,8 @@ export default function PlanosPage() {
 
 	const dataI = `${diaI}/${mesI}/${anoI}`;
 
-	const minhaDataF = new Date(form?.range?.to || "");
-	minhaDataF.setDate(minhaDataF.getDate()); // Adiciona 16 dias
+	const minhaDataF = new Date(formData?.range?.to || "");
+	minhaDataF.setDate(minhaDataF.getDate() + 16); // Adiciona 16 dias
 
 	const diaF = String(minhaDataF.getDate()).padStart(2, "0");
 	const mesF = String(minhaDataF.getMonth() + 1).padStart(2, "0"); // Mês é 0-indexado
@@ -291,58 +211,43 @@ export default function PlanosPage() {
 			});
 		}, [formData]);
   /** ======= Loading State ======= */
-   const labelAgeGroup = (g: { start: number; end: number }) => `${g.start}-${g.end}`;
 
-const planHasCovid = (p: QuoteResponse) =>
-  (p.benefits || []).some(b => /covid/i.test(b.name));
-
-	const filteredPlans = useMemo(() => {
-  return plans.filter((p) => {
-    // Seguradoras
-    if (filters.insurers.length && !filters.insurers.includes(p.provider_name)) {
-      return false;
-    }
-
-    // Faixa etária (string "start-end") – OR: o plano deve cobrir pelo menos uma faixa escolhida
-    if (
-      filters.ageGroups.length &&
-      !(p.ageGroups || []).some(g => filters.ageGroups.includes(labelAgeGroup(g)))
-    ) {
-      return false;
-    }
-
-    // Valor de cobertura médica (totalGroupValue) – OR
-    if (
-      filters.coverageValues.length &&
-      !(p.ageGroups || []).some(g => filters.coverageValues.includes(g.totalGroupValue))
-    ) {
-      return false;
-    }
-
-    // Cobertura COVID (derivada dos benefícios)
-    if (filters.covid.length) {
-      const hasCovid = planHasCovid(p);
-      const pediuCom = filters.covid.includes("com");
-      const pediuSem = filters.covid.includes("sem");
-      // Se só "com" estiver selecionado, precisa ter covid
-      if (pediuCom && !pediuSem && !hasCovid) return false;
-      // Se só "sem" estiver selecionado, não pode ter covid
-      if (pediuSem && !pediuCom && hasCovid) return false;
-      // Se ambos selecionados, não filtra por covid (cai aqui sem retornar)
-    }
-
-    // Benefícios – AND: o plano precisa conter todos os selecionados
-    if (
-      filters.benefits.length &&
-      !filters.benefits.every(b => (p.benefits || []).some(pb => pb.name === b))
-    ) {
-      return false;
-    }
-
-    return true;
-  });
-}, [plans, filters]);
-
+	// const filteredPlans = useMemo(() => {
+	// 		return plans.filter((p) => {
+	// 			// DMH mínima: usa o maior valor selecionado como requisito mínimo
+	// 			if (filters.medicalMin.length) {
+	// 				const minReq = Math.max(...filters.medicalMin);
+	// 				if (p.coberturaMedica < minReq) return false;
+	// 			}
+	// 			// COVID
+	// 			if (filters.covid.length) {
+	// 				const wantCom = filters.covid.includes("com");
+	// 				const wantSem = filters.covid.includes("sem");
+	// 				if (wantCom && wantSem) {
+	// 					// ambos = ignora filtro
+	// 				} else if (wantCom && !p.coberturaPandemia) return false;
+	// 				else if (wantSem && p.coberturaPandemia) return false;
+	// 			}
+	// 			// Seguradoras
+	// 			if (filters.insurers.length && !filters.insurers.includes(p.seguradora))
+	// 				return false;
+	// 			// Faixa etária (string)
+	// 			if (
+	// 				filters.faixaEtaria.length &&
+	// 				!filters.faixaEtaria.includes(p.faixaEtaria || "")
+	// 			)
+	// 				return false;
+	// 			// Benefícios: exige TODOS os selecionados
+	// 			if (
+	// 				filters.benefits.length &&
+	// 				!filters.benefits.every((b) => p.beneficios.includes(b))
+	// 			)
+	// 				return false;
+	
+	// 			return true;
+	// 		});
+	// 	}, [filters]);
+	
 
 	const viewPlan = useMemo(
 		() => plans.find((p) => p.code === viewPlanId) || null,
@@ -363,38 +268,15 @@ const planHasCovid = (p: QuoteResponse) =>
 	
 	const [currentPage, setCurrentPage] = useState(1);
 	const itemsPerPage = 10;
-	const totalPages = Math.ceil(filteredPlans.length / itemsPerPage);
+	const totalPages = Math.ceil(plans.length / itemsPerPage);
 	const startIndex = (currentPage - 1) * itemsPerPage;
-	const currentPlans = filteredPlans.slice(startIndex, startIndex + itemsPerPage);
+	const currentPlans = plans.slice(startIndex, startIndex + itemsPerPage);
+	console.log("plan",plans)
 
 	const handleSearch = async () =>{
 		await fetchQuotes()
 	} 
-     const options = useMemo(() => {
-  const coverage = new Set<number>();
-  const insurers = new Set<string>();
-  const ageGroups = new Set<string>();
-  const benefits = new Set<string>();
 
-  for (const p of plans) {
-    insurers.add(p.provider_name);
-    for (const g of p.ageGroups || []) {
-      if (typeof g.totalGroupValue === "number") coverage.add(g.totalGroupValue);
-      ageGroups.add(`${g.start}-${g.end}`);
-    }
-    for (const b of p.benefits || []) {
-      benefits.add(b.name);
-    }
-  }
-
-  return {
-    coverageValues: [...coverage].sort((a, b) => a - b),
-    covid: ["com", "sem"] as ("com" | "sem")[],
-    insurers: [...insurers].sort(),
-    ageGroups: [...ageGroups],
-    benefits: [...benefits].sort(),
-  };
-}, [plans]);
 	return (
 		<div className="bg-gray-50 min-h-screen">
 			{/* Header */}
@@ -479,92 +361,82 @@ const planHasCovid = (p: QuoteResponse) =>
 								</h1>
 							</div>
 							{/* TOP Cards */}
-							<div className="grid grid-cols-1 md:grid-cols-3 gap-6 cursor-pointer mb-6">
-							{currentPlans.slice(0, 3).map((plan) => (
-								<div
-								key={plan.code}
-								className="bg-white shadow-lg rounded-2xl p-6 border border-gray-200 transform transition duration-300 hover:scale-105 hover:shadow-xl flex flex-col" // flex vertical
-								>
-								{/* Conteúdo do card */}
-								<div>
-									{/* Plano e Seguradora */}
-									<div className="col-span-1 flex  rounded-lg bg-gradient-to-r from-blue-50 to-cyan-300 h-[84px] items-center justify-center gap-3 p-3">
-									<img
-										src={
-										plan.provider_code === "hero"
-											? "/seguradoras/hero.png"
-											: "/seguradoras/my-travel-assist.png"
-										}
-										alt={plan.provider_name}
-										className="w-24 h-auto object-contain"
-									/>
-									<h3 className="text-sm font-bold ">{plan.name}</h3>
-									</div>
-
-									<div className="mt-4">
-									{plan.totalPrice > plan.totalPriceWithPixDiscount && (
-										<p className="line-through text-gray-400 text-sm">
-										{(plan.totalPrice*1.05).toLocaleString("pt-BR", {
-											style: "currency",
-											currency: "BRL",
-										})}
-										</p>
-									)}
-									<div className="flex items-baseline space-x-1">
-										<p className="text-2xl font-bold text-blue-600">
-										{plan.totalPrice.toLocaleString("pt-BR", {
-											style: "currency",
-											currency: "BRL",
-										})}
-										</p>
-										<p>/por pessoa no Pix</p>
-									</div>
-									<p className="text-sm text-gray-600">ou em até 12x no cartão</p>
-									</div>
-
-									{/* Benefícios */}
-									<ul className="mt-4 space-y-1 text-sm text-gray-700">
-									{plan.benefits.map((b, i) => (
-										<li key={i}>• {b.name}</li>
-									))}
-									</ul>
-								</div>
-
-								{/* Ações (fixadas no rodapé) */}
-								<div className="mt-auto pt-6 space-y-2">
-									<button className="w-full bg-blue-600 hover:cursor-pointer hover:animate-pulse text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2">
-									<span>Selecionar Plano</span>
-									<ArrowRight className="h-4 w-4" />
-									</button>
-									<button
-									onClick={() => {
-										handleSelectPlan(plan.code);
-										if (
-										!selectedPlans.includes(plan.code) &&
-										selectedPlans.length >= 5
-										) {
-										setShowComparison(true);
-										}
-									}}
-									className={`flex-1 py-2 px-4 rounded-lg w-full hover:cursor-pointer border transition-colors flex items-center justify-center space-x-1 ${
-										selectedPlans.includes(plan.code)
-										? "bg-blue-50 border-blue-500 text-blue-700"
-										: "border-gray-300 text-gray-700 hover:bg-gray-50"
-									}`}
-									disabled={
-										!selectedPlans.includes(plan.code) && selectedPlans.length >= 4
-									}
+							<div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+								{currentPlans.map((plan) => (
+									<div
+										key={plan.code}
+										className="bg-white shadow-lg rounded-2xl p-6 border border-gray-200  transform transition duration-300 hover:scale-105 hover:shadow-xl"
 									>
-									<GitCompare className="h-4 w-4" />
-									<span className="text-sm">
-										{selectedPlans.includes(plan.code) ? "Selecionado" : "Comparar"}
-									</span>
-									</button>
-								</div>
-								</div>
-							))}
+										{/* Plano e Seguradora */}
+										{/* <h3 className="text-lg font-bold mb-2">{plan.plano}</h3>
+										<p className="text-sm text-gray-600">{plan.seguradora}</p>
+				
+										<div className="mt-4">
+											{plan.precoOriginal > plan.preco && (
+												<p className="line-through text-gray-400 text-sm">
+													{plan.precoOriginal.toLocaleString("pt-BR", {
+														style: "currency",
+														currency: "BRL",
+													})}
+												</p>
+											)}
+											<div className="flex items-baseline space-x-1">
+												<p className="text-2xl font-bold text-blue-600">
+													{plan.preco.toLocaleString("pt-BR", {
+														style: "currency",
+														currency: "BRL",
+													})}
+												</p>
+												<p>/por pessoa no Pix</p>
+											</div>
+											<p className="text-sm text-gray-600">
+												ou em até 12x no cartão
+											</p>
+										</div>*/}
+										{/* Benefícios */}
+										<ul className="mt-4 space-y-1 text-sm text-gray-700">
+											{/* {plan.beneficios.map((b, i) => (
+												<li key={i}>• {b}</li>
+											))} */}
+											beneficios
+										</ul>
+										{/* Ações */}
+										<div className="mt-6 space-y-2">
+											<button className="w-full bg-blue-600  hover:cursor-pointer hover:animate-pulse text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2">
+												<span>Selecionar Plano</span>
+												<ArrowRight className="h-4 w-4" />
+											</button>
+											<button
+												onClick={() => {
+													handleSelectPlan(plan.code);
+													if (
+														!selectedPlans.includes(plan.code) &&
+														selectedPlans.length >= 5
+													) {
+														setShowComparison(true);
+													}
+												}}
+												className={`flex-1 py-2 px-4 rounded-lg w-full hover:cursor-pointer border transition-colors flex items-center justify-center space-x-1 ${
+													selectedPlans.includes(plan.code)
+														? "bg-blue-50 border-blue-500 text-blue-700"
+														: "border-gray-300 text-gray-700 hover:bg-gray-50"
+												}`}
+												disabled={
+													!selectedPlans.includes(plan.code) &&
+													selectedPlans.length >= 4
+												}
+											>
+												<GitCompare className="h-4 w-4" />
+												<span className="text-sm">
+													{selectedPlans.includes(plan.code)
+														? "Selecionado"
+														: "Comparar"}
+												</span>
+											</button>
+										</div>
+									</div>
+								))}
 							</div>
-
 							{/* Barra de ações */}
 							<div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
 								<div className="flex items-center gap-3">
@@ -585,91 +457,6 @@ const planHasCovid = (p: QuoteResponse) =>
 									<option>Ordenar por: Melhor avaliação</option>
 								</select>
 							</div>
-
-
-							{/* Filtros aplicados */}
-{(filters.insurers.length > 0 ||
-  filters.ageGroups.length > 0 ||
-  filters.benefits.length > 0) && (
-  <div className="flex flex-wrap items-center gap-2 mt-4">
-    <span className="text-sm text-gray-600 font-medium">
-      Filtros aplicados:
-    </span>
-
-    {/* Insurers */}
-    {filters.insurers.map((insurer) => (
-      <span
-        key={insurer}
-        className="flex items-center gap-1 bg-green-700 text-white px-3 py-1 rounded-full text-xs font-medium"
-      >
-        {insurer}
-        <button
-          onClick={() =>
-            setFilters((prev) => ({
-              ...prev,
-              insurers: prev.insurers.filter((i) => i !== insurer),
-            }))
-          }
-          className="ml-1 hover:text-red-300"
-        >
-          <X className="h-3 w-3" />
-        </button>
-      </span>
-    ))}
-
-    {/* Faixa Etária */}
-    {filters.ageGroups.map((age) => (
-      <span
-        key={age}
-        className="flex items-center gap-1 bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-medium"
-      >
-        {age}
-        <button
-          onClick={() =>
-            setFilters((prev) => ({
-              ...prev,
-              ageGroups: prev.ageGroups.filter((f) => f !== age),
-            }))
-          }
-          className="ml-1 hover:text-red-300"
-        >
-          <X className="h-3 w-3" />
-        </button>
-      </span>
-    ))}
-
-    {/* Benefícios */}
-    {filters.benefits.map((benefit) => (
-      <span
-        key={benefit}
-        className="flex items-center gap-1 bg-purple-600 text-white px-3 py-1 rounded-full text-xs font-medium"
-      >
-        {benefit}
-        <button
-          onClick={() =>
-            setFilters((prev) => ({
-              ...prev,
-              benefits: prev.benefits.filter((b) => b !== benefit),
-            }))
-          }
-          className="ml-1 hover:text-red-300"
-        >
-          <X className="h-3 w-3" />
-        </button>
-      </span>
-    ))}
-
-    {/* Botão limpar tudo */}
-    <button
-      onClick={() => setFilters(initialFilters)}
-      className="ml-2 text-xs text-blue-700 hover:underline"
-    >
-      Limpar todos os filtros
-    </button>
-  </div>
-)}
-
-
 							{/* Cards */}
 							<div className="mt-6 border rounded-lg  space-y-6 overflow-hidden">
 								{/* Cabeçalho estilo tabela */}
@@ -681,7 +468,7 @@ const planHasCovid = (p: QuoteResponse) =>
 								</div>
 
 								{/* Linhas de planos */}
-								{currentPlans.map((plan, index) => (
+								{currentPlans.map((plan) => (
 									<div
 									key={plan.code}
 									className="grid grid-cols-8 items-center border-b bg-white hover:bg-gray-50 transition"
@@ -702,14 +489,14 @@ const planHasCovid = (p: QuoteResponse) =>
 
 										{/* Coluna Plano */}
 										<div className="col-span-3 p-3">
-											<h3 className="font-semibold text-gray-900 text-lg mb-1">
+											<h3 className="font-semibold text-gray-900 text-sm mb-1">
 											{plan.name}
 											</h3>
-											<p className="text-sm text-gray-600">
+											<p className="text-xs text-gray-600">
 											Faixa etária: {plan.ageGroups?.[plan.ageGroups.length-1]?.start} a{" "}
 											{plan.ageGroups?.[plan.ageGroups.length - 1]?.end} anos
 											</p>
-											<p className="text-sm text-gray-600">
+											<p className="text-xs text-gray-600">
 											{plan.ageGroups?.[plan.ageGroups.length-1]?.price
 												? `R$ ${
 														(Number(plan.ageGroups[plan.ageGroups.length-1].price) * plan.dolar * plan.days).toFixed(2)
@@ -717,19 +504,17 @@ const planHasCovid = (p: QuoteResponse) =>
 													}`
 												: ""}
 											</p>
-											<button
-											onClick={() => setViewPlanId(plan.code)}
-											className="text-normal cursor-pointer text-blue-700 font-medium mt-1 hover:underline">
-												Ver a cobertura completa
+											<button className="text-xs text-blue-700 font-medium mt-1 hover:underline">
+											Ver a cobertura completa
 											</button>
 										</div>
 
 										{/* Coluna Despesa médica e bagagem */}
 										<div className="col-span-2 p-3 text-sm text-gray-700">
 											<p className="font-semibold">Despesa Médica Hospitalar</p>
-											<p className="text-xs mb-2">{mockCoberturas?.[index].despesa}</p>
+											<p className="text-xs mb-2">USD 60.000</p>
 											<p className="font-semibold">Seguro bagagem</p>
-											<p className="text-xs">{mockCoberturas?.[index].bagagem}</p>
+											<p className="text-xs">USD 1.200 (COMPLEMENTAR)</p>
 										</div>
 
 										{/* Coluna Total por segurado */}
@@ -737,7 +522,7 @@ const planHasCovid = (p: QuoteResponse) =>
 											<div className="
 											flex flex-auto">
 												<span className="text-normal mr-1 line-through">
-													{formatPrice(plan.totalPrice * 1.05)/*valor do pix*/} 
+													{formatPrice(plan.totalPrice * 1.05)} 
 												</span>
 												<p className="text-normal text-gray-700" >10x sem juros no cartão</p>
 											</div>
@@ -756,30 +541,9 @@ const planHasCovid = (p: QuoteResponse) =>
 											</div>
 											<p className="text-xs text-gray-600 mb-2">/ preço por pessoa</p>
 											<div className="flex flex-row items-end gap-2">
-											<button
-									onClick={() => {
-										handleSelectPlan(plan.code);
-										if (
-										!selectedPlans.includes(plan.code) &&
-										selectedPlans.length >= 5
-										) {
-										setShowComparison(true);
-										}
-									}}
-									className={`flex-1 py-2 px-4 rounded-lg w-full hover:cursor-pointer border transition-colors flex items-center justify-center space-x-1 ${
-										selectedPlans.includes(plan.code)
-										? "bg-blue-50 border-blue-500 text-blue-700"
-										: "border-gray-300 text-gray-700 hover:bg-gray-50"
-									}`}
-									disabled={
-										!selectedPlans.includes(plan.code) && selectedPlans.length >= 4
-									}
-									>
-									<GitCompare className="h-4 w-4" />
-									<span className="text-sm">
-										{selectedPlans.includes(plan.code) ? "Selecionado" : "Comparar"}
-									</span>
-									</button>
+											<button className="px-3 py-2 border border-blue-600 text-blue-600 rounded-md text-xs font-semibold hover:bg-blue-50 flex items-center gap-1">
+												Comparar Plano
+											</button>
 											<button className="px-3 py-2 bg-blue-600 text-white rounded-md text-xs font-semibold hover:bg-blue-700 flex items-center gap-1">
 												Selecionar seguro
 											</button>
@@ -833,39 +597,35 @@ const planHasCovid = (p: QuoteResponse) =>
 								<div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t shadow-lg">
 									<div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
 										{/* Planos selecionados */}
-										<div className="flex flex-row justify-around h-auto py-1 items-center gap-4 overflow-x-auto w-full">
+										<div className="flex items-center gap-4 overflow-x-auto">
 											{getSelectedPlans().map((plan) => (
 												<div
 													key={plan.code}
-													className="relative bg-gray-200 h-16 w-48 border rounded-lg px-3 py-2 flex items-center gap-2"
-													>
-													<img
-														src={
-														plan.provider_code === "hero"
-															? "/seguradoras/hero.png"
-															: "/seguradoras/my-travel-assist.png"
-														}
-														alt={plan.provider_name}
-														className="w-24 h-auto object-contain"
-													/>
-
-													{/* Botão remover no canto superior direito */}
+													className="flex items-center gap-2 border rounded-lg px-3 py-2"
+												>
+													<span className="text-sm font-medium">
+														{plan.provider_name}
+													</span>
+													<span className="text-xs text-gray-500 truncate">
+														{plan.name}
+													</span>
 													<button
 														onClick={() =>
-														setSelectedPlans((cur) => cur.filter((id) => id !== plan.code))
+															setSelectedPlans((cur) =>
+																cur.filter((id) => id !== plan.code),
+															)
 														}
-														className="absolute top-1 right-1 cursor-pointer text-red-500 hover:text-red-700"
+														className="ml-2 text-red-500 hover:text-red-700"
 													>
 														<X className="h-4 w-4" />
 													</button>
-													</div>
-
+												</div>
 											))}
 										</div>
 										{/* Botão comparar */}
 										<button
 											onClick={() => setShowComparison(true)}
-											className="flex-shrink-0 bg-blue-700 hover:bg-blue-800 cursor-pointer text-white font-semibold px-6 py-3 rounded-lg"
+											className="flex-shrink-0 bg-blue-700 hover:bg-blue-800 text-white font-semibold px-6 py-3 rounded-lg"
 										>
 											Comparar {selectedPlans.length} planos
 										</button>
@@ -1022,18 +782,18 @@ const planHasCovid = (p: QuoteResponse) =>
 									</div>
 								</div>
 							)}
-							 Modal de Detalhes
+							{/* Modal de Detalhes
 							{viewPlan && (
 								<PlanDetailsModal
 									plan={viewPlan}
 									onClose={() => setViewPlanId(null)}
 								/>
-							)} 
+							)} */}
 						</div>
 					</div>
 				</div>
 				{/* Modal de Filtros */}
-				 <FiltersModal
+				{/* <FiltersModal
 					isOpen={isFilterOpen}
 					onClose={() => setIsFilterOpen(false)}
 					onApply={() => setIsFilterOpen(false)}
@@ -1041,7 +801,7 @@ const planHasCovid = (p: QuoteResponse) =>
 					state={filters}
 					setState={setFilters}
 					options={options}
-				/>
+				/> */}
 			</div>
 	  )}
 		</div>

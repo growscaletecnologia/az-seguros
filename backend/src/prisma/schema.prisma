@@ -680,7 +680,7 @@ model Destiny {
 
 model PlanBenefit {
   id              Int      @id @default(autoincrement())
-  code            String
+  code            Int
   categoryName    String
   name            String
   longDescription String?  @db.Text
