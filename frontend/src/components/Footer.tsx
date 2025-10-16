@@ -34,7 +34,9 @@ export default function Footer() {
 
 					{/*Formas de pagamento*/}
 					<div className="flex flex-col items-center">
-						<h3 className="text-base sm:text-lg font-semibold mb-4 sm:mb-6">Formas de Pagamento</h3>
+						<h3 className="text-base sm:text-lg font-semibold mb-4 sm:mb-6">
+							Formas de Pagamento
+						</h3>
 						<div className="flex flex-row gap-2 justify-center items-center">
 							<Image
 								alt="Cartão de Crédito"
@@ -62,12 +64,16 @@ export default function Footer() {
 
 					{/* Contato */}
 					<div className="flex flex-col items-center w-full">
-						<h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Contato</h3>
+						<h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">
+							Contato
+						</h3>
 						<div className="flex flex-col items-center">
 							<ul className="space-y-2">
 								<li className="flex items-center space-x-2">
 									<Phone className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-green-400" />
-									<span className="text-xs sm:text-sm text-gray-300">0800 123 4567</span>
+									<span className="text-xs sm:text-sm text-gray-300">
+										0800 123 4567
+									</span>
 								</li>
 								<li className="flex items-center space-x-2">
 									<Mail className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-400" />
@@ -77,7 +83,9 @@ export default function Footer() {
 								</li>
 								<li className="flex items-center space-x-2">
 									<MapPin className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-red-400" />
-									<span className="text-xs sm:text-sm text-gray-300">São Paulo, SP</span>
+									<span className="text-xs sm:text-sm text-gray-300">
+										São Paulo, SP
+									</span>
 								</li>
 							</ul>
 						</div>

@@ -132,137 +132,132 @@ import { Calendar as CalendarIcon, Info } from "lucide-react";
 import * as React from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { addDays } from "date-fns";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { addDays } from "date-fns";
 import "react-day-picker/style.css";
 
 type Props = {
-  range?: { from: Date | null; to: Date | null };
-  onChange?: (range: { from: Date | null; to: Date | null }) => void;
-  minDate?: Date;
+	range?: { from: Date | null; to: Date | null };
+	onChange?: (range: { from: Date | null; to: Date | null }) => void;
+	minDate?: Date;
 };
 
 export function DateRangePicker({
-  range,
-  onChange,
-  minDate = new Date(),
+	range,
+	onChange,
+	minDate = new Date(),
 }: Props) {
-  const [open, setOpen] = React.useState(false);
-  const [startDate, setStartDate] = React.useState<Date | null>(
-    range?.from ?? null,
-  );
-  const [endDate, setEndDate] = React.useState<Date | null>(
-    range?.to ?? null,
-  );
+	const [open, setOpen] = React.useState(false);
+	const [startDate, setStartDate] = React.useState<Date | null>(
+		range?.from ?? null,
+	);
+	const [endDate, setEndDate] = React.useState<Date | null>(range?.to ?? null);
 
-  const handleChange = (dates: [Date | null, Date | null]) => {
-    const [start, end] = dates;
-    setStartDate(start);
-    setEndDate(end);
-    onChange?.({ from: start, to: end });
+	const handleChange = (dates: [Date | null, Date | null]) => {
+		const [start, end] = dates;
+		setStartDate(start);
+		setEndDate(end);
+		onChange?.({ from: start, to: end });
 
-    if (start && end) {
-      setOpen(false); // fecha quando o intervalo está completo
-    }
-  };
+		if (start && end) {
+			setOpen(false); // fecha quando o intervalo está completo
+		}
+	};
 
-  return (
-    <div className="flex flex-col gap-2 ">
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <div className="flex flex-row gap-3">
-            {/* Campo Embarque */}
-            <div
-              className={cn(
-                "flex flex-auto w-full px-4 py-3 h-[52px] rounded-lg bg-white/20 border border-white/30 text-white text-sm text-left font-normal focus:outline-none focus:ring-2 focus:ring-yellow-400",
-                !startDate && "text-white/70",
-              )}
-            >
-              <CalendarIcon className="flex relative right-1.5 h-5 w-5" />
-              {startDate ? (
-                <div className="text-[16px]">
-                  {new Date(startDate).toLocaleDateString("pt-BR")}
-                </div>
-              ) : (
-                <span className="text-white/90 text-[14px] font-semibold">
-                  Embarque no Brasil
-                </span>
-              )}
-            </div>
+	return (
+		<div className="flex flex-col gap-2 ">
+			<Popover open={open} onOpenChange={setOpen}>
+				<PopoverTrigger asChild>
+					<div className="flex flex-row gap-3">
+						{/* Campo Embarque */}
+						<div
+							className={cn(
+								"flex flex-auto w-full px-4 py-3 h-[52px] rounded-lg bg-white/20 border border-white/30 text-white text-sm text-left font-normal focus:outline-none focus:ring-2 focus:ring-yellow-400",
+								!startDate && "text-white/70",
+							)}
+						>
+							<CalendarIcon className="flex relative right-1.5 h-5 w-5" />
+							{startDate ? (
+								<div className="text-[16px]">
+									{new Date(startDate).toLocaleDateString("pt-BR")}
+								</div>
+							) : (
+								<span className="text-white/90 text-[14px] font-semibold">
+									Embarque no Brasil
+								</span>
+							)}
+						</div>
 
-            {/* Campo Desembarque */}
-            <div
-              className={cn(
-                "flex flex-auto w-full px-4 py-3 h-[52px] rounded-lg bg-white/20 border border-white/30 text-white text-sm text-left font-normal focus:outline-none focus:ring-2 focus:ring-yellow-400",
-                !endDate && "text-white/70",
-              )}
-            >
-              <CalendarIcon className="flex relative right-1.5 h-5 w-5" />
-              {endDate ? (
-                <div className="text-[16px]">
-                  {new Date(endDate)?.toLocaleDateString("pt-BR")}
-                </div>
-              ) : (
-                <span className="text-white/90 text-[14px] font-semibold">
-                  Desembarque no Brasil
-                </span>
-              )}
-            </div>
-          </div>
-        </PopoverTrigger>
+						{/* Campo Desembarque */}
+						<div
+							className={cn(
+								"flex flex-auto w-full px-4 py-3 h-[52px] rounded-lg bg-white/20 border border-white/30 text-white text-sm text-left font-normal focus:outline-none focus:ring-2 focus:ring-yellow-400",
+								!endDate && "text-white/70",
+							)}
+						>
+							<CalendarIcon className="flex relative right-1.5 h-5 w-5" />
+							{endDate ? (
+								<div className="text-[16px]">
+									{new Date(endDate)?.toLocaleDateString("pt-BR")}
+								</div>
+							) : (
+								<span className="text-white/90 text-[14px] font-semibold">
+									Desembarque no Brasil
+								</span>
+							)}
+						</div>
+					</div>
+				</PopoverTrigger>
 
-        <PopoverContent className="w-auto h-auto bg-transparent rounded-2xl border-none p-0 ">
-           <DatePicker
-		   		calendarClassName="h-auto min-w-[550px] flex flex-col !bg-blue-100 p-1 rounded-lg"
-				selected={startDate}
-				onChange={handleChange}
-				startDate={startDate}
-				endDate={endDate}
-				selectsRange
-				inline
-				monthsShown={2}
-				locale={ptBR}
-				minDate={addDays(new Date(), 1)}
-				shouldCloseOnSelect={false}
-				className="!bg-blue-100"
-				calendarIconClassName="!text-blue-500"
-				weekClassName={() =>
-					cn(
-						"flex flex-row gap-2",
-					)
-				}
-				dayClassName={(date) => {
-          const isStart =
-            startDate instanceof Date && !isNaN(startDate.getTime()) &&
-            date.getTime() === startDate.getTime();
+				<PopoverContent className="w-auto h-auto bg-transparent rounded-2xl border-none p-0 ">
+					<DatePicker
+						calendarClassName="h-auto min-w-[550px] flex flex-col !bg-blue-100 p-1 rounded-lg"
+						selected={startDate}
+						onChange={handleChange}
+						startDate={startDate}
+						endDate={endDate}
+						selectsRange
+						inline
+						monthsShown={2}
+						locale={ptBR}
+						minDate={addDays(new Date(), 1)}
+						shouldCloseOnSelect={false}
+						className="!bg-blue-100"
+						calendarIconClassName="!text-blue-500"
+						weekClassName={() => cn("flex flex-row gap-2")}
+						dayClassName={(date) => {
+							const isStart =
+								startDate instanceof Date &&
+								!isNaN(startDate.getTime()) &&
+								date.getTime() === startDate.getTime();
 
-          const isEnd =
-            endDate instanceof Date && !isNaN(endDate.getTime()) &&
-            date.getTime() === endDate.getTime();
+							const isEnd =
+								endDate instanceof Date &&
+								!isNaN(endDate.getTime()) &&
+								date.getTime() === endDate.getTime();
 
-          const isInRange =
-            startDate instanceof Date &&
-            endDate instanceof Date &&
-            !isNaN(startDate.getTime()) &&
-            !isNaN(endDate.getTime()) &&
-            date >= startDate &&
-            date <= endDate;
+							const isInRange =
+								startDate instanceof Date &&
+								endDate instanceof Date &&
+								!isNaN(startDate.getTime()) &&
+								!isNaN(endDate.getTime()) &&
+								date >= startDate &&
+								date <= endDate;
 
-          return cn(
-            isInRange ? "bg-blue-100 text-blue-400" : "",
-            isStart ? "bg-blue-600 text-white" : "",
-            isEnd ? "bg-blue-500 text-white" : "",
-          );
-        }}
-
-				/>
-        </PopoverContent>
-      </Popover>
-    </div>
-  );
+							return cn(
+								isInRange ? "bg-blue-100 text-blue-400" : "",
+								isStart ? "bg-blue-600 text-white" : "",
+								isEnd ? "bg-blue-500 text-white" : "",
+							);
+						}}
+					/>
+				</PopoverContent>
+			</Popover>
+		</div>
+	);
 }

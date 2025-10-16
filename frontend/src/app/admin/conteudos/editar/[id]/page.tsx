@@ -15,8 +15,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import {
-	SystemPage,
-	SystemPageType,
+	type SystemPage,
+	type SystemPageType,
 	SystemPagesService,
 } from "@/services/systemPages";
 import { useRouter } from "next/navigation";
@@ -33,7 +33,7 @@ export default function EditarConteudoPage({
 	const [loading, setLoading] = useState(true);
 	const [saving, setSaving] = useState(false);
 	const [systemPage, setSystemPage] = useState<SystemPage | null>(null);
-	
+
 	// Desembrulha os parâmetros usando React.use()
 	const { id: pageId } = React.use(params);
 
@@ -124,11 +124,15 @@ export default function EditarConteudoPage({
 			console.error("Erro ao atualizar página:", error);
 			// Tratamento específico para diferentes tipos de erro
 			if (error?.response?.status === 409) {
-				toast.error("Este slug já está sendo usado por outra página. Escolha um slug diferente.");
+				toast.error(
+					"Este slug já está sendo usado por outra página. Escolha um slug diferente.",
+				);
 			} else if (error?.response?.status === 422) {
 				toast.error("Dados inválidos. Verifique os campos obrigatórios.");
 			} else {
-				toast.error("Erro ao atualizar página. Verifique os dados e tente novamente.");
+				toast.error(
+					"Erro ao atualizar página. Verifique os dados e tente novamente.",
+				);
 			}
 		} finally {
 			setSaving(false);
@@ -194,7 +198,10 @@ export default function EditarConteudoPage({
 			<div className="flex justify-between items-center mb-6">
 				<h1 className="text-3xl font-bold">Editar Página do Sistema</h1>
 				<div className="flex gap-2">
-					<Button variant="outline" onClick={() => router.push("/admin/conteudos")}>
+					<Button
+						variant="outline"
+						onClick={() => router.push("/admin/conteudos")}
+					>
 						Cancelar
 					</Button>
 					<Button
@@ -282,7 +289,6 @@ export default function EditarConteudoPage({
 							/>
 						</CardContent>
 					</Card>
-
 				</div>
 
 				{/* Coluna lateral direita */}
@@ -295,21 +301,51 @@ export default function EditarConteudoPage({
 						<CardContent className="space-y-4">
 							<div className="flex items-center space-x-2">
 								<div className="w-6 h-6 flex items-center justify-center">
-									<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-clock">
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										width="20"
+										height="20"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										strokeWidth="2"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										className="lucide lucide-clock"
+									>
 										<circle cx="12" cy="12" r="10" />
 										<polyline points="12 6 12 12 16 14" />
 									</svg>
 								</div>
-								<span>Atualizado em: {new Date(systemPage.updatedAt).toLocaleDateString()}</span>
+								<span>
+									Atualizado em:{" "}
+									{new Date(systemPage.updatedAt).toLocaleDateString()}
+								</span>
 							</div>
 							<div className="flex items-center space-x-2">
 								<div className="w-6 h-6 flex items-center justify-center">
-									<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-activity">
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										width="20"
+										height="20"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										strokeWidth="2"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										className="lucide lucide-activity"
+									>
 										<path d="M22 12h-4l-3 9L9 3l-3 9H2" />
 									</svg>
 								</div>
 								<span className={getStatusColor(systemPage.status)}>
-									Status: {systemPage.status === "PUBLISHED" ? "Publicado" : systemPage.status === "DRAFT" ? "Rascunho" : "Arquivado"}
+									Status:{" "}
+									{systemPage.status === "PUBLISHED"
+										? "Publicado"
+										: systemPage.status === "DRAFT"
+											? "Rascunho"
+											: "Arquivado"}
 								</span>
 							</div>
 							<Button
@@ -335,7 +371,18 @@ export default function EditarConteudoPage({
 						<CardHeader className="flex flex-row items-center justify-between">
 							<CardTitle className="flex items-center">
 								Tipo de Página
-								<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-file-text ml-2">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="20"
+									height="20"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									strokeWidth="2"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									className="lucide lucide-file-text ml-2"
+								>
 									<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
 									<polyline points="14 2 14 8 20 8" />
 									<line x1="16" y1="13" x2="8" y2="13" />
@@ -356,7 +403,18 @@ export default function EditarConteudoPage({
 						<CardHeader>
 							<CardTitle className="flex items-center">
 								Informações
-								<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-info ml-2">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="20"
+									height="20"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									strokeWidth="2"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									className="lucide lucide-info ml-2"
+								>
 									<circle cx="12" cy="12" r="10" />
 									<path d="M12 16v-4" />
 									<path d="M12 8h.01" />
@@ -365,11 +423,23 @@ export default function EditarConteudoPage({
 						</CardHeader>
 						<CardContent className="space-y-3">
 							<div className="text-sm text-gray-600">
-								<p><strong>ID:</strong> {systemPage.id}</p>
-								<p><strong>Slug:</strong> {systemPage.slug}</p>
-								<p><strong>Tipo:</strong> {getTypeLabel(systemPage.type)}</p>
-								<p><strong>Criado em:</strong> {new Date(systemPage.createdAt).toLocaleDateString()}</p>
-								<p><strong>Última atualização:</strong> {new Date(systemPage.updatedAt).toLocaleDateString()}</p>
+								<p>
+									<strong>ID:</strong> {systemPage.id}
+								</p>
+								<p>
+									<strong>Slug:</strong> {systemPage.slug}
+								</p>
+								<p>
+									<strong>Tipo:</strong> {getTypeLabel(systemPage.type)}
+								</p>
+								<p>
+									<strong>Criado em:</strong>{" "}
+									{new Date(systemPage.createdAt).toLocaleDateString()}
+								</p>
+								<p>
+									<strong>Última atualização:</strong>{" "}
+									{new Date(systemPage.updatedAt).toLocaleDateString()}
+								</p>
 							</div>
 						</CardContent>
 					</Card>

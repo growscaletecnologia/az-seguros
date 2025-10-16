@@ -61,7 +61,7 @@ const CuponsPage = () => {
 		front_publishable: false,
 		description: "",
 		userId: AuthService.getUser()?.id,
-		status: "ACTIVE"
+		status: "ACTIVE",
 	});
 
 	// Carregar cupons ao iniciar
@@ -88,7 +88,7 @@ const CuponsPage = () => {
 			// Garantir que o status seja definido como ACTIVE se não estiver especificado ou estiver vazio
 			const cupomData = {
 				...novoCupom,
-				status: novoCupom.status || "ACTIVE" as const
+				status: novoCupom.status || ("ACTIVE" as const),
 			};
 			await couponsService.create(cupomData);
 			toast.success("Cupom criado com sucesso!");
@@ -97,7 +97,10 @@ const CuponsPage = () => {
 			loadCoupons();
 		} catch (error: any) {
 			// Melhor tratamento de erro com mensagem específica
-			const errorMessage = error?.response?.data?.message || error?.message || "Erro ao criar cupom";
+			const errorMessage =
+				error?.response?.data?.message ||
+				error?.message ||
+				"Erro ao criar cupom";
 			toast.error(errorMessage);
 			console.error(error);
 		} finally {
@@ -118,7 +121,7 @@ const CuponsPage = () => {
 				usageLimit: novoCupom.usageLimit,
 				front_publishable: novoCupom.front_publishable,
 				description: novoCupom.description,
-				status: novoCupom.status || "ACTIVE" as const,
+				status: novoCupom.status || ("ACTIVE" as const),
 			};
 
 			await couponsService.update(editingCoupon.id, updateData);
@@ -128,7 +131,10 @@ const CuponsPage = () => {
 			loadCoupons();
 		} catch (error: any) {
 			// Melhor tratamento de erro com mensagem específica
-			const errorMessage = error?.response?.data?.message || error?.message || "Erro ao atualizar cupom";
+			const errorMessage =
+				error?.response?.data?.message ||
+				error?.message ||
+				"Erro ao atualizar cupom";
 			toast.error(errorMessage);
 			console.error(error);
 		} finally {
@@ -181,7 +187,7 @@ const CuponsPage = () => {
 			front_publishable: false,
 			description: "",
 			userId: AuthService.getUser()?.id,
-			status: "ACTIVE"
+			status: "ACTIVE",
 		});
 		setEditingCoupon(null);
 	};
@@ -249,12 +255,16 @@ const CuponsPage = () => {
 
 						<div className="grid grid-cols-2 gap-4 py-4">
 							<div className="col-span-2">
-								<Label htmlFor="code">Código do Cupom (máx. 20 caracteres, sem espaços)</Label>
+								<Label htmlFor="code">
+									Código do Cupom (máx. 20 caracteres, sem espaços)
+								</Label>
 								<Input
 									id="code"
 									value={novoCupom.code}
 									onChange={(e) => {
-										const value = e.target.value.toUpperCase().replace(/\s+/g, '');
+										const value = e.target.value
+											.toUpperCase()
+											.replace(/\s+/g, "");
 										if (value.length <= 20) {
 											setNovoCupom({
 												...novoCupom,
@@ -336,17 +346,23 @@ const CuponsPage = () => {
 										const selectedDate = new Date(e.target.value);
 										const today = new Date();
 										today.setHours(0, 0, 0, 0);
-										
+
 										// Só valida data mínima se for criação de novo cupom
 										if (!editingCoupon && selectedDate < today) {
-											toast.error("A data de expiração não pode ser menor que a data atual");
+											toast.error(
+												"A data de expiração não pode ser menor que a data atual",
+											);
 											return;
 										}
-										
+
 										setNovoCupom({ ...novoCupom, expiresAt: e.target.value });
 									}}
 									className="mt-1"
-									min={!editingCoupon ? new Date().toISOString().split('T')[0] : undefined}
+									min={
+										!editingCoupon
+											? new Date().toISOString().split("T")[0]
+											: undefined
+									}
 								/>
 							</div>
 
@@ -410,7 +426,7 @@ const CuponsPage = () => {
 				</Dialog>
 			</div>
 
-			<Card className="p-2" >
+			<Card className="p-2">
 				<CardHeader>
 					<CardTitle className="text-lg font-bold">Cupons Existentes</CardTitle>
 				</CardHeader>

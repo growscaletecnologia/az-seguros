@@ -16,14 +16,19 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { CreateUserDto, usersService } from "@/services/api/users";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { type CreateUserDto, usersService } from "@/services/api/users";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { InfoIcon } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { InfoIcon } from "lucide-react";
 
 // Schema de validação do formulário
 const createUserSchema = z.object({
@@ -66,7 +71,7 @@ export function CreateUserForm({ onSuccess }: CreateUserFormProps) {
 	const onSubmit = async (values: CreateUserFormValues) => {
 		try {
 			setSubmitting(true);
-			
+
 			const createUserDto: CreateUserDto = {
 				email: values.email,
 				name: values.name,
@@ -131,7 +136,9 @@ export function CreateUserForm({ onSuccess }: CreateUserFormProps) {
 											<InfoIcon className="h-4 w-4 text-gray-500" />
 										</TooltipTrigger>
 										<TooltipContent>
-											<p>A senha poderá ser alterada posteriormente pelo usuário</p>
+											<p>
+												A senha poderá ser alterada posteriormente pelo usuário
+											</p>
 										</TooltipContent>
 									</Tooltip>
 								</TooltipProvider>
@@ -150,10 +157,7 @@ export function CreateUserForm({ onSuccess }: CreateUserFormProps) {
 					render={({ field }) => (
 						<FormItem>
 							<FormLabel>Papel</FormLabel>
-							<Select
-								onValueChange={field.onChange}
-								defaultValue={field.value}
-							>
+							<Select onValueChange={field.onChange} defaultValue={field.value}>
 								<FormControl>
 									<SelectTrigger>
 										<SelectValue placeholder="Selecione um papel" />

@@ -1,11 +1,11 @@
 // app/faq/page.tsx
 "use client";
 
-import { ChevronDown } from "lucide-react";
-import { useState, useEffect } from "react";
+import UnavailableContent from "@/components/UnavailableContent";
 import { SystemPagesService } from "@/services/systemPages";
 import DOMPurify from "dompurify";
-import UnavailableContent from "@/components/UnavailableContent";
+import { ChevronDown } from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface FAQItem {
 	question: string;
@@ -94,20 +94,20 @@ export default function FAQPage() {
 	useEffect(() => {
 		const fetchFAQContent = async () => {
 			let faqPage = null;
-			
+
 			try {
 				setLoading(true);
 				faqPage = await SystemPagesService.getByType("FAQ");
-				
+
 				if (faqPage) {
 					// Se tiver conteúdo HTML, usamos ele diretamente
 					setHtmlContent(faqPage.content);
-					
+
 					// Se tiver título, atualizamos o título da página
 					if (faqPage.title) {
 						setPageTitle(faqPage.title);
 					}
-					
+
 					// Tentamos extrair FAQs do conteúdo se não for HTML estruturado
 					// Isso é um fallback caso o conteúdo não seja HTML completo
 					try {
@@ -127,7 +127,7 @@ export default function FAQPage() {
 			} finally {
 				setLoading(false);
 			}
-			
+
 			// Se não houver conteúdo na API e não tivermos FAQs padrão, mostraremos o componente de indisponibilidade
 			if (!faqPage && defaultFaqs.length === 0) {
 				setHtmlContent(null);
@@ -144,10 +144,8 @@ export default function FAQPage() {
 				<div className="text-center py-8">Carregando...</div>
 			) : htmlContent || faqs.length > 0 ? (
 				<>
-					<h1 className="text-3xl font-bold text-center mb-8">
-						{pageTitle}
-					</h1>
-					
+					<h1 className="text-3xl font-bold text-center mb-8">{pageTitle}</h1>
+
 					{htmlContent ? (
 						// Renderiza conteúdo HTML se disponível
 						<div className="faq-content">
@@ -164,7 +162,7 @@ export default function FAQPage() {
 				</>
 			) : (
 				// Mostra o componente de conteúdo indisponível quando não há dados
-				<UnavailableContent 
+				<UnavailableContent
 					title="FAQ Indisponível"
 					message="As perguntas frequentes não estão disponíveis no momento. Por favor, tente novamente mais tarde."
 				/>

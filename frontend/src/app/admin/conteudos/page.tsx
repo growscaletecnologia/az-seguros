@@ -4,27 +4,30 @@
 export const dynamic = "force-dynamic";
 export const runtime = "edge";
 
+import JoditEditorComponent from "@/components/Inputs/JoditEditor";
+import { FrontSectionModal } from "@/components/modals/FrontSectionModal";
 import { Button } from "@/components/ui/button";
 import { CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import React, { useState, useEffect } from "react";
 import {
-  SystemPage,
-  SystemPageType,
-  SystemPageStatus,
-  SystemPagesService
-} from "@/services/systemPages";
+	type FrontSection,
+	frontSectionsService,
+} from "@/services/frontsections.service";
 import { settingsService } from "@/services/settings.service";
-import { frontSectionsService, type FrontSection } from "@/services/frontsections.service";
-import { FrontSectionModal } from "@/components/modals/FrontSectionModal";
-import JoditEditorComponent from "@/components/Inputs/JoditEditor";
-import { toast } from "sonner";
+import {
+	type SystemPage,
+	SystemPageStatus,
+	type SystemPageType,
+	SystemPagesService,
+} from "@/services/systemPages";
 import { Separator } from "@radix-ui/react-dropdown-menu";
-import { useRouter } from "next/navigation";
-import { Edit, Trash2, Plus, Eye, EyeOff } from "lucide-react";
+import { Edit, Eye, EyeOff, Plus, Trash2 } from "lucide-react";
 import * as LucideIcons from "lucide-react";
+import { useRouter } from "next/navigation";
+import React, { useState, useEffect } from "react";
+import { toast } from "sonner";
 
 // Interface para os conteúdos legados
 interface Conteudo {
@@ -38,20 +41,21 @@ interface Conteudo {
 
 const ConteudosPage = () => {
 	const router = useRouter();
-	
+
 	// ------------------ STATE SYSTEM PAGES ------------------
 	const [systemPages, setSystemPages] = useState<SystemPage[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
-	
+
 	// ------------------ STATE FRONT SECTIONS ------------------
 	const [frontSections, setFrontSections] = useState<FrontSection[]>([]);
 	const [isLoadingFrontSections, setIsLoadingFrontSections] = useState(true);
 	const [showFrontSectionModal, setShowFrontSectionModal] = useState(false);
-	const [editingFrontSection, setEditingFrontSection] = useState<FrontSection | null>(null);
+	const [editingFrontSection, setEditingFrontSection] =
+		useState<FrontSection | null>(null);
 	const [sectionTitle, setSectionTitle] = useState<string>(
-		"Por que escolher a SeguroViagem?"
+		"Por que escolher a SeguroViagem?",
 	);
-	
+
 	// ------------------ FUNCTIONS SYSTEM PAGES ------------------
 	/**
 	 * Loads all system pages from the API
@@ -115,7 +119,9 @@ const ConteudosPage = () => {
 		try {
 			await frontSectionsService.toggleStatus(section.id);
 			await loadFrontSections();
-			toast.success(`Seção ${section.status === 'ACTIVE' ? 'desativada' : 'ativada'} com sucesso!`);
+			toast.success(
+				`Seção ${section.status === "ACTIVE" ? "desativada" : "ativada"} com sucesso!`,
+			);
 		} catch (error) {
 			console.error("Erro ao alterar status:", error);
 			toast.error("Erro ao alterar status da seção");
@@ -126,7 +132,9 @@ const ConteudosPage = () => {
 	 * Remove uma seção
 	 */
 	const handleDeleteFrontSection = async (section: FrontSection) => {
-		if (!confirm(`Tem certeza que deseja excluir a seção "${section.title}"?`)) {
+		if (
+			!confirm(`Tem certeza que deseja excluir a seção "${section.title}"?`)
+		) {
 			return;
 		}
 
@@ -145,11 +153,10 @@ const ConteudosPage = () => {
 	 */
 	const renderSectionIcon = (iconName: string) => {
 		const IconComponent = (LucideIcons as any)[iconName];
-		if (!IconComponent) return <div className="w-6 h-6 bg-gray-300 rounded"></div>;
+		if (!IconComponent)
+			return <div className="w-6 h-6 bg-gray-300 rounded"></div>;
 		return <IconComponent className="w-6 h-6" />;
 	};
-
-	
 
 	/**
 	 * Navigates to the edit page route
@@ -170,34 +177,33 @@ const ConteudosPage = () => {
 			console.error("Erro ao alterar status:", error);
 		}
 	};
-	
+
 	// Restaurar uma versão arquivada
 	const restoreArchivedVersion = async (page: SystemPage) => {
 		try {
 			// Verificar se já existe uma página publicada do mesmo tipo
-			const currentPublished = systemPages.find(p => 
-				p.type === page.type && 
-				p.status === "PUBLISHED"
+			const currentPublished = systemPages.find(
+				(p) => p.type === page.type && p.status === "PUBLISHED",
 			);
-			
+
 			if (currentPublished) {
 				const confirm = window.confirm(
-					`Ao restaurar esta versão, a versão atual publicada será arquivada. Deseja continuar?`
+					`Ao restaurar esta versão, a versão atual publicada será arquivada. Deseja continuar?`,
 				);
-				
+
 				if (!confirm) return;
-				
+
 				// Arquivar a versão atual
 				await SystemPagesService.update(currentPublished.id, {
-					status: "ARCHIVED"
+					status: "ARCHIVED",
 				});
 			}
-			
+
 			// Publicar a versão arquivada
 			await SystemPagesService.update(page.id, {
-				status: "PUBLISHED"
+				status: "PUBLISHED",
 			});
-			
+
 			// Atualizar a lista
 			await loadSystemPages();
 			toast.success("Versão restaurada com sucesso!");
@@ -206,12 +212,12 @@ const ConteudosPage = () => {
 			toast.error("Erro ao restaurar versão");
 		}
 	};
-	
+
 	useEffect(() => {
 		loadSystemPages();
 		loadFrontSections();
 	}, []);
-	
+
 	// Obter cor com base no tipo da página
 	const getTypeColor = (type: SystemPageType) => {
 		switch (type) {
@@ -242,7 +248,7 @@ const ConteudosPage = () => {
 	});
 	const [isLoadingGtm, setIsLoadingGtm] = useState(true);
 	const [isSavingGtm, setIsSavingGtm] = useState(false);
-	
+
 	// Carregar configurações do GTM
 	useEffect(() => {
 		const loadGtmSettings = async () => {
@@ -260,10 +266,10 @@ const ConteudosPage = () => {
 				setIsLoadingGtm(false);
 			}
 		};
-		
+
 		loadGtmSettings();
 	}, []);
-	
+
 	// Salvar configurações do GTM
 	const saveGtmSettings = async () => {
 		try {
@@ -312,7 +318,7 @@ const ConteudosPage = () => {
 						<div className="flex justify-between items-center mb-6">
 							<h2 className="text-xl font-semibold">Páginas do Sistema</h2>
 						</div>
-						
+
 						{isLoading ? (
 							<div className="flex justify-center p-8">
 								<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-700"></div>
@@ -331,7 +337,7 @@ const ConteudosPage = () => {
 													<h3 className="font-semibold">{page.title}</h3>
 													<span
 														className={`px-2 py-1 text-xs rounded ${getTypeColor(
-															page.type
+															page.type,
 														)}`}
 													>
 														{page.type}
@@ -343,45 +349,57 @@ const ConteudosPage = () => {
 																: "bg-red-100 text-red-800"
 														}`}
 													>
-														{page.status === "PUBLISHED" ? "Publicado" : "Rascunho"}
+														{page.status === "PUBLISHED"
+															? "Publicado"
+															: "Rascunho"}
 													</span>
 												</div>
 												<p className="text-gray-600 text-sm mb-2">
-													Slug: {page.slug} | Última atualização: {new Date(page.updatedAt).toLocaleDateString()}
+													Slug: {page.slug} | Última atualização:{" "}
+													{new Date(page.updatedAt).toLocaleDateString()}
 												</p>
 												<div className="bg-gray-50 p-3 rounded text-sm max-h-24 overflow-hidden">
-													<div className="text-gray-700" dangerouslySetInnerHTML={{ __html: page.content.substring(0, 150) + (page.content.length > 150 ? '...' : '') }}></div>
+													<div
+														className="text-gray-700"
+														dangerouslySetInnerHTML={{
+															__html:
+																page.content.substring(0, 150) +
+																(page.content.length > 150 ? "..." : ""),
+														}}
+													></div>
 												</div>
 											</div>
 											<div className="flex flex-col space-y-2 ml-4">
-									<Button
-										onClick={() => editSystemPage(page)}
-										variant="outline"
-										className="bg-yellow-500 text-white hover:bg-yellow-600 border-none"
-									>
-										Editar
-									</Button>
-									{page.status !== "ARCHIVED" ? (
-										<Button
-											onClick={() => toggleSystemPageStatus(page)}
-											variant="outline"
-											className={`border-none ${
-												page.status === "PUBLISHED"
-													? "bg-orange-500 hover:bg-orange-600"
-													: "bg-green-500 hover:bg-green-600"
-											} text-white`}
-										>
-											{page.status === "PUBLISHED" ? "Despublicar" : "Publicar"}
-										</Button>
-									) : (
-										<Button
-											variant="outline"
-											className="bg-amber-500 text-white hover:bg-amber-600 border-none"
-											onClick={() => restoreArchivedVersion(page)}
-										>
-											Restaurar
-										</Button>
-									)}
+												<Button
+													onClick={() => editSystemPage(page)}
+													variant="outline"
+													className="bg-yellow-500 text-white hover:bg-yellow-600 border-none"
+												>
+													Editar
+												</Button>
+												{page.status !== "ARCHIVED" ? (
+													<Button
+														onClick={() => toggleSystemPageStatus(page)}
+														variant="outline"
+														className={`border-none ${
+															page.status === "PUBLISHED"
+																? "bg-orange-500 hover:bg-orange-600"
+																: "bg-green-500 hover:bg-green-600"
+														} text-white`}
+													>
+														{page.status === "PUBLISHED"
+															? "Despublicar"
+															: "Publicar"}
+													</Button>
+												) : (
+													<Button
+														variant="outline"
+														className="bg-amber-500 text-white hover:bg-amber-600 border-none"
+														onClick={() => restoreArchivedVersion(page)}
+													>
+														Restaurar
+													</Button>
+												)}
 											</div>
 										</div>
 									</div>
@@ -396,7 +414,7 @@ const ConteudosPage = () => {
 					<div className="bg-white p-6 rounded-lg shadow space-y-6">
 						<div className="flex justify-between items-center mb-6">
 							<h2 className="text-xl font-semibold">Seção: Por que escolher</h2>
-							<Button 
+							<Button
 								onClick={handleNewFrontSection}
 								className="bg-blue-600 text-white hover:bg-blue-700"
 							>
@@ -412,7 +430,7 @@ const ConteudosPage = () => {
 						) : frontSections.length === 0 ? (
 							<div className="text-center p-8 border rounded bg-gray-50">
 								<p className="text-gray-500">Nenhuma seção encontrada</p>
-								<Button 
+								<Button
 									onClick={handleNewFrontSection}
 									className="mt-4 bg-blue-600 text-white hover:bg-blue-700"
 								>
@@ -425,72 +443,87 @@ const ConteudosPage = () => {
 								{frontSections
 									.sort((a, b) => a.order - b.order)
 									.map((section) => (
-									<div key={section.id} className="border p-4 rounded-lg space-y-3 relative">
-										{/* Status Badge */}
-										<div className="absolute top-2 right-2">
-											<span
-												className={`px-2 py-1 text-xs rounded ${
-													section.status === 'ACTIVE'
-														? "bg-green-100 text-green-800"
-														: "bg-red-100 text-red-800"
-												}`}
-											>
-												{section.status === 'ACTIVE' ? 'Ativo' : 'Inativo'}
-											</span>
-										</div>
-
-										{/* Ícone e Título */}
-										<div className="flex items-center gap-3 mb-3">
-											<div className={`p-2 rounded-lg bg-${section.bgColor}-100`}>
-												{renderSectionIcon(section.icon)}
+										<div
+											key={section.id}
+											className="border p-4 rounded-lg space-y-3 relative"
+										>
+											{/* Status Badge */}
+											<div className="absolute top-2 right-2">
+												<span
+													className={`px-2 py-1 text-xs rounded ${
+														section.status === "ACTIVE"
+															? "bg-green-100 text-green-800"
+															: "bg-red-100 text-red-800"
+													}`}
+												>
+													{section.status === "ACTIVE" ? "Ativo" : "Inativo"}
+												</span>
 											</div>
-											<div>
-												<h3 className="font-semibold text-lg">{section.title}</h3>
-												<p className="text-sm text-gray-500">Ordem: {section.order}</p>
+
+											{/* Ícone e Título */}
+											<div className="flex items-center gap-3 mb-3">
+												<div
+													className={`p-2 rounded-lg bg-${section.bgColor}-100`}
+												>
+													{renderSectionIcon(section.icon)}
+												</div>
+												<div>
+													<h3 className="font-semibold text-lg">
+														{section.title}
+													</h3>
+													<p className="text-sm text-gray-500">
+														Ordem: {section.order}
+													</p>
+												</div>
+											</div>
+
+											{/* Descrição */}
+											<p className="text-gray-600 text-sm">
+												{section.description}
+											</p>
+
+											{/* Ações */}
+											<div className="flex gap-2 pt-3 border-t">
+												<Button
+													onClick={() => handleEditFrontSection(section)}
+													variant="outline"
+													size="sm"
+													className="flex-1"
+												>
+													<Edit className="h-4 w-4 mr-1" />
+													Editar
+												</Button>
+												<Button
+													onClick={() => toggleFrontSectionStatus(section)}
+													variant="outline"
+													size="sm"
+													className={`${
+														section.status === "ACTIVE"
+															? "text-orange-600 hover:bg-orange-50"
+															: "text-green-600 hover:bg-green-50"
+													}`}
+												>
+													{section.status === "ACTIVE" ? (
+														<>
+															<EyeOff className="h-4 w-4 mr-1" /> Desativar
+														</>
+													) : (
+														<>
+															<Eye className="h-4 w-4 mr-1" /> Ativar
+														</>
+													)}
+												</Button>
+												<Button
+													onClick={() => handleDeleteFrontSection(section)}
+													variant="outline"
+													size="sm"
+													className="text-red-600 hover:bg-red-50"
+												>
+													<Trash2 className="h-4 w-4" />
+												</Button>
 											</div>
 										</div>
-
-										{/* Descrição */}
-										<p className="text-gray-600 text-sm">{section.description}</p>
-
-										{/* Ações */}
-										<div className="flex gap-2 pt-3 border-t">
-											<Button
-												onClick={() => handleEditFrontSection(section)}
-												variant="outline"
-												size="sm"
-												className="flex-1"
-											>
-												<Edit className="h-4 w-4 mr-1" />
-												Editar
-											</Button>
-											<Button
-												onClick={() => toggleFrontSectionStatus(section)}
-												variant="outline"
-												size="sm"
-												className={`${
-													section.status === 'ACTIVE'
-														? 'text-orange-600 hover:bg-orange-50'
-														: 'text-green-600 hover:bg-green-50'
-												}`}
-											>
-												{section.status === 'ACTIVE' ? (
-													<><EyeOff className="h-4 w-4 mr-1" /> Desativar</>
-												) : (
-													<><Eye className="h-4 w-4 mr-1" /> Ativar</>
-												)}
-											</Button>
-											<Button
-												onClick={() => handleDeleteFrontSection(section)}
-												variant="outline"
-												size="sm"
-												className="text-red-600 hover:bg-red-50"
-											>
-												<Trash2 className="h-4 w-4" />
-											</Button>
-										</div>
-									</div>
-								))}
+									))}
 							</div>
 						)}
 					</div>
@@ -500,7 +533,7 @@ const ConteudosPage = () => {
 				<TabsContent value="headerFooter">
 					<div className="bg-white p-6 rounded-lg shadow space-y-6">
 						<h2 className="text-xl font-semibold mb-4">Google Tag Manager</h2>
-						
+
 						{isLoadingGtm ? (
 							<div className="flex justify-center p-8">
 								<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-700"></div>
@@ -523,7 +556,8 @@ const ConteudosPage = () => {
 										placeholder="<!-- Google Tag Manager -->"
 									/>
 									<p className="text-xs text-gray-500 mt-1">
-										Cole o código do GTM que deve ser inserido na seção &lt;head&gt; do site.
+										Cole o código do GTM que deve ser inserido na seção
+										&lt;head&gt; do site.
 									</p>
 								</div>
 								<div>
@@ -542,10 +576,11 @@ const ConteudosPage = () => {
 										placeholder="<!-- Google Tag Manager (noscript) -->"
 									/>
 									<p className="text-xs text-gray-500 mt-1">
-										Cole o código do GTM que deve ser inserido logo após a abertura da tag &lt;body&gt;.
+										Cole o código do GTM que deve ser inserido logo após a
+										abertura da tag &lt;body&gt;.
 									</p>
 								</div>
-								<Button 
+								<Button
 									className="bg-blue-600 text-white hover:bg-blue-700"
 									onClick={saveGtmSettings}
 									disabled={isSavingGtm}

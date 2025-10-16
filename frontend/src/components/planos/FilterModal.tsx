@@ -1,23 +1,21 @@
 import { FilterIcon, X } from "lucide-react";
 import { Checkbox } from "./Checkbox";
 
-
 export type FilterState = {
-  coverageValues: number[];     // valores numéricos de cobertura médica (ex: 10000, 25000)
-  covid: ("com" | "sem")[];     // derivado da lista de benefícios
-  insurers: string[];           // nomes das seguradoras (provider_name)
-  ageGroups: string[];          // ex: "0-17", "18-40", "41-60"
-  benefits: string[];           // nomes dos benefícios
+	coverageValues: number[]; // valores numéricos de cobertura médica (ex: 10000, 25000)
+	covid: ("com" | "sem")[]; // derivado da lista de benefícios
+	insurers: string[]; // nomes das seguradoras (provider_name)
+	ageGroups: string[]; // ex: "0-17", "18-40", "41-60"
+	benefits: string[]; // nomes dos benefícios
 };
 
 export const initialFilters: FilterState = {
-  coverageValues: [],
-  covid: [],
-  insurers: [],
-  ageGroups: [],
-  benefits: [],
+	coverageValues: [],
+	covid: [],
+	insurers: [],
+	ageGroups: [],
+	benefits: [],
 };
-
 
 export function FiltersModal({
 	isOpen,
@@ -35,13 +33,12 @@ export function FiltersModal({
 	state: FilterState;
 	setState: React.Dispatch<React.SetStateAction<FilterState>>;
 	options: {
-  coverageValues: number[];     // pega de QuoteAgeGroup.totalGroupValue
-  covid: ("com" | "sem")[];     // ["com", "sem"]
-  insurers: string[];           // lista única de provider_name
-  ageGroups: string[];          // ["0-17", "18-40", "41-60"]
-  benefits: string[];           // lista única de QuoteBenefit.name
-};
-
+		coverageValues: number[]; // pega de QuoteAgeGroup.totalGroupValue
+		covid: ("com" | "sem")[]; // ["com", "sem"]
+		insurers: string[]; // lista única de provider_name
+		ageGroups: string[]; // ["0-17", "18-40", "41-60"]
+		benefits: string[]; // lista única de QuoteBenefit.name
+	};
 }) {
 	if (!isOpen) return null;
 
@@ -89,87 +86,86 @@ export function FiltersModal({
 				{/* Grid opções */}
 				<div className="px-6 py-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-6">
 					{/* Cobertura médica */}
-<div>
-  <h4 className="font-semibold text-gray-900 mb-2">
-    Valor de Cobertura Médica
-  </h4>
-  <div>
-    {options.coverageValues.map((v) => (
-      <Checkbox
-        key={v}
-        id={`cov-${v}`}
-        checked={state.coverageValues.includes(v)}
-        onChange={() => toggleNumber("coverageValues", v)}
-        label={`USD $${v.toLocaleString("en-US")}`}
-      />
-    ))}
-  </div>
-</div>
+					<div>
+						<h4 className="font-semibold text-gray-900 mb-2">
+							Valor de Cobertura Médica
+						</h4>
+						<div>
+							{options.coverageValues.map((v) => (
+								<Checkbox
+									key={v}
+									id={`cov-${v}`}
+									checked={state.coverageValues.includes(v)}
+									onChange={() => toggleNumber("coverageValues", v)}
+									label={`USD $${v.toLocaleString("en-US")}`}
+								/>
+							))}
+						</div>
+					</div>
 
-{/* Faixa Etária */}
-<div>
-  <h4 className="font-semibold text-gray-900 mb-2">Faixa Etária</h4>
-  <div>
-    {options.ageGroups.map((f) => (
-      <Checkbox
-        key={f}
-        id={`age-${f}`}
-        checked={state.ageGroups.includes(f)}
-        onChange={() => toggleString("ageGroups", f)}
-        label={f}
-      />
-    ))}
-  </div>
-</div>
+					{/* Faixa Etária */}
+					<div>
+						<h4 className="font-semibold text-gray-900 mb-2">Faixa Etária</h4>
+						<div>
+							{options.ageGroups.map((f) => (
+								<Checkbox
+									key={f}
+									id={`age-${f}`}
+									checked={state.ageGroups.includes(f)}
+									onChange={() => toggleString("ageGroups", f)}
+									label={f}
+								/>
+							))}
+						</div>
+					</div>
 
-{/* Seguradoras */}
-<div>
-  <h4 className="font-semibold text-gray-900 mb-2">Seguradoras</h4>
-  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
-    {options.insurers.map((s) => (
-      <Checkbox
-        key={s}
-        id={`seg-${s}`}
-        checked={state.insurers.includes(s)}
-        onChange={() => toggleString("insurers", s)}
-        label={s}
-      />
-    ))}
-  </div>
-</div>
+					{/* Seguradoras */}
+					<div>
+						<h4 className="font-semibold text-gray-900 mb-2">Seguradoras</h4>
+						<div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
+							{options.insurers.map((s) => (
+								<Checkbox
+									key={s}
+									id={`seg-${s}`}
+									checked={state.insurers.includes(s)}
+									onChange={() => toggleString("insurers", s)}
+									label={s}
+								/>
+							))}
+						</div>
+					</div>
 
-{/* COVID */}
-<div>
-  <h4 className="font-semibold text-gray-900 mb-2">
-    Cobertura COVID-19
-  </h4>
-  {options.covid.map((c) => (
-    <Checkbox
-      key={c}
-      id={`covid-${c}`}
-      checked={state.covid.includes(c)}
-      onChange={() => toggleString("covid", c)}
-      label={c === "com" ? "Com cobertura" : "Sem cobertura"}
-    />
-  ))}
-</div>
+					{/* COVID */}
+					<div>
+						<h4 className="font-semibold text-gray-900 mb-2">
+							Cobertura COVID-19
+						</h4>
+						{options.covid.map((c) => (
+							<Checkbox
+								key={c}
+								id={`covid-${c}`}
+								checked={state.covid.includes(c)}
+								onChange={() => toggleString("covid", c)}
+								label={c === "com" ? "Com cobertura" : "Sem cobertura"}
+							/>
+						))}
+					</div>
 
-{/* Benefícios */}
-<div className="lg:col-span-2">
-  <h4 className="font-semibold text-gray-900 mb-2">Benefícios</h4>
-  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
-    {options.benefits.map((b) => (
-      <Checkbox
-        key={b}
-        id={`ben-${b}`}
-        checked={state.benefits.includes(b)}
-        onChange={() => toggleString("benefits", b)}
-        label={b}
-      />
-    ))}
-  </div>
-</div>
-
+					{/* Benefícios */}
+					<div className="lg:col-span-2">
+						<h4 className="font-semibold text-gray-900 mb-2">Benefícios</h4>
+						<div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
+							{options.benefits.map((b) => (
+								<Checkbox
+									key={b}
+									id={`ben-${b}`}
+									checked={state.benefits.includes(b)}
+									onChange={() => toggleString("benefits", b)}
+									label={b}
+								/>
+							))}
+						</div>
+					</div>
 				</div>
 
 				{/* Footer ações */}

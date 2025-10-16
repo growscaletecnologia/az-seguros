@@ -198,7 +198,9 @@ export default function CheckoutPage() {
 			{/* Header */}
 			<div className="bg-white shadow-sm border-b">
 				<div className="max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6">
-					<h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">Finalizar Compra</h1>
+					<h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
+						Finalizar Compra
+					</h1>
 					<p className="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">
 						Revise seus dados e efetue o pagamento
 					</p>
@@ -294,7 +296,9 @@ export default function CheckoutPage() {
 									<MapPin className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-500" />
 									<div>
 										<p className="text-xs sm:text-sm text-gray-600">Destino</p>
-										<p className="text-sm sm:text-base font-medium">{quotationData.destino}</p>
+										<p className="text-sm sm:text-base font-medium">
+											{quotationData.destino}
+										</p>
 									</div>
 								</div>
 								<div className="flex items-center space-x-2">

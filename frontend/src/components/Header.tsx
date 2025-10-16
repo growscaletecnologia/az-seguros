@@ -1,18 +1,10 @@
 "use client";
 
-import {
-	LogOut,
-	Menu,
-	Phone,
-	Settings,
-	Shield,
-	User,
-	X,
-} from "lucide-react";
+import AuthService from "@/lib/services/auth-service";
+import { LogOut, Menu, Phone, Settings, Shield, User, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import AuthService from "@/lib/services/auth-service";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -25,7 +17,11 @@ import {
 export default function Header() {
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const [isAuthenticated, setIsAuthenticated] = useState(false);
-	const [user, setUser] = useState<{ name: string; email: string; role: string } | null>(null);
+	const [user, setUser] = useState<{
+		name: string;
+		email: string;
+		role: string;
+	} | null>(null);
 	const router = useRouter();
 
 	// Verificar autenticação quando o componente montar
@@ -33,7 +29,7 @@ export default function Header() {
 		const checkAuth = () => {
 			const isAuth = AuthService.isAuthenticated();
 			setIsAuthenticated(isAuth);
-			
+
 			if (isAuth) {
 				const userData = AuthService.getUser();
 				setUser(userData);
@@ -56,10 +52,16 @@ export default function Header() {
 		};
 
 		window.addEventListener("storage", handleStorageChange);
-		window.addEventListener("authStateChanged", handleAuthStateChange as EventListener);
+		window.addEventListener(
+			"authStateChanged",
+			handleAuthStateChange as EventListener,
+		);
 		return () => {
 			window.removeEventListener("storage", handleStorageChange);
-			window.removeEventListener("authStateChanged", handleAuthStateChange as EventListener);
+			window.removeEventListener(
+				"authStateChanged",
+				handleAuthStateChange as EventListener,
+			);
 		};
 	}, []);
 
@@ -74,12 +76,12 @@ export default function Header() {
 	// Função para gerar as iniciais do nome do usuário
 	const getUserInitials = () => {
 		if (!user || !user.name) return "U";
-		
+
 		const nameParts = user.name.split(" ");
 		if (nameParts.length === 1) return nameParts[0].charAt(0).toUpperCase();
-		
+
 		return (
-			nameParts[0].charAt(0).toUpperCase() + 
+			nameParts[0].charAt(0).toUpperCase() +
 			nameParts[nameParts.length - 1].charAt(0).toUpperCase()
 		);
 	};
@@ -98,7 +100,6 @@ export default function Header() {
 
 					{/* Desktop Navigation */}
 					<nav className="hidden md:flex items-center space-x-4 lg:space-x-8">
-						
 						<Link
 							href="/faq"
 							className="text-gray-700 hover:text-blue-600 font-medium text-sm lg:text-base"
@@ -116,7 +117,7 @@ export default function Header() {
 								<Phone className="h-4 w-4" />
 								<span className="text-sm font-medium">0800 123 4567</span>
 							</div>
-							
+
 							{isAuthenticated && user ? (
 								<DropdownMenu>
 									<DropdownMenuTrigger className="flex items-center justify-center h-9 w-9 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-colors">
@@ -126,21 +127,29 @@ export default function Header() {
 										<DropdownMenuLabel>
 											<div className="flex flex-col">
 												<span className="font-medium">{user.name}</span>
-												<span className="text-xs text-gray-500">{user.email}</span>
+												<span className="text-xs text-gray-500">
+													{user.email}
+												</span>
 											</div>
 										</DropdownMenuLabel>
 										<DropdownMenuSeparator />
-										
+
 										{user.role === "CUSTOMER" ? (
 											<>
 												<DropdownMenuItem asChild>
-													<Link href="/cliente" className="cursor-pointer w-full">
+													<Link
+														href="/cliente"
+														className="cursor-pointer w-full"
+													>
 														<User className="mr-2 h-4 w-4" />
 														<span>Área do Cliente</span>
 													</Link>
 												</DropdownMenuItem>
 												<DropdownMenuItem asChild>
-													<Link href="/cliente/seguros" className="cursor-pointer w-full">
+													<Link
+														href="/cliente/seguros"
+														className="cursor-pointer w-full"
+													>
 														<Shield className="mr-2 h-4 w-4" />
 														<span>Meus Seguros</span>
 													</Link>
@@ -148,15 +157,21 @@ export default function Header() {
 											</>
 										) : (
 											<DropdownMenuItem asChild>
-												<Link href="/admin/painel" className="cursor-pointer w-full">
+												<Link
+													href="/admin/painel"
+													className="cursor-pointer w-full"
+												>
 													<Settings className="mr-2 h-4 w-4" />
 													<span>Área Administrativa</span>
 												</Link>
 											</DropdownMenuItem>
 										)}
-										
+
 										<DropdownMenuSeparator />
-										<DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-600 focus:text-red-600">
+										<DropdownMenuItem
+											onClick={handleLogout}
+											className="cursor-pointer text-red-600 focus:text-red-600"
+										>
 											<LogOut className="mr-2 h-4 w-4" />
 											<span>Sair</span>
 										</DropdownMenuItem>
@@ -213,7 +228,7 @@ export default function Header() {
 							>
 								Ajuda
 							</Link>
-							
+
 							{/* Opções de usuário no menu mobile */}
 							{isAuthenticated && user ? (
 								<>
@@ -224,12 +239,14 @@ export default function Header() {
 											</div>
 											<div className="flex flex-col">
 												<span className="font-medium text-sm">{user.name}</span>
-												<span className="text-xs text-gray-500">{user.email}</span>
+												<span className="text-xs text-gray-500">
+													{user.email}
+												</span>
 											</div>
 										</div>
 									</div>
 									<div className="border-t border-gray-100 my-2"></div>
-									
+
 									{user.role === "CUSTOMER" ? (
 										<>
 											<Link
@@ -259,7 +276,7 @@ export default function Header() {
 											Área Administrativa
 										</Link>
 									)}
-									
+
 									<button
 										onClick={() => {
 											handleLogout();

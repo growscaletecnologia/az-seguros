@@ -14,7 +14,7 @@ export interface Coupon {
 	usageLimit: number;
 	front_publishable: boolean;
 	description?: string;
-	status:  "ACTIVE" |   "INACTIVE" |    "REDEEMED" |    "EXPIRED";
+	status: "ACTIVE" | "INACTIVE" | "REDEEMED" | "EXPIRED";
 	deleted: boolean;
 	deletedAt?: string;
 	createdAt: string;

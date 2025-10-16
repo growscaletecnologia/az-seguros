@@ -1,4 +1,12 @@
 "use client";
+import { Button } from "@/components/ui/button";
+import {
+	createSecurityIntegration,
+	deleteSecurityIntegration,
+	getAllSecurityIntegrations,
+	updateSecurityIntegration,
+} from "@/services/security-integrations.service";
+import type { SecurityIntegration } from "@/types/types";
 import {
 	Eye,
 	Pencil,
@@ -9,15 +17,7 @@ import {
 	X,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import {
-	getAllSecurityIntegrations,
-	createSecurityIntegration,
-	updateSecurityIntegration,
-	deleteSecurityIntegration,
-} from "@/services/security-integrations.service";
 import { toast } from "sonner";
-import { SecurityIntegration } from "@/types/types";
-import { Button } from "@/components/ui/button";
 
 // helpers
 const maskSecret = (text: string) => (text ? `•••• ${text.slice(-4)}` : "—");
@@ -28,13 +28,13 @@ export default function IntegrationsPage() {
 	const [integracoes, setIntegracoes] = useState<SecurityIntegration[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
-	console.log("integracoes",integracoes)
+	console.log("integracoes", integracoes);
 	useEffect(() => {
 		async function loadIntegrations() {
 			try {
 				setIsLoading(true);
 				const data = await getAllSecurityIntegrations();
-				
+
 				setIntegracoes(data);
 				setError(null);
 			} catch (err) {
@@ -157,7 +157,9 @@ export default function IntegrationsPage() {
 			setOpen(false);
 		} catch (err) {
 			console.error("Erro ao salvar integração:", err);
-			alert("Falha ao salvar integração. Verifique os dados e tente novamente.");
+			alert(
+				"Falha ao salvar integração. Verifique os dados e tente novamente.",
+			);
 		}
 	};
 
@@ -254,8 +256,9 @@ export default function IntegrationsPage() {
 								className="grid grid-cols-12 items-center px-4 py-3"
 							>
 								<div className="col-span-3">
-									<div className="font-medium text-gray-900">{i.insurerName}</div>
-									
+									<div className="font-medium text-gray-900">
+										{i.insurerName}
+									</div>
 								</div>
 
 								<div className="col-span-3 text-gray-900">
@@ -263,7 +266,8 @@ export default function IntegrationsPage() {
 										<span className="font-medium">Usuário:</span> {i.username}
 									</div>
 									<div className="text-xs">
-										<span className="font-medium">Secret:</span> {maskSecret(i.clientSecret)}
+										<span className="font-medium">Secret:</span>{" "}
+										{maskSecret(i.clientSecret)}
 									</div>
 								</div>
 
@@ -293,23 +297,18 @@ export default function IntegrationsPage() {
 
 								<div className="col-span-2 flex justify-end gap-2">
 									<Button
-										
 										className="hover:bg-transparent cursor-pointer"
 										variant={"ghost"}
 										onClick={() => {
 											setIsEditing(true);
 											setEditingId(i.id!);
-											setFormData({...i});
+											setFormData({ ...i });
 											setNoMarkup(i.markUp === null);
 											setOpen(true);
 										}}
 									>
-									
-											<p className="w-4 h-4 text-gray-700" /> Editar
-										
+										<p className="w-4 h-4 text-gray-700" /> Editar
 									</Button>
-									
-									
 								</div>
 							</div>
 						))}
@@ -469,7 +468,7 @@ export default function IntegrationsPage() {
 								</label>
 							</div>
 							{/* Ativa */}
-						
+
 							<div className="flex justify-end gap-2">
 								<button
 									type="button"
