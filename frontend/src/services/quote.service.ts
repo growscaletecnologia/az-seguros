@@ -19,6 +19,7 @@ export interface QuoteResponse {
 	slug: string;
 	provider_code: string;
 	provider_name: string;
+	provider_terms_url?: string;
 	totalPrice: number;
 	totalPriceWithPixDiscount: number;
 	dolar: number;

@@ -17,7 +17,7 @@ import { ArrowLeft, Calendar, CheckCircle, User } from "lucide-react";
 import { DateRangePicker } from "@/components/Inputs/CustomCalendar";
 import DestinationSelect from "@/components/Inputs/DestinationSelect";
 import EmailField from "@/components/Inputs/EmailInput";
-import PassengersSelect from "@/components/Inputs/PassengersSelect,";
+import PassengersSelect from "@/components/Inputs/PassengersSelect";
 import PhoneField from "@/components/Inputs/PhoneInput";
 import {
 	HoverCard,

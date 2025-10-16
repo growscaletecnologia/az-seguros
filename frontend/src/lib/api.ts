@@ -12,7 +12,7 @@ import axios, {
  */
 const API_URL =
 	process.env.NODE_ENV === "production"
-		? process.env.NEXT_PUBLIC_API_URL || "https://api.azseguros.com.br/api"
+		? process.env.NEXT_PUBLIC_API_URL || "https://segurospromo.growscale.com.br/api"
 		: "http://localhost:5000/api";
 
 /**

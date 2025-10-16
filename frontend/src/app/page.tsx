@@ -33,7 +33,7 @@ import { useState } from "react";
 
 import DestinationSelect from "@/components/Inputs/DestinationSelect";
 
-import PassengersSelect from "@/components/Inputs/PassengersSelect,";
+import PassengersSelect from "@/components/Inputs/PassengersSelect";
 import { AvaliacoesCarousel } from "@/components/avaliations/AvaliacoesCarousel";
 import {
 	HoverCard,
@@ -72,19 +72,26 @@ function smoothScrollTo(position: number, duration: number) {
 }
 
 export default function HomePage() {
-	const { formData: dados, setForm } = usePreRegisterForm();
-	const [formData, setFormData] = useState<PreRegisterForm>({
+	const { formData, setForm, setField, reset } = usePreRegisterForm();
+
+	useEffect(() => {
+	if (!formData) {
+		setForm({
+		destination: "europa",
+		range: {
+			from: new Date(),
+			to: new Date(),
+		},
+		passengers: "1",
 		name: "",
 		email: "",
 		phone: "",
-		range: undefined,
-		passengers: "1",
-		destination: "BA",
 		step: 1,
 		coupon: "",
 		term: false,
-	});
-
+		});
+	}
+	}, [formData, setForm]);
 	const router = useRouter();
 	const [coupomChecked, setCoupomChecked] = useState(false);
 	const [errors, setErrors] = useState<
@@ -173,11 +180,11 @@ export default function HomePage() {
 			"destination",
 			"term",
 		];
-		const newErrors: Partial<Record<keyof PreRegisterForm, boolean>> = {};
 
+		const newErrors: Partial<Record<keyof PreRegisterForm, boolean>> = {};
 		requiredFields.forEach((field) => {
-			if (!formData[field] || (field === "range" && !formData.range?.from)) {
-				newErrors[field] = true;
+			if (!formData?.[field] || (field === "range" && !formData?.range?.from)) {
+			newErrors[field] = true;
 			}
 		});
 
@@ -186,12 +193,15 @@ export default function HomePage() {
 			return;
 		}
 
-		const finalForm = { ...formData, coupon: coupomChecked ? "SEGURO25" : "" };
+		const finalForm = {
+			...formData,
+			coupon: coupomChecked && featuredCoupon?.code ? featuredCoupon.code : null,
+		};
 
 		setForm(finalForm);
 		router.push("/planos");
-		console.log("Form submitted:", finalForm);
 	}
+
 	return (
 		<div className="bg-white">
 			{/* Hero Section */}
@@ -238,7 +248,7 @@ export default function HomePage() {
 											checked={coupomChecked}
 											onChange={() => {
 												setCoupomChecked(!coupomChecked);
-												setFormData((prev) => ({ ...prev, coupon: "" }));
+												setField("coupon", featuredCoupon.code);
 											}}
 										/>
 										<span className="text-base sm:text-lg font-bold">
@@ -254,10 +264,7 @@ export default function HomePage() {
 											checked={coupomChecked}
 											onChange={() => {
 												setCoupomChecked(!coupomChecked);
-												setFormData((prev) => ({
-													...prev,
-													coupon: featuredCoupon.code,
-												}));
+												setField("coupon", featuredCoupon.code);
 											}}
 										/>
 										<span className="text-sm">Aplicar cupom</span>
@@ -287,10 +294,8 @@ export default function HomePage() {
 									</h3>
 									<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
 										<DestinationSelect
-											data={formData.destination}
-											setData={(value) =>
-												setFormData((prev) => ({ ...prev, destination: value }))
-											}
+											data={formData?.destination || ""}
+											setData={(value) => setField("destination", value)}
 										/>
 										{errors.destination && (
 											<p className="text-red-500 text-xs sm:text-sm">
@@ -299,12 +304,10 @@ export default function HomePage() {
 										)}
 										<div className="col-span-1 md:col-span-2 lg:col-span-2">
 											<DateRangePicker
-												onChange={(value) => {
-													setFormData((prev) => ({ ...prev, range: value }));
-												}}
+												onChange={(value) => setField("range", value)}
 												minDate={new Date()}
 												months={1}
-												range={formData.range}
+												range={formData?.range}
 											/>
 											{errors.range && (
 												<p className="text-red-500 text-xs sm:text-sm">
@@ -322,20 +325,17 @@ export default function HomePage() {
 												type="text"
 												placeholder="Nome completo"
 												className="w-full bg-transparent border-0 placeholder-white/70 text-white focus:ring-0 focus:outline-none text-sm sm:text-base"
-												value={formData.name}
+												value={formData?.name || ""}
 												onChange={(e) =>
-													setFormData((prev) => ({
-														...prev,
-														name: e.target.value,
-													}))
+													setField("name", e.target.value)
 												}
 											/>
 										</div>
 										<div>
 											<EmailField
-												email={formData.email}
+												email={formData?.email || ""}
 												setEmail={(value) =>
-													setFormData((prev) => ({ ...prev, email: value }))
+													setField("email", value)
 												}
 											/>
 											{errors.email && (
@@ -346,9 +346,9 @@ export default function HomePage() {
 										</div>
 										<div>
 											<PhoneField
-												phone={formData.phone}
+												phone={formData?.phone || ""}
 												setPhone={(value) =>
-													setFormData((prev) => ({ ...prev, phone: value }))
+													setField("phone", value)
 												}
 											/>
 											{errors.phone && (
@@ -361,9 +361,9 @@ export default function HomePage() {
 
 									<div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4 mt-3 sm:mt-4">
 										<PassengersSelect
-											data={formData.passengers}
+											data={formData?.passengers || ""}
 											setData={(value) =>
-												setFormData((prev) => ({ ...prev, passengers: value }))
+												setField("passengers", value)
 											}
 										/>
 
@@ -382,9 +382,9 @@ export default function HomePage() {
 											type="checkbox"
 											id="cupom"
 											className="w-5 h-5 rounded-2xl mt-1"
-											checked={formData.term}
+											checked={formData?.term}
 											onChange={() => {
-												setFormData((prev) => ({ ...prev, term: !prev.term }));
+												setField("term", !formData?.term)
 											}}
 										/>
 

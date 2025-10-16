@@ -30,7 +30,7 @@ export default function RootLayout({
 				<main className="min-h-screen pt-16">{children}</main>
 				<ChatWidget />
 				<Footer />
-				<Toaster position="top-right" richColors />
+				<Toaster position="top-center" richColors />
 			</body>
 		</html>
 	);

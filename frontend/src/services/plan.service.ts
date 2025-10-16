@@ -1,4 +1,5 @@
 import { api } from "@/lib/api";
+import { PlanInfo } from "@/types/types";
 
 export interface Plan {
 	id: number;
@@ -125,6 +126,23 @@ export const PlanService = {
 		return response.data;
 	},
 
+
+	  /**
+		 * Busca informações detalhadas do plano
+		 * (usa o endpoint `/insurer/plans/product/info`)
+		 */
+		async getInfo(params: {
+			destination: string;
+			departure: string;
+			arrival: string;
+			id: number;
+		}): Promise<PlanInfo> {
+			const { destination, departure, arrival, id } = params;
+			const response = await api.get(`/insurer/plans/product/info`, {
+			params: { destination, departure, arrival, id },
+			});
+			return response.data;
+		},
 	/**
 	 * Deleta um plano pelo ID
 	 * @param id ID do plano

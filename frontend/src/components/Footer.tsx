@@ -52,13 +52,6 @@ export default function Footer() {
 								className="w-auto h-6 sm:h-8"
 								src={"/pix-footer-icon.svg"}
 							/>
-							<Image
-								alt="Boleto"
-								width={40}
-								height={30}
-								className="w-auto h-6 sm:h-8"
-								src={"/boleto-footer-icon.svg"}
-							/>
 						</div>
 					</div>
 

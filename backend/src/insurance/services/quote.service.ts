@@ -12,7 +12,92 @@ export class QuoteService {
   private readonly dollarValue = 5.6 // taxa fictícia de conversão
 
  
- async calculateQuote(dto: QuoteRequestDto): Promise<any[]> {
+//  async calculateQuote(dto: QuoteRequestDto): Promise<any[]> {
+//   const { slug, departure, arrival, passengers } = dto;
+
+//   await this.validateRequest(dto);
+
+//   const days = this.calculateDays(departure, arrival);
+//   const avgAge = this.calculateAverageAge(passengers.map(p => ({ age: Number(p.age) })));
+
+//   this.logger.log(`Calculando cotação para destino: ${slug}, dias: ${days}, idade média: ${avgAge}`);
+
+//   const plans = await PlansRepository.findNormalizedPlans({ slug, age: avgAge });
+//   console.log("plans", plans)
+//   if (!plans) {
+//     this.logger.warn(`Nenhum plano encontrado para o destino: ${slug}`);
+//     //throw new BadRequestError('Nenhum plano disponível para os critérios fornecidos.');
+//   }
+
+//   const dollar_price = await prisma.dollarCotation.findFirst({ where: { id: 1 } });
+//   const dolar = Number(dollar_price?.price || 1);
+
+//   const quotedPlans = plans.map(plan => {
+//     let total = 0;
+
+//     // 🧮 tabela de valores calculados por faixa etária
+//     const detailedAgeGroups = plan.ageGroups.map(group => {
+//       const faixaValor = passengers
+//         .filter(p => p.age >= group.start && p.age <= group.end)
+//         .map(p => {
+//           const price = Number(group.price);
+//           const iof = Number(group.priceIof);
+//             const isBrazil = slug.toLowerCase() === 'brasil';
+//           const baseValue = isBrazil
+//             ? price * days // já em reais
+//         : (price * days) * dolar; // converter de USD para BRL
+
+//           const valorFinal = baseValue + (baseValue * iof);
+
+//           let valorComMarkup = valorFinal;
+//           if (plan.markUp && plan.markUp > 0) {
+//             const margem = plan.markUp / 100;
+//             valorComMarkup = valorFinal / (1 - margem);
+//           }
+
+//           return valorComMarkup;
+//         });
+
+//       const totalGroupValue = faixaValor.reduce((acc, v) => acc + v, 0);
+
+//       return {
+//         start: group.start,
+//         end: group.end,
+//         price: Number(group.price),
+//         priceIof: Number(group.priceIof),
+//         totalGroupValue: Number(totalGroupValue.toFixed(2)),
+//       };
+//     });
+
+//     // 💰 soma total geral
+//     total = detailedAgeGroups.reduce((acc, g) => acc + g.totalGroupValue, 0);
+
+//     // 💸 aplica desconto de 5% no PIX
+//     const totalPriceWithPixDiscount = Number((total * 0.95).toFixed(2));
+
+//     return {
+//       code: plan.code,
+//       name: plan.name,
+//       slug: plan.slug,
+//       provider_code: plan.provider_code,
+//       provider_name: plan.provider_name,
+//       provider_terms_url: plan.term_url,
+//       totalPrice: Number(total.toFixed(2)),
+//       totalPriceWithPixDiscount,
+//       dolar:dolar,
+//       currency: this.defaultCurrency,
+//       days,
+//       passengers: passengers.length,
+//       ageGroups: detailedAgeGroups,
+//       benefits: plan.benefits,
+//     };
+//   });
+
+//   this.logger.log(`Cotação calculada com sucesso para ${quotedPlans.length} planos.`);
+//   return quotedPlans;
+// }
+
+async calculateQuote(dto: QuoteRequestDto): Promise<any[]> {
   const { slug, departure, arrival, passengers } = dto;
 
   await this.validateRequest(dto);
@@ -23,56 +108,51 @@ export class QuoteService {
   this.logger.log(`Calculando cotação para destino: ${slug}, dias: ${days}, idade média: ${avgAge}`);
 
   const plans = await PlansRepository.findNormalizedPlans({ slug, age: avgAge });
-  console.log("plans", plans)
   if (!plans) {
     this.logger.warn(`Nenhum plano encontrado para o destino: ${slug}`);
-    //throw new BadRequestError('Nenhum plano disponível para os critérios fornecidos.');
   }
 
   const dollar_price = await prisma.dollarCotation.findFirst({ where: { id: 1 } });
   const dolar = Number(dollar_price?.price || 1);
 
   const quotedPlans = plans.map(plan => {
-    let total = 0;
+    const isBrazil = slug.toLowerCase() === "brasil";
 
-    // 🧮 tabela de valores calculados por faixa etária
+    // 🧮 calcular todos os grupos etários com valor total e markup
     const detailedAgeGroups = plan.ageGroups.map(group => {
-      const faixaValor = passengers
-        .filter(p => p.age >= group.start && p.age <= group.end)
-        .map(p => {
-          const price = Number(group.price);
-          const iof = Number(group.priceIof);
-            const isBrazil = slug.toLowerCase() === 'brasil';
-          const baseValue = isBrazil
-            ? price * days // já em reais
-        : (price * days) * dolar; // converter de USD para BRL
+      const basePrice = Number(group.price);
+      const iof = Number(group.priceIof);
 
-          const valorFinal = baseValue + (baseValue * iof);
+      // preço bruto (por pessoa)
+      const baseValue = isBrazil
+        ? basePrice * days // já em reais
+        : (basePrice * days) * dolar; // converter de USD para BRL
 
-          let valorComMarkup = valorFinal;
-          if (plan.markUp && plan.markUp > 0) {
-            const margem = plan.markUp / 100;
-            valorComMarkup = valorFinal / (1 - margem);
-          }
+      const valorComIof = baseValue + (baseValue * iof);
 
-          return valorComMarkup;
-        });
+      // aplica markup se existir
+      let valorComMarkup = valorComIof;
+      if (plan.markUp && plan.markUp > 0) {
+        const margem = plan.markUp / 100;
+        valorComMarkup = valorComIof / (1 - margem);
+      }
 
-      const totalGroupValue = faixaValor.reduce((acc, v) => acc + v, 0);
-
+      // totalGroupValue agora é sempre o valor final (por pessoa, já com markup)
       return {
         start: group.start,
         end: group.end,
-        price: Number(group.price),
-        priceIof: Number(group.priceIof),
-        totalGroupValue: Number(totalGroupValue.toFixed(2)),
+        price: basePrice,
+        priceIof: iof,
+        totalGroupValue: Number(valorComMarkup.toFixed(2)),
       };
     });
 
-    // 💰 soma total geral
-    total = detailedAgeGroups.reduce((acc, g) => acc + g.totalGroupValue, 0);
+    // 💰 total real da cotação com base nas idades enviadas
+    const total = passengers.reduce((acc, p) => {
+      const group = detailedAgeGroups.find(g => p.age >= g.start && p.age <= g.end);
+      return acc + (group ? group.totalGroupValue : 0);
+    }, 0);
 
-    // 💸 aplica desconto de 5% no PIX
     const totalPriceWithPixDiscount = Number((total * 0.95).toFixed(2));
 
     return {
@@ -84,11 +164,11 @@ export class QuoteService {
       provider_terms_url: plan.term_url,
       totalPrice: Number(total.toFixed(2)),
       totalPriceWithPixDiscount,
-      dolar:dolar,
+      dolar,
       currency: this.defaultCurrency,
       days,
       passengers: passengers.length,
-      ageGroups: detailedAgeGroups,
+      ageGroups: detailedAgeGroups, // ✅ agora contém o valor total já com markup
       benefits: plan.benefits,
     };
   });
@@ -96,6 +176,7 @@ export class QuoteService {
   this.logger.log(`Cotação calculada com sucesso para ${quotedPlans.length} planos.`);
   return quotedPlans;
 }
+
 
   private async validateRequest(dto: QuoteRequestDto): Promise<void> {
     const start = new Date(dto.departure)
