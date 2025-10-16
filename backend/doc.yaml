@@ -1,0 +1,2610 @@
+openapi: 3.0.0
+paths:
+  /:
+    get:
+      operationId: AppController_getHello
+      parameters: []
+      responses:
+        "200":
+          description: ""
+  /auth/login:
+    post:
+      operationId: AuthController_login
+      parameters: []
+      responses:
+        "201":
+          description: ""
+      tags: &a1
+        - Autenticação
+  /auth/verify-email:
+    get:
+      operationId: AuthController_verifyEmail
+      parameters:
+        - name: token
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+      tags: *a1
+  /auth/reset-password:
+    post:
+      operationId: AuthController_doReset
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DoResetDto"
+      responses:
+        "201":
+          description: ""
+      tags: *a1
+  /auth/session/check:
+    post:
+      operationId: AuthController_checkSession
+      summary: Verifica se a sessão está ativa
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SessionCheckDto"
+      responses:
+        "200":
+          description: Sessão válida
+        "401":
+          description: Sessão inválida ou expirada
+      tags: *a1
+  /auth/session/user:
+    get:
+      operationId: AuthController_getUserSession
+      summary: Verifica se o usuário tem sessão ativa
+      parameters: []
+      responses:
+        "200":
+          description: Retorna status da sessão do usuário
+      tags: *a1
+  /auth/session/logout:
+    post:
+      operationId: AuthController_logout
+      summary: Invalida a sessão atual do usuário
+      parameters: []
+      responses:
+        "200":
+          description: Sessão invalidada com sucesso
+      tags: *a1
+  /users:
+    post:
+      operationId: UsersController_create
+      summary: Create a new user
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserDto"
+      responses:
+        "201":
+          description: ""
+      tags: &a2
+        - Users
+    get:
+      operationId: UsersController_findAll
+      summary: Get all users
+      parameters: []
+      responses:
+        "200":
+          description: ""
+      tags: *a2
+  /users/{id}:
+    get:
+      operationId: UsersController_findOne
+      summary: Get a user by ID
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+      tags: *a2
+    patch:
+      operationId: UsersController_update
+      summary: Update a user
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserDto"
+      responses:
+        "200":
+          description: ""
+      tags: *a2
+  /users/{id}/delete:
+    delete:
+      operationId: UsersController_remove
+      summary: Delete a user
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+      tags: *a2
+  /invitations/create:
+    post:
+      operationId: InvitationController_inviteUser
+      summary: Invite a new user
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InviteUserDto"
+      responses:
+        "201":
+          description: ""
+      tags: &a3
+        - User Invitations
+  /invitations/accept/{token}:
+    post:
+      operationId: InvitationController_acceptInvitation
+      summary: Accept a user invitation
+      parameters:
+        - name: token
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "201":
+          description: ""
+      tags: *a3
+  /invitations/resend/{userId}:
+    post:
+      operationId: InvitationController_resendInvitation
+      summary: Resend an invitation to a user
+      parameters:
+        - name: userId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "201":
+          description: ""
+      tags: *a3
+  /permissions:
+    post:
+      operationId: PermissionsController_create
+      summary: Create a new permission
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePermissionDto"
+      responses:
+        "201":
+          description: Permission created successfully
+      tags: &a4
+        - permissions
+    get:
+      operationId: PermissionsController_findAll
+      summary: Get all permissions
+      parameters: []
+      responses:
+        "200":
+          description: ""
+      tags: *a4
+  /permissions/{id}:
+    get:
+      operationId: PermissionsController_findOne
+      summary: Get a permission by ID
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        "200":
+          description: ""
+      tags: *a4
+    patch:
+      operationId: PermissionsController_update
+      summary: Update a permission
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePermissionDto"
+      responses:
+        "200":
+          description: ""
+      tags: *a4
+    delete:
+      operationId: PermissionsController_remove
+      summary: Delete a permission
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        "200":
+          description: ""
+      tags: *a4
+  /permissions/resource/{resource}:
+    get:
+      operationId: PermissionsController_findByResource
+      summary: Get permissions by resource
+      parameters:
+        - name: resource
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+      tags: *a4
+  /roles:
+    post:
+      operationId: RolesController_create
+      summary: Create a new role
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateRoleDto"
+      responses:
+        "201":
+          description: Role created successfully
+      tags: &a5
+        - roles
+    get:
+      operationId: RolesController_findAll
+      summary: Get all roles
+      parameters: []
+      responses:
+        "200":
+          description: ""
+      tags: *a5
+  /roles/{id}:
+    get:
+      operationId: RolesController_findOne
+      summary: Get a role by ID
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        "200":
+          description: ""
+      tags: *a5
+    patch:
+      operationId: RolesController_update
+      summary: Update a role
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateRoleDto"
+      responses:
+        "200":
+          description: ""
+      tags: *a5
+    delete:
+      operationId: RolesController_remove
+      summary: Delete a role
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        "200":
+          description: ""
+      tags: *a5
+  /roles/{id}/permissions:
+    post:
+      operationId: RolesController_assignPermissions
+      summary: Assign permissions to a role
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssignPermissionsDto"
+      responses:
+        "201":
+          description: ""
+      tags: *a5
+    delete:
+      operationId: RolesController_removePermissions
+      summary: Remove permissions from a role
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        "200":
+          description: ""
+      tags: *a5
+  /roles/{id}/granular-permissions:
+    post:
+      operationId: RolesController_updateGranularPermissions
+      summary: Update granular permissions for a role based on sidebar pages
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateGranularPermissionsDto"
+      responses:
+        "201":
+          description: ""
+      tags: *a5
+  /coupons:
+    post:
+      operationId: CouponsController_create
+      summary: Criar um novo cupom
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCouponDto"
+      responses:
+        "201":
+          description: Cupom criado com sucesso
+        "400":
+          description: Dados inválidos
+      tags: &a6
+        - coupons
+    get:
+      operationId: CouponsController_findAll
+      summary: Listar todos os cupons
+      parameters: []
+      responses:
+        "200":
+          description: Lista de cupons retornada com sucesso
+      tags: *a6
+  /coupons/code/{code}:
+    get:
+      operationId: CouponsController_findByCode
+      summary: Buscar cupom pelo código
+      parameters:
+        - name: code
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Cupom encontrado
+        "404":
+          description: Cupom não encontrado
+      tags: *a6
+  /coupons/public:
+    get:
+      operationId: CouponsController_findPublicCoupons
+      summary: Listar cupons publicáveis e ativos na tela inicial
+      parameters: []
+      responses:
+        "200":
+          description: Lista de cupons públicos ativos retornada com sucesso
+      tags: *a6
+  /coupons/{id}:
+    get:
+      operationId: CouponsController_findOne
+      summary: Buscar cupom pelo ID
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Cupom encontrado
+        "404":
+          description: Cupom não encontrado
+      tags: *a6
+    patch:
+      operationId: CouponsController_update
+      summary: Atualizar um cupom
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCouponDto"
+      responses:
+        "200":
+          description: Cupom atualizado com sucesso
+        "404":
+          description: Cupom não encontrado
+      tags: *a6
+    delete:
+      operationId: CouponsController_remove
+      summary: Remover um cupom (exclusão permanente ou soft delete)
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: obliterate
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Cupom removido com sucesso
+        "404":
+          description: Cupom não encontrado
+      tags: *a6
+  /coupons/{id}/use:
+    post:
+      operationId: CouponsController_registerUsage
+      summary: Registrar uso de um cupom
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "201":
+          description: Uso de cupom registrado com sucesso
+        "400":
+          description: Cupom inválido ou expirado
+        "404":
+          description: Cupom não encontrado
+      tags: *a6
+  /posts:
+    post:
+      operationId: PostsController_create
+      summary: Criar um novo post
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePostDto"
+      responses:
+        "201":
+          description: Post criado com sucesso
+        "400":
+          description: Dados inválidos
+        "409":
+          description: Slug já existe
+      tags: &a7
+        - posts
+    get:
+      operationId: PostsController_findAll
+      summary: Listar todos os posts
+      parameters:
+        - name: page
+          required: false
+          in: query
+          description: Número da página
+          schema:
+            type: string
+        - name: limit
+          required: false
+          in: query
+          description: Limite de itens por página
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: Texto para busca no título, descrição ou conteúdo
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Lista de posts retornada com sucesso
+      tags: *a7
+  /posts/upload/main-image/{postId}:
+    post:
+      operationId: PostsController_uploadMainImage
+      summary: Upload da imagem principal do post
+      parameters:
+        - name: postId
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "201":
+          description: Imagem enviada com sucesso
+        "400":
+          description: Arquivo inválido
+      tags: *a7
+  /posts/upload/gallery/{postId}:
+    post:
+      operationId: PostsController_uploadGallery
+      summary: Upload de múltiplas imagens para o post
+      parameters:
+        - name: postId
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        "201":
+          description: Imagens enviadas com sucesso
+        "400":
+          description: Arquivos inválidos
+      tags: *a7
+  /posts/public:
+    get:
+      operationId: PostsController_findPublishedPosts
+      summary: Listar posts publicados (acesso público)
+      parameters:
+        - name: page
+          required: false
+          in: query
+          description: Número da página
+          schema:
+            type: string
+        - name: limit
+          required: false
+          in: query
+          description: Limite de itens por página
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: Texto para busca no título, descrição ou conteúdo
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Lista de posts publicados retornada com sucesso
+      tags: *a7
+  /posts/status/{status}:
+    get:
+      operationId: PostsController_findByStatus
+      summary: Listar posts por status
+      parameters:
+        - name: status
+          required: true
+          in: path
+          description: Status do post
+          schema:
+            enum:
+              - DRAFT
+              - PUBLISHED
+              - ARCHIVED
+            type: string
+        - name: page
+          required: false
+          in: query
+          description: Número da página
+          schema:
+            type: string
+        - name: limit
+          required: false
+          in: query
+          description: Limite de itens por página
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Lista de posts retornada com sucesso
+      tags: *a7
+  /posts/{id}:
+    get:
+      operationId: PostsController_findOne
+      summary: Buscar post por ID
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: ID do post
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Post encontrado com sucesso
+        "404":
+          description: Post não encontrado
+      tags: *a7
+    put:
+      operationId: PostsController_update
+      summary: Atualizar um post
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: ID do post
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePostDto"
+      responses:
+        "200":
+          description: Post atualizado com sucesso
+        "404":
+          description: Post não encontrado
+      tags: *a7
+    delete:
+      operationId: PostsController_remove
+      summary: Remover um post
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: ID do post
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Post removido com sucesso
+        "404":
+          description: Post não encontrado
+      tags: *a7
+  /posts/slug/{slug}:
+    get:
+      operationId: PostsController_findBySlug
+      summary: Buscar post por slug (acesso público)
+      parameters:
+        - name: slug
+          required: true
+          in: path
+          description: Slug do post
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Post encontrado com sucesso
+        "404":
+          description: Post não encontrado
+      tags: *a7
+  /posts/{id}/upload-cover-image:
+    post:
+      operationId: PostsController_uploadCoverImage
+      summary: Upload da imagem de capa do post
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: ID do post
+          schema:
+            type: string
+      requestBody:
+        required: true
+        description: Arquivo de imagem para capa do post
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+              $ref: "#/components/schemas/"
+      responses:
+        "200":
+          description: Imagem de capa enviada com sucesso
+        "404":
+          description: Post não encontrado
+      tags: *a7
+  /posts/media/{id}:
+    delete:
+      operationId: PostsController_removeMedia
+      summary: Remover uma mídia do post
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: ID da mídia
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Mídia removida com sucesso
+        "404":
+          description: Mídia não encontrada
+      tags: *a7
+  /categories/create:
+    post:
+      operationId: CategoriesController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCategoryDto"
+      responses:
+        "201":
+          description: OK
+  /categories/all:
+    get:
+      operationId: CategoriesController_findAll
+      parameters:
+        - name: page
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: limit
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  /categories:
+    get:
+      operationId: CategoriesController_findAllnoLimit
+      parameters: []
+      responses:
+        "200":
+          description: ""
+  /categories/get/{id}:
+    get:
+      operationId: CategoriesController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  /categories/update/{id}:
+    put:
+      operationId: CategoriesController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCategoryDto"
+      responses:
+        "200":
+          description: ""
+  /categories/remove/{id}:
+    delete:
+      operationId: CategoriesController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "204":
+          description: ""
+  /tags/all:
+    get:
+      operationId: TagsController_findAll
+      parameters:
+        - name: page
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: limit
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  /tags/all-no-limit:
+    get:
+      operationId: TagsController_findAllnoLimit
+      parameters: []
+      responses:
+        "200":
+          description: ""
+  /tags/create:
+    post:
+      operationId: TagsController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTagDto"
+      responses:
+        "201":
+          description: ""
+  /tags/get/{id}:
+    get:
+      operationId: TagsController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  /tags/update/{id}:
+    put:
+      operationId: TagsController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTagDto"
+      responses:
+        "200":
+          description: ""
+  /tags/remove/{id}:
+    delete:
+      operationId: TagsController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "204":
+          description: ""
+  /logs:
+    get:
+      operationId: LogsController_findAll
+      parameters:
+        - name: page
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: limit
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: sortBy
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: sortOrder
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: path
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: method
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: statusCode
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: userId
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  /logs/{id}:
+    get:
+      operationId: LogsController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  /system-pages:
+    post:
+      operationId: SystemPagesController_create
+      summary: Criar uma nova página do sistema
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSystemPageDto"
+      responses:
+        "201":
+          description: Página criada com sucesso
+        "400":
+          description: Dados inválidos
+        "409":
+          description: Slug já existe
+      tags: &a8
+        - system-pages
+    get:
+      operationId: SystemPagesController_findAll
+      summary: Listar todas as páginas do sistema
+      parameters:
+        - name: page
+          required: false
+          in: query
+          description: Número da página
+          schema:
+            type: string
+        - name: limit
+          required: false
+          in: query
+          description: Limite de itens por página
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Lista de páginas retornada com sucesso
+      tags: *a8
+  /system-pages/status/{status}:
+    get:
+      operationId: SystemPagesController_findByStatus
+      summary: Listar páginas do sistema por status
+      parameters:
+        - name: status
+          required: true
+          in: path
+          description: Status da página
+          schema:
+            enum:
+              - DRAFT
+              - PUBLISHED
+              - ARCHIVED
+            type: string
+        - name: page
+          required: false
+          in: query
+          description: Número da página
+          schema:
+            type: string
+        - name: limit
+          required: false
+          in: query
+          description: Limite de itens por página
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Lista de páginas retornada com sucesso
+      tags: *a8
+  /system-pages/{id}:
+    get:
+      operationId: SystemPagesController_findOne
+      summary: Buscar página por ID
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: ID da página
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Página encontrada com sucesso
+        "404":
+          description: Página não encontrada
+      tags: *a8
+    put:
+      operationId: SystemPagesController_update
+      summary: Atualizar uma página do sistema
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: ID da página
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSystemPageDto"
+      responses:
+        "200":
+          description: Página atualizada com sucesso
+        "404":
+          description: Página não encontrada
+      tags: *a8
+    delete:
+      operationId: SystemPagesController_remove
+      summary: Remover uma página do sistema
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: ID da página
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Página removida com sucesso
+        "404":
+          description: Página não encontrada
+      tags: *a8
+  /system-pages/slug/{slug}:
+    get:
+      operationId: SystemPagesController_findBySlug
+      summary: Buscar página por slug (acesso público)
+      parameters:
+        - name: slug
+          required: true
+          in: path
+          description: Slug da página
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Página encontrada com sucesso
+        "404":
+          description: Página não encontrada
+      tags: *a8
+  /system-pages/type/{type}:
+    get:
+      operationId: SystemPagesController_findByType
+      summary: Buscar página por tipo (acesso público)
+      parameters:
+        - name: type
+          required: true
+          in: path
+          description: Tipo da página
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Página encontrada com sucesso
+        "404":
+          description: Página não encontrada
+      tags: *a8
+  /settings:
+    post:
+      operationId: SettingsController_create
+      summary: Criar uma nova configuração
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSettingDto"
+      responses:
+        "201":
+          description: Configuração criada com sucesso
+      tags: &a9
+        - settings
+    get:
+      operationId: SettingsController_findAll
+      summary: Listar todas as configurações
+      parameters: []
+      responses:
+        "200":
+          description: Lista de configurações retornada com sucesso
+      tags: *a9
+  /settings/{id}:
+    get:
+      operationId: SettingsController_findOne
+      summary: Buscar uma configuração pelo ID
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Configuração encontrada
+        "404":
+          description: Configuração não encontrada
+      tags: *a9
+    patch:
+      operationId: SettingsController_update
+      summary: Atualizar uma configuração pelo ID
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSettingDto"
+      responses:
+        "200":
+          description: Configuração atualizada com sucesso
+        "404":
+          description: Configuração não encontrada
+      tags: *a9
+    delete:
+      operationId: SettingsController_remove
+      summary: Remover uma configuração pelo ID
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Configuração removida com sucesso
+        "404":
+          description: Configuração não encontrada
+      tags: *a9
+  /settings/key/{key}:
+    get:
+      operationId: SettingsController_findByKey
+      summary: Buscar uma configuração pela chave
+      parameters:
+        - name: key
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Configuração encontrada
+        "404":
+          description: Configuração não encontrada
+      tags: *a9
+  /settings/gtm/settings:
+    get:
+      operationId: SettingsController_getGtmSettings
+      summary: Obter configurações do Google Tag Manager
+      parameters: []
+      responses:
+        "200":
+          description: Configurações GTM retornadas com sucesso
+      tags: *a9
+    post:
+      operationId: SettingsController_updateGtmSettings
+      summary: Atualizar configurações do Google Tag Manager
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GtmSettingsDto"
+      responses:
+        "200":
+          description: Configurações GTM atualizadas com sucesso
+      tags: *a9
+  /avaliations:
+    post:
+      operationId: AvaliationsController_create
+      summary: Criar uma nova avaliação
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAvaliationDto"
+      responses:
+        "201":
+          description: Avaliação criada com sucesso
+        "400":
+          description: Dados inválidos
+      tags: &a10
+        - avaliations
+    get:
+      operationId: AvaliationsController_findAll
+      summary: Listar todas as avaliações
+      parameters:
+        - name: activeOnly
+          required: false
+          in: query
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Lista de avaliações retornada com sucesso
+      tags: *a10
+  /avaliations/{id}:
+    get:
+      operationId: AvaliationsController_findOne
+      summary: Buscar uma avaliação pelo ID
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Avaliação encontrada
+        "404":
+          description: Avaliação não encontrada
+      tags: *a10
+    patch:
+      operationId: AvaliationsController_update
+      summary: Atualizar uma avaliação
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateAvaliationDto"
+      responses:
+        "200":
+          description: Avaliação atualizada com sucesso
+        "404":
+          description: Avaliação não encontrada
+      tags: *a10
+      security:
+        - bearer: []
+    delete:
+      operationId: AvaliationsController_remove
+      summary: Remover uma avaliação
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Avaliação removida com sucesso
+        "404":
+          description: Avaliação não encontrada
+      tags: *a10
+      security:
+        - bearer: []
+  /avaliations/{id}/toggle-active:
+    patch:
+      operationId: AvaliationsController_toggleActive
+      summary: Alternar status de ativação da avaliação
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Status alterado com sucesso
+        "404":
+          description: Avaliação não encontrada
+      tags: *a10
+      security:
+        - bearer: []
+  /frontsections:
+    post:
+      operationId: FrontsectionsController_create
+      summary: Criar nova seção frontal
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateFrontsectionDto"
+      responses:
+        "201":
+          description: Seção criada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FrontsectionEntity"
+        "400":
+          description: Dados inválidos
+        "401":
+          description: Não autorizado
+      tags: &a11
+        - Front Sections
+      security:
+        - bearer: []
+    get:
+      operationId: FrontsectionsController_findAll
+      summary: Listar todas as seções frontais (Admin)
+      parameters:
+        - name: activeOnly
+          required: false
+          in: query
+          description: Filtrar apenas seções ativas
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Lista de seções
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FrontsectionEntity"
+        "401":
+          description: Não autorizado
+      tags: *a11
+      security:
+        - bearer: []
+  /frontsections/public:
+    get:
+      operationId: FrontsectionsController_findPublic
+      summary: Listar seções ativas para exibição pública
+      parameters: []
+      responses:
+        "200":
+          description: Lista de seções ativas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FrontsectionEntity"
+      tags: *a11
+  /frontsections/{id}:
+    get:
+      operationId: FrontsectionsController_findOne
+      summary: Buscar seção por ID
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: ID da seção
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Seção encontrada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FrontsectionEntity"
+        "401":
+          description: Não autorizado
+        "404":
+          description: Seção não encontrada
+      tags: *a11
+      security:
+        - bearer: []
+    patch:
+      operationId: FrontsectionsController_update
+      summary: Atualizar seção frontal
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: ID da seção
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateFrontsectionDto"
+      responses:
+        "200":
+          description: Seção atualizada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FrontsectionEntity"
+        "400":
+          description: Dados inválidos
+        "401":
+          description: Não autorizado
+        "404":
+          description: Seção não encontrada
+      tags: *a11
+      security:
+        - bearer: []
+    delete:
+      operationId: FrontsectionsController_remove
+      summary: Remover seção frontal
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: ID da seção
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Seção removida com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FrontsectionEntity"
+        "401":
+          description: Não autorizado
+        "404":
+          description: Seção não encontrada
+      tags: *a11
+      security:
+        - bearer: []
+  /frontsections/{id}/toggle-status:
+    patch:
+      operationId: FrontsectionsController_toggleStatus
+      summary: Alternar status da seção (ativo/inativo)
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: ID da seção
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Status alterado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FrontsectionEntity"
+        "401":
+          description: Não autorizado
+        "404":
+          description: Seção não encontrada
+      tags: *a11
+      security:
+        - bearer: []
+  /security-integrations:
+    post:
+      operationId: SecurityIntegrationController_create
+      summary: Criar uma nova integração de segurança
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSecurityIntegrationDto"
+      responses:
+        "201":
+          description: Integração criada com sucesso
+        "400":
+          description: Dados inválidos
+      tags: &a12
+        - security-integrations
+      security: &a13
+        - bearer: []
+    get:
+      operationId: SecurityIntegrationController_findAll
+      summary: Listar todas as integrações de segurança
+      parameters: []
+      responses:
+        "200":
+          description: Lista de integrações retornada com sucesso
+      tags: *a12
+      security: *a13
+  /security-integrations/{id}:
+    get:
+      operationId: SecurityIntegrationController_findOne
+      summary: Buscar uma integração de segurança pelo ID
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Integração encontrada com sucesso
+        "404":
+          description: Integração não encontrada
+      tags: *a12
+      security: *a13
+    patch:
+      operationId: SecurityIntegrationController_update
+      summary: Atualizar uma integração de segurança
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSecurityIntegrationDto"
+      responses:
+        "200":
+          description: Integração atualizada com sucesso
+        "404":
+          description: Integração não encontrada
+      tags: *a12
+      security: *a13
+    delete:
+      operationId: SecurityIntegrationController_remove
+      summary: Remover uma integração de segurança
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Integração removida com sucesso
+        "404":
+          description: Integração não encontrada
+      tags: *a12
+      security: *a13
+  /quotes:
+    post:
+      operationId: QuoteController_getQuotes
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuoteRequestDto"
+      responses:
+        "200":
+          description: ""
+  /insurer/plans/sync:
+    get:
+      operationId: PlanController_syncPlans
+      parameters: []
+      responses:
+        "200":
+          description: ""
+  /insurer/plans:
+    get:
+      operationId: PlanController_findAll
+      parameters: []
+      responses:
+        "200":
+          description: ""
+  /insurer/plans/filter:
+    get:
+      operationId: PlanController_findWithFilter
+      parameters:
+        - name: slug
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: age
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+  /insurer/plans/{id}:
+    get:
+      operationId: PlanController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        "200":
+          description: ""
+    delete:
+      operationId: PlanController_delete
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        "200":
+          description: ""
+  /insurer/plans/benefits/{id}:
+    get:
+      operationId: PlanController_findWithBenefits
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        "200":
+          description: ""
+  /insurer/plans/product/info:
+    get:
+      operationId: PlanController_findInfo
+      parameters:
+        - name: destination
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: departure
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: arrival
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: id
+          required: true
+          in: query
+          schema:
+            type: number
+      responses:
+        "200":
+          description: ""
+  /benefits:
+    post:
+      operationId: BenefitsController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBenefitDto"
+      responses:
+        "201":
+          description: ""
+    get:
+      operationId: BenefitsController_findAll
+      parameters: []
+      responses:
+        "200":
+          description: ""
+  /benefits/assign:
+    post:
+      operationId: BenefitsController_assignBenefits
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssignBenefitsDto"
+      responses:
+        "201":
+          description: ""
+  /benefits/bulk:
+    post:
+      operationId: BenefitsController_createMany
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+      responses:
+        "201":
+          description: ""
+  /benefits/{id}:
+    get:
+      operationId: BenefitsController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+    patch:
+      operationId: BenefitsController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateBenefitDto"
+      responses:
+        "200":
+          description: ""
+    delete:
+      operationId: BenefitsController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+info:
+  title: API de Faturamentos
+  description: Documentação API Asaas backend
+  version: "1.0"
+  contact: {}
+tags: []
+servers: []
+components:
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: JWT
+      type: http
+  schemas:
+    DoResetDto:
+      type: object
+      properties: {}
+    SessionCheckDto:
+      type: object
+      properties:
+        sessionId:
+          type: string
+          description: ID da sessão a ser verificada
+          example: session:123456:1758543992
+      required:
+        - sessionId
+    CreateUserDto:
+      type: object
+      properties: {}
+    UpdateUserDto:
+      type: object
+      properties: {}
+    InviteUserDto:
+      type: object
+      properties:
+        email:
+          type: string
+          description: Email of the user to invite
+          example: user@example.com
+        name:
+          type: string
+          description: Name of the user to invite
+          example: John Doe
+        roleIds:
+          description: Array of role IDs to assign to the invited user
+          example:
+            - 2
+          type: array
+          items:
+            type: number
+        message:
+          type: string
+          description: Custom message to include in the invitation email
+          example: Please join our platform as a manager.
+      required:
+        - email
+        - name
+        - roleIds
+    CreatePermissionDto:
+      type: object
+      properties:
+        resource:
+          type: string
+          description: The resource name that the permission applies to
+          example: users
+        action:
+          type: string
+          description: The action that can be performed on the resource
+          enum: &a14
+            - CREATE
+            - READ
+            - UPDATE
+            - DELETE
+          example: READ
+        description:
+          type: string
+          description: Optional description of the permission
+          example: Allows reading user data
+      required:
+        - resource
+        - action
+    UpdatePermissionDto:
+      type: object
+      properties:
+        resource:
+          type: string
+          description: The resource name that the permission applies to
+          example: users
+        action:
+          type: string
+          description: The action that can be performed on the resource
+          enum: *a14
+          example: READ
+        description:
+          type: string
+          description: Optional description of the permission
+          example: Allows reading user data
+    CreateRoleDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the role
+          example: EDITOR
+        description:
+          type: string
+          description: Optional description of the role
+          example: Can edit content but not delete
+        isSystem:
+          type: boolean
+          description: Whether this is a system role that cannot be modified by users
+          example: false
+          default: false
+      required:
+        - name
+    UpdateRoleDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the role
+          example: EDITOR
+        description:
+          type: string
+          description: Optional description of the role
+          example: Can edit content but not delete
+        isSystem:
+          type: boolean
+          description: Whether this is a system role that cannot be modified by users
+          example: false
+          default: false
+    AssignPermissionsDto:
+      type: object
+      properties:
+        permissionIds:
+          description: Array of permission IDs to assign to the role
+          example:
+            - 1
+            - 2
+            - 3
+          type: array
+          items:
+            type: number
+        allow:
+          type: boolean
+          description: Whether to allow or deny the permissions
+          example: true
+          default: true
+      required:
+        - permissionIds
+        - allow
+    GranularPermissionDto:
+      type: object
+      properties:
+        resource:
+          type: string
+          description: Recurso ao qual a permissão se aplica
+          enum:
+            - dashboard
+            - usuarios
+            - rbac
+            - blog
+            - cupons
+            - pedidos
+            - integracoes
+            - paginas
+          example: usuarios
+        canRead:
+          type: boolean
+          description: Permissão para visualizar o recurso
+          example: true
+        canCreate:
+          type: boolean
+          description: Permissão para criar o recurso
+          example: true
+        canUpdate:
+          type: boolean
+          description: Permissão para editar o recurso
+          example: true
+        canDelete:
+          type: boolean
+          description: Permissão para excluir o recurso
+          example: false
+      required:
+        - resource
+        - canRead
+        - canCreate
+        - canUpdate
+        - canDelete
+    UpdateGranularPermissionsDto:
+      type: object
+      properties:
+        permissions:
+          description: Lista de permissões granulares para cada recurso
+          type: array
+          items:
+            $ref: "#/components/schemas/GranularPermissionDto"
+      required:
+        - permissions
+    CreateCouponDto:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Código do cupom
+        discount:
+          type: number
+          description: Valor do desconto
+        status:
+          type: string
+          description: Status do cupom
+          enum:
+            - ACTIVE
+            - INACTIVE
+            - REDEEMED
+            - EXPIRED
+          default: ACTIVE
+        discountType:
+          type: string
+          description: Tipo de desconto (percentual ou valor fixo)
+          enum:
+            - PERCENTAGE
+            - FIXED
+        expiresAt:
+          type: string
+          description: Data de expiração do cupom
+        userId:
+          type: string
+          description: ID do usuário que criou o cupom
+        usageLimit:
+          type: number
+          description: Limite de uso do cupom
+        front_publishable:
+          type: boolean
+          description: Indica se o cupom pode ser exibido na tela inicial
+        description:
+          type: string
+          description: Descrição do cupom
+      required:
+        - code
+        - discount
+        - discountType
+        - expiresAt
+        - userId
+    UpdateCouponDto:
+      type: object
+      properties: {}
+    CreatePostDto:
+      type: object
+      properties:
+        mainImage:
+          type: string
+          example: data:image/png;base64,<arquivo base64>
+        fullUrl:
+          type: string
+          description: URL completa do post
+          example: /blog/seguros/passaporte
+        coverImage:
+          type: string
+          description: URL da imagem de capa do post
+          example: https://example.com/image.jpg
+      required:
+        - mainImage
+        - fullUrl
+        - coverImage
+    UpdatePostDto:
+      type: object
+      properties:
+        mainImage:
+          type: string
+          example: data:image/png;base64,<arquivo base64>
+        fullUrl:
+          type: string
+          description: URL completa do post
+          example: /blog/seguros/passaporte
+        coverImage:
+          type: string
+          description: URL da imagem de capa do post
+          example: https://example.com/image.jpg
+      required:
+        - mainImage
+        - fullUrl
+        - coverImage
+    CreateCategoryDto:
+      type: object
+      properties: {}
+    UpdateCategoryDto:
+      type: object
+      properties: {}
+    CreateTagDto:
+      type: object
+      properties: {}
+    UpdateTagDto:
+      type: object
+      properties: {}
+    CreateSystemPageDto:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Termos de Uso
+        slug:
+          type: string
+          example: termos-de-uso
+        content:
+          type: string
+          example: <h1>Termos de Uso</h1><p>Conteúdo dos termos...</p>
+        type:
+          type: string
+          enum:
+            - FAQ
+            - TERMS
+            - POLICIES
+            - HELP
+            - CONTACT
+          example: TERMS
+        status:
+          type: string
+          enum:
+            - DRAFT
+            - PUBLISHED
+            - ARCHIVED
+          example: PUBLISHED
+      required:
+        - title
+        - slug
+        - content
+        - type
+        - status
+    UpdateSystemPageDto:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Termos de Uso Atualizados
+        slug:
+          type: string
+          example: termos-de-uso
+        content:
+          type: string
+          example: <h1>Termos de Uso Atualizados</h1><p>Conteúdo dos termos...</p>
+        type:
+          type: string
+          enum:
+            - FAQ
+            - TERMS
+            - POLICIES
+            - HELP
+            - CONTACT
+          example: TERMS
+        status:
+          type: string
+          enum:
+            - DRAFT
+            - PUBLISHED
+            - ARCHIVED
+          example: PUBLISHED
+      required:
+        - title
+        - slug
+        - content
+        - type
+        - status
+    CreateSettingDto:
+      type: object
+      properties:
+        key:
+          type: string
+          description: Chave única da configuração
+        value:
+          type: string
+          description: Valor da configuração
+        description:
+          type: string
+          description: Descrição da configuração
+        gtm_head_code:
+          type: string
+          description: Código GTM para o head
+        gtm_body_code:
+          type: string
+          description: Código GTM para o body
+      required:
+        - key
+        - value
+    UpdateSettingDto:
+      type: object
+      properties:
+        key:
+          type: string
+          description: Chave única da configuração
+        value:
+          type: string
+          description: Valor da configuração
+        description:
+          type: string
+          description: Descrição da configuração
+        gtm_head_code:
+          type: string
+          description: Código GTM para o head
+        gtm_body_code:
+          type: string
+          description: Código GTM para o body
+    GtmSettingsDto:
+      type: object
+      properties:
+        gtm_head_code:
+          type: string
+          description: Código GTM para o head
+        gtm_body_code:
+          type: string
+          description: Código GTM para o body
+      required:
+        - gtm_head_code
+        - gtm_body_code
+    CreateAvaliationDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Nome do usuário que fez a avaliação
+        rating:
+          type: number
+          description: Avaliação de 1 a 5 estrelas
+        comment:
+          type: string
+          description: Comentário da avaliação
+        location:
+          type: string
+          description: Local/destino da viagem (opcional)
+        avatar:
+          type: string
+          description: Iniciais ou URL para avatar do usuário (opcional)
+        active:
+          type: boolean
+          description: Controla se a avaliação está visível
+          default: true
+      required:
+        - name
+        - rating
+        - comment
+        - active
+    UpdateAvaliationDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Nome do usuário que fez a avaliação
+        rating:
+          type: number
+          description: Avaliação de 1 a 5 estrelas
+        comment:
+          type: string
+          description: Comentário da avaliação
+        location:
+          type: string
+          description: Local/destino da viagem (opcional)
+        avatar:
+          type: string
+          description: Iniciais ou URL para avatar do usuário (opcional)
+        active:
+          type: boolean
+          description: Controla se a avaliação está visível
+          default: true
+    CreateFrontsectionDto:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Título da seção
+          example: Melhor Preço
+          maxLength: 100
+        description:
+          type: string
+          description: Descrição detalhada da seção
+          example: Garantimos o melhor preço do mercado ou devolvemos a diferença.
+          maxLength: 500
+        icon:
+          type: string
+          description: "Nome do ícone do Lucide React (ex: DollarSign, Clock, Shield,
+            Users)"
+          example: DollarSign
+          enum: &a15
+            - DollarSign
+            - Euro
+            - PoundSterling
+            - CreditCard
+            - Banknote
+            - TrendingUp
+            - TrendingDown
+            - Clock
+            - Clock3
+            - Clock9
+            - Timer
+            - Hourglass
+            - Calendar
+            - CalendarDays
+            - Shield
+            - ShieldCheck
+            - ShieldAlert
+            - Lock
+            - Unlock
+            - Key
+            - Eye
+            - EyeOff
+            - User
+            - Users
+            - UserCheck
+            - UserPlus
+            - UserX
+            - Heart
+            - Star
+            - Award
+            - Phone
+            - PhoneCall
+            - MessageCircle
+            - Mail
+            - Send
+            - Headphones
+            - CheckCircle
+            - CheckSquare
+            - Badge
+            - Trophy
+            - Target
+            - Zap
+            - MapPin
+            - Globe
+            - Plane
+            - Car
+            - Train
+            - Ship
+            - Compass
+            - Navigation
+            - Settings
+            - Cog
+            - Wrench
+            - Tool
+            - Package
+            - Gift
+            - Sparkles
+            - Rocket
+        bgColor:
+          type: string
+          description: Cor de fundo do ícone
+          example: blue
+          enum: &a16
+            - blue
+            - green
+            - orange
+            - red
+            - purple
+            - yellow
+            - pink
+            - gray
+          default: blue
+        order:
+          type: number
+          description: Ordem de exibição da seção
+          example: 1
+          minimum: 0
+        status:
+          type: string
+          description: Status da seção
+          enum: &a17
+            - ACTIVE
+            - INACTIVE
+          example: ACTIVE
+          default: ACTIVE
+      required:
+        - title
+        - description
+        - icon
+        - bgColor
+        - order
+        - status
+    FrontsectionEntity:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID único da seção
+          example: clxxxxx
+        title:
+          type: string
+          description: Título da seção
+          example: Melhor Preço
+        description:
+          type: string
+          description: Descrição da seção
+          example: Garantimos o melhor preço do mercado ou devolvemos a diferença.
+        icon:
+          type: string
+          description: Nome do ícone
+          example: DollarSign
+        bgColor:
+          type: string
+          description: Cor de fundo do ícone
+          example: blue
+        order:
+          type: number
+          description: Ordem de exibição
+          example: 1
+        status:
+          type: string
+          description: Status da seção
+          enum:
+            - ACTIVE
+            - INACTIVE
+          example: ACTIVE
+        createdAt:
+          format: date-time
+          type: string
+          description: Data de criação
+          example: 2024-01-01T00:00:00.000Z
+        updatedAt:
+          format: date-time
+          type: string
+          description: Data de atualização
+          example: 2024-01-01T00:00:00.000Z
+      required:
+        - id
+        - title
+        - description
+        - icon
+        - bgColor
+        - order
+        - status
+        - createdAt
+        - updatedAt
+    UpdateFrontsectionDto:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Título da seção
+          example: Melhor Preço
+          maxLength: 100
+        description:
+          type: string
+          description: Descrição detalhada da seção
+          example: Garantimos o melhor preço do mercado ou devolvemos a diferença.
+          maxLength: 500
+        icon:
+          type: string
+          description: "Nome do ícone do Lucide React (ex: DollarSign, Clock, Shield,
+            Users)"
+          example: DollarSign
+          enum: *a15
+        bgColor:
+          type: string
+          description: Cor de fundo do ícone
+          example: blue
+          enum: *a16
+          default: blue
+        order:
+          type: number
+          description: Ordem de exibição da seção
+          example: 1
+          minimum: 0
+        status:
+          type: string
+          description: Status da seção
+          enum: *a17
+          example: ACTIVE
+          default: ACTIVE
+    CreateSecurityIntegrationDto:
+      type: object
+      properties:
+        insurerName:
+          type: string
+          description: Nome da Seguradora
+        grantType:
+          type: string
+          description: Tipo de concessão (password, client_credentials, etc.)
+        clientId:
+          type: number
+          description: ID do cliente
+        clientSecret:
+          type: string
+          description: Segredo do cliente
+        username:
+          type: string
+          description: Nome de usuário para autenticação
+        password:
+          type: string
+          description: Senha do usuário para autenticação
+        scope:
+          type: string
+          description: Escopo de acesso solicitado (opcional)
+        ativa:
+          type: boolean
+          description: Status ativo/inativo da integração
+        markUp:
+          type: number
+          description: Markup para cálculo de seguro
+        baseUrl:
+          type: string
+          description: URL base para autenticação
+        authUrl:
+          type: string
+          description: URL de autenticação
+        insurerCode:
+          type: string
+          description: Código da Seguradora
+      required:
+        - insurerName
+        - grantType
+        - clientId
+        - clientSecret
+        - username
+        - password
+    UpdateSecurityIntegrationDto:
+      type: object
+      properties:
+        insurerName:
+          type: string
+          description: Nome da Seguradora
+        grantType:
+          type: string
+          description: Tipo de concessão (password, client_credentials, etc.)
+        clientId:
+          type: number
+          description: ID do cliente
+        clientSecret:
+          type: string
+          description: Segredo do cliente
+        username:
+          type: string
+          description: Nome de usuário para autenticação
+        password:
+          type: string
+          description: Senha do usuário para autenticação
+        scope:
+          type: string
+          description: Escopo de acesso solicitado (opcional)
+        ativa:
+          type: boolean
+          description: Status ativo/inativo da integração
+        markUp:
+          type: number
+          description: Markup para cálculo de seguro
+        baseUrl:
+          type: string
+          description: URL base para autenticação
+        authUrl:
+          type: string
+          description: URL de autenticação
+        insurerCode:
+          type: string
+          description: Código da Seguradora
+    QuoteRequestDto:
+      type: object
+      properties: {}
+    CreateBenefitDto:
+      type: object
+      properties: {}
+    AssignBenefitsDto:
+      type: object
+      properties: {}
+    UpdateBenefitDto:
+      type: object
+      properties: {}

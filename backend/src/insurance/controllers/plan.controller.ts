@@ -156,4 +156,23 @@ export class PlanController {
       details: error.message,
     })
   }
+  @Get('product/info')
+  @HttpCode(HttpStatus.OK)
+  async findInfo( @Query('destination') destination?: string, @Query('departure') departure?: string, @Query('arrival') arrival?: string, @Query('id') id?: Number, ) { 
+    try { 
+      if(!destination || !departure || !arrival || !id){
+         throw new BadRequestException("erro ao processar solicitação") 
+      } const filters = { 
+        destination: destination ? String(destination) : undefined,
+        departure: departure ? String(departure) : undefined,
+        arrival: arrival ? String(arrival) : undefined,
+        id: id ? Number(id) : undefined, 
+      }
+        const result = await this.planService.getPlanInfo( String(destination), String(departure), String(arrival), Number(id), ) 
+        return result } catch (error) { this.handleControllerError(error, 'findWithFilter') 
+
+      } 
+    }
+
+
 }

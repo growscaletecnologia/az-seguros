@@ -3,6 +3,7 @@ import prisma from 'src/prisma/client'
 import { HeroConnector } from '../connectors/hero.connector'
 import { MTAConnector } from '../connectors/mta.connector'
 import { PlansRepository } from '../repository/plans.repository'
+import { QuoteService } from './quote.service'
 
 @Injectable()
 export class PlanService {
@@ -12,6 +13,7 @@ export class PlanService {
   constructor(
     private readonly heroConnector: HeroConnector,
     private readonly mtaConnector: MTAConnector,
+    private readonly quoteService: QuoteService
   ) {}
 
   /**
@@ -164,6 +166,47 @@ export class PlanService {
         `[PlanService] Retentando ${insurerId} (tentativa ${attempt + 1})`
       )
       return this.fetchPlansWithRetry(connector, insurerId, attempt + 1)
+    }
+  }
+
+   async getPlanInfo(destination: string, departure: string, arrival: string, id: number) {
+    try {
+      this.logger.log(
+        `[PlanService] Buscando informações do plano ${id} para destino ${destination}`,
+      );
+
+      const response = await this.quoteService.calculateQuote({
+        slug: destination,
+        departure,
+        arrival,
+        passengers: [{ type: 'age', age: 30 }],
+        dateFormat: 'YYYY-MM-DD',
+      });
+
+      if (!response || !Array.isArray(response)) {
+        throw new Error('Resposta inválida da QuoteService');
+      }
+
+      // Filtra o plano pelo id recebido
+      const selectedPlan = response.find(plan => plan.code === id);
+
+      if (!selectedPlan) {
+        this.logger.warn(`[PlanService] Nenhum plano encontrado com ID ${id}`);
+        return { message: 'Plano não encontrado' };
+      }
+
+      this.logger.log(`[PlanService] Plano ${selectedPlan.name} encontrado com sucesso`);
+
+      // Retorna o plano filtrado e outras informações
+      return {
+        ...selectedPlan,
+        destination,
+        departure,
+        arrival,
+      };
+    } catch (error) {
+      this.logger.error(`[PlanService] Erro ao calcular cotação: ${error}`);
+      throw error;
     }
   }
 }
