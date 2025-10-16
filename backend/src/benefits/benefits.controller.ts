@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { BenefitsService } from './benefits.service';
 import { CreateBenefitDto } from './dto/create-benefit.dto';
 import { UpdateBenefitDto } from './dto/update-benefit.dto';
+import { AssignBenefitsDto } from './dto/assign.benefit.dto';
 
 @Controller('benefits')
 export class BenefitsController {
@@ -15,6 +16,11 @@ export class BenefitsController {
   @Post()
   create(@Body() createBenefitDto: CreateBenefitDto) {
     return this.benefitsService.create(createBenefitDto);
+  }
+
+  @Post('assign')
+  assignBenefits(@Body() assignBenefits: AssignBenefitsDto){
+     return this.benefitsService.assignBenefits(assignBenefits)
   }
 
   /**

@@ -1,12 +1,7 @@
 "use client";
 import { CreateUserForm } from "@/components/rbac/create-user-form";
 import { Button } from "@/components/ui/button";
-import {
-	Card,
-	CardContent,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
 	Dialog,
 	DialogContent,
@@ -52,7 +47,7 @@ const ClientesPage = () => {
 			setLoading(true);
 			const data = await usersService.getAll();
 			const clientesMapeados = data
-				.filter(user => user.role === "CUSTOMER")
+				.filter((user) => user.role === "CUSTOMER")
 				.map(mapApiUserToCliente);
 			setClientes(clientesMapeados);
 		} catch (error) {
@@ -90,7 +85,7 @@ const ClientesPage = () => {
 
 	const excluirCliente = async (id: string) => {
 		if (!confirm("Tem certeza que deseja excluir este cliente?")) return;
-		
+
 		try {
 			await usersService.remove(id);
 			toast.success("Cliente excluído com sucesso!");
@@ -223,7 +218,7 @@ const ClientesPage = () => {
 													name="status"
 													value="ativo"
 													checked={editandoCliente.ativo}
-													onChange={() => 
+													onChange={() =>
 														setEditandoCliente({
 															...editandoCliente,
 															ativo: true,
@@ -239,7 +234,7 @@ const ClientesPage = () => {
 													name="status"
 													value="inativo"
 													checked={!editandoCliente.ativo}
-													onChange={() => 
+													onChange={() =>
 														setEditandoCliente({
 															...editandoCliente,
 															ativo: false,
@@ -295,7 +290,10 @@ const ClientesPage = () => {
 							<tbody>
 								{clientes.length === 0 ? (
 									<tr>
-										<td colSpan={4} className="px-4 py-2 text-center text-gray-500">
+										<td
+											colSpan={4}
+											className="px-4 py-2 text-center text-gray-500"
+										>
 											Nenhum cliente encontrado.
 										</td>
 									</tr>

@@ -48,7 +48,7 @@ export default function BlogAdminPage() {
 				filter.status || "PUBLISHED",
 				filter.page || 1,
 				filter.limit || 10,
-				search.length > 2 ? search : undefined
+				search.length > 2 ? search : undefined,
 			);
 			console.log("POSTS AQUI", response);
 			setPosts(response.posts || []);
@@ -155,7 +155,10 @@ export default function BlogAdminPage() {
 /**
  * Componente para exibir a tabela de posts
  */
-function PostsTable({ posts, onDelete }: { posts: Post[]; onDelete: () => void }) {
+function PostsTable({
+	posts,
+	onDelete,
+}: { posts: Post[]; onDelete: () => void }) {
 	// Formata o status do post para exibição
 	const getStatusBadge = (status: string) => {
 		switch (status) {
@@ -204,30 +207,22 @@ function PostsTable({ posts, onDelete }: { posts: Post[]; onDelete: () => void }
 				) : (
 					posts?.map((post) => {
 						// Extrair as categorias e tags da nova estrutura aninhada
-						const categories = post.categories.map(
-							(pc) => pc.category,
-						);
+						const categories = post.categories.map((pc) => pc.category);
 						const tags = post.tags.map((pt) => pt.tag);
 
 						return (
 							<TableRow key={post.id}>
-								<TableCell className="font-medium">
-									{post.title}
-								</TableCell>
+								<TableCell className="font-medium">{post.title}</TableCell>
 								<TableCell>{getStatusBadge(post.status)}</TableCell>
 								<TableCell>
-									{format(
-										new Date(post.createdAt),
-										"dd/MM/yyyy HH:mm",
-										{ locale: ptBR },
-									)}
+									{format(new Date(post.createdAt), "dd/MM/yyyy HH:mm", {
+										locale: ptBR,
+									})}
 								</TableCell>
 								<TableCell>
-									{format(
-										new Date(post.updatedAt),
-										"dd/MM/yyyy HH:mm",
-										{ locale: ptBR },
-									)}
+									{format(new Date(post.updatedAt), "dd/MM/yyyy HH:mm", {
+										locale: ptBR,
+									})}
 								</TableCell>
 								<TableCell className="text-right">
 									<div className="flex justify-end gap-2">
@@ -236,10 +231,7 @@ function PostsTable({ posts, onDelete }: { posts: Post[]; onDelete: () => void }
 												Editar
 											</Button>
 										</Link>
-										<Link
-											href={`/blog/${post.slug}`}
-											target="_blank"
-										>
+										<Link href={`/blog/${post.slug}`} target="_blank">
 											<Button variant="outline" size="sm">
 												Visualizar
 											</Button>

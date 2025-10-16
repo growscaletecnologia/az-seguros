@@ -109,6 +109,30 @@ async createMany(createBenefitDto: CreateBenefitDto[]) {
     });
   }
 
+
+
+     async assignBenefitsToPlan(planId: number, benefitIds: number[], skipDuplicates = true) {
+    const data = benefitIds.map(id => ({
+      insurerPlanId: planId,
+      planBenefitId: id,
+    }));
+
+    return prisma.insurerPlanBenefit.createMany({
+      data,
+      skipDuplicates,
+    });
+  }
+
+  async findBenefitsByPlan(planId: number) {
+    return prisma.insurerPlan.findUnique({
+      where: { id: planId },
+      include: {
+        planBenefits: {
+          include: { planBenefit: true },
+        },
+      },
+    });
+  }
   /**
    * Remove um benefício pelo ID.
    * @param id ID do benefício a ser removido.

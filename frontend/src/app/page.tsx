@@ -6,9 +6,9 @@ import EmailField from "@/components/Inputs/EmailInput";
 import PhoneField from "@/components/Inputs/PhoneInput";
 import { WhyChooseSection } from "@/components/sections/WhyChooseSection";
 import { couponsService } from "@/services/api/coupons";
-import { postsService, Post } from "@/services/posts.service";
-import { buildImageUrl } from "@/utils/imageUtils";
+import { type Post, postsService } from "@/services/posts.service";
 import type { PreRegisterForm } from "@/types/types";
+import { buildImageUrl } from "@/utils/imageUtils";
 import {
 	ArrowRight,
 	CheckCircle,
@@ -33,14 +33,14 @@ import { useState } from "react";
 
 import DestinationSelect from "@/components/Inputs/DestinationSelect";
 
+import PassengersSelect from "@/components/Inputs/PassengersSelect,";
+import { AvaliacoesCarousel } from "@/components/avaliations/AvaliacoesCarousel";
 import {
 	HoverCard,
 	HoverCardContent,
 	HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { usePreRegisterForm } from "@/hooks/useRegisterStore";
-import { AvaliacoesCarousel } from "@/components/avaliations/AvaliacoesCarousel";
-import PassengersSelect from "@/components/Inputs/PassengersSelect,";
 
 /**
  * Função para realizar rolagem suave até uma posição específica na página
@@ -48,27 +48,27 @@ import PassengersSelect from "@/components/Inputs/PassengersSelect,";
  * @param duration Duração da animação em milissegundos
  */
 function smoothScrollTo(position: number, duration: number) {
-  const startPosition = window.scrollY;
-  const distance = position - startPosition;
-  let startTime: number | null = null;
+	const startPosition = window.scrollY;
+	const distance = position - startPosition;
+	let startTime: number | null = null;
 
-  function animation(currentTime: number) {
-    if (startTime === null) startTime = currentTime;
-    const timeElapsed = currentTime - startTime;
-    const run = easeInOutQuad(timeElapsed, startPosition, distance, duration);
-    window.scrollTo(0, run);
-    if (timeElapsed < duration) requestAnimationFrame(animation);
-  }
+	function animation(currentTime: number) {
+		if (startTime === null) startTime = currentTime;
+		const timeElapsed = currentTime - startTime;
+		const run = easeInOutQuad(timeElapsed, startPosition, distance, duration);
+		window.scrollTo(0, run);
+		if (timeElapsed < duration) requestAnimationFrame(animation);
+	}
 
-  // Função de easing para suavizar o movimento
-  function easeInOutQuad(t: number, b: number, c: number, d: number) {
-    t /= d / 2;
-    if (t < 1) return c / 2 * t * t + b;
-    t--;
-    return -c / 2 * (t * (t - 2) - 1) + b;
-  }
+	// Função de easing para suavizar o movimento
+	function easeInOutQuad(t: number, b: number, c: number, d: number) {
+		t /= d / 2;
+		if (t < 1) return (c / 2) * t * t + b;
+		t--;
+		return (-c / 2) * (t * (t - 2) - 1) + b;
+	}
 
-  requestAnimationFrame(animation);
+	requestAnimationFrame(animation);
 }
 
 export default function HomePage() {
@@ -217,7 +217,9 @@ export default function HomePage() {
 						<div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
 							<div className="flex items-center space-x-2">
 								<CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0" />
-								<span className="text-sm sm:text-base">Melhor Preço Garantido</span>
+								<span className="text-sm sm:text-base">
+									Melhor Preço Garantido
+								</span>
 							</div>
 							<div className="flex items-center space-x-2">
 								<CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0" />
@@ -428,7 +430,8 @@ export default function HomePage() {
 							Últimas do Blog
 						</h2>
 						<p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
-							Confira as últimas notícias, dicas e informações sobre seguros de viagem
+							Confira as últimas notícias, dicas e informações sobre seguros de
+							viagem
 						</p>
 					</div>
 
@@ -445,28 +448,31 @@ export default function HomePage() {
 									if (post.coverImage) {
 										return buildImageUrl(post.coverImage);
 									}
-									
+
 									// Se não, procura pela imagem principal nos media
-									const mainImage = post.media?.find(media => media.isMain);
+									const mainImage = post.media?.find((media) => media.isMain);
 									if (mainImage?.url) {
 										return buildImageUrl(mainImage.url);
 									}
-									
+
 									// Se não encontrar nenhuma, usa a primeira imagem disponível
 									const firstImage = post.media?.[0];
 									if (firstImage?.url) {
 										return buildImageUrl(firstImage.url);
 									}
-									
+
 									// Fallback para placeholder
 									return buildImageUrl(null);
 								};
 
 								const mainImageUrl = getMainImageUrl(post);
-								const categories = post.categories.map(pc => pc.category);
+								const categories = post.categories.map((pc) => pc.category);
 
 								return (
-									<div key={post.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+									<div
+										key={post.id}
+										className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition"
+									>
 										<Link href={`/blog/${post.slug}`}>
 											<div className="aspect-video relative overflow-hidden">
 												<img
@@ -509,8 +515,8 @@ export default function HomePage() {
 										Seguro Viagem Marítimo
 									</h3>
 									<p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4">
-										Proteção contra imprevistos em alto mar, incluindo assistência
-										a bordo e emergências durante cruzeiros.
+										Proteção contra imprevistos em alto mar, incluindo
+										assistência a bordo e emergências durante cruzeiros.
 									</p>
 									<Link
 										href="/planos"
@@ -534,8 +540,9 @@ export default function HomePage() {
 										Seguro Viagem Intercâmbio
 									</h3>
 									<p className="text-gray-600 mb-4">
-										Estude em outro país com tranquilidade. Cobertura para saúde,
-										acidentes e suporte durante todo o programa de intercâmbio.
+										Estude em outro país com tranquilidade. Cobertura para
+										saúde, acidentes e suporte durante todo o programa de
+										intercâmbio.
 									</p>
 									<Link
 										href="/planos"
@@ -584,8 +591,8 @@ export default function HomePage() {
 										Seguro Viagem Mochilão
 									</h3>
 									<p className="text-gray-600 mb-4">
-										Explore o mundo com tranquilidade. Assistência para múltiplos
-										países e coberturas pensadas para mochileiros.
+										Explore o mundo com tranquilidade. Assistência para
+										múltiplos países e coberturas pensadas para mochileiros.
 									</p>
 									<Link
 										href="/planos"
@@ -703,7 +710,12 @@ export default function HomePage() {
 
 					{/* Carrossel de avaliações */}
 					<div className="mb-8">
-						<AvaliacoesCarousel limit={9} showOnlyActive={true} autoplay={true} delayMs={5000} />
+						<AvaliacoesCarousel
+							limit={9}
+							showOnlyActive={true}
+							autoplay={true}
+							delayMs={5000}
+						/>
 					</div>
 				</div>
 			</section>

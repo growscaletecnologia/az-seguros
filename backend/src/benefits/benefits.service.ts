@@ -1,7 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateBenefitDto } from './dto/create-benefit.dto';
 import { UpdateBenefitDto } from './dto/update-benefit.dto';
 import { BenefitsRepository } from './benefits.repository';
+import { AssignBenefitsDto } from './dto/assign.benefit.dto';
+import prisma from 'src/prisma/client';
 
 @Injectable()
 export class BenefitsService {
@@ -59,5 +61,25 @@ export class BenefitsService {
    */
   async remove(id: number) {
     return this.benefitsRepository.remove(id);
+  }
+
+
+  async assignBenefits(dto: AssignBenefitsDto) {
+    const { planId, benefitIds, skipDuplicates } = dto;
+
+    console.log("bateu na service ", dto)
+    // Validação básica
+    const plan = await prisma.insurerPlan.findUnique({ where: { id: planId } });
+    if (!plan) throw new NotFoundException(`Plano ${planId} não encontrado`);
+
+    const benefits = await prisma.planBenefit.findMany({
+      where: { id: { in: benefitIds } },
+    });
+    if (benefits.length === 0) throw new NotFoundException(`Nenhum benefício válido encontrado`);
+
+    await this.benefitsRepository.assignBenefitsToPlan(planId, benefits.map(b => b.id), skipDuplicates);
+
+    // Retorna o plano com os benefícios
+    return this.benefitsRepository.findBenefitsByPlan(planId);
   }
 }
