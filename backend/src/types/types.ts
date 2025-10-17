@@ -47,3 +47,32 @@ export interface InsurerPlan {
   destinies: InsurerDestiny[]
   coverages?: InsurerCoverage[]
 }
+
+export type CoverageItem = {
+  id: number;
+  title: string;
+  value: string;
+  type: string;
+  displayOrder?: number | null;
+};
+
+export type DiscountType = 'PERCENTAGE' | 'FIXED';
+export interface Coupon {
+    id: string;
+    code: string;
+    description: string;
+    discount: number; // Valor do desconto (ex: 20 para 20%, ou 50 para R$50)
+    discountType: DiscountType; 
+    usageLimit: number;
+    usagesLeft: number;
+    status: 'ACTIVE' | 'INACTIVE' | string; // Use um literal se tiver apenas ACTIVE/INACTIVE
+    front_publishable: boolean;
+    userId: string;
+    
+    // Datas e Timestamps (Representadas como strings ISO)
+    createdAt: string;
+    updatedAt: string;
+    expiresAt: string | null; // Pode ser nulo se não houver expiração
+    deleted: boolean;
+    deletedAt: string | null; // Null se não foi deletado
+}

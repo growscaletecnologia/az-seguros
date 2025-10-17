@@ -7,6 +7,7 @@ import { TokenService } from '../services/token.service'
 import { BadRequestError } from 'src/common/errors/http-errors'
 import { InsurerAgeGroup, InsurerDestiny, InsurerPlan } from 'src/types/types'
 import { InsurerCodeEnum } from '@prisma/client'
+import { format, addDays } from 'date-fns';
 
 @Injectable()
 export class MTAConnector extends InsuranceConnectorBase {
@@ -104,101 +105,12 @@ export class MTAConnector extends InsuranceConnectorBase {
 
         const plansArray = Object.values(data.data).filter((item) => typeof item === 'object')
 
-        // 🔹 Sincronização com o banco de dados
-
-        // for (const plan of plansArray as InsurerPlan[]) {
-        //   const existingPlan = await prisma.insurerPlan.findFirst({
-        //     where: { externalId: plan.id, securityIntegrationId: credentials.id },
-        //     include: { destinies: { include: { ageGroups: true } } },
-        //   })
-
-        //   if (!existingPlan) {
-        //     await prisma.insurerPlan.create({
-        //       data: {
-        //         externalId: plan.id,
-        //         additionalId: plan.additional_id,
-        //         ref: plan.ref,
-        //         slug: plan.slug,
-        //         is: plan.is,
-        //         isShow: plan.is_show,
-        //         name: plan.name,
-        //         multitrip: Boolean(plan.multitrip),
-        //         securityIntegrationId: credentials.id,
-        //         destinies: {
-        //           create: plan.destinies.map((dest: HeroDestiny) => ({
-        //             name: dest.destiny.name,
-        //             slug: dest.destiny.slug,
-        //             displayOrder: dest.destiny.display_order,
-        //             destinyCode: dest.destiny.destiny_code,
-        //             crmBonusValue: dest.destiny.crm_bonus_value,
-        //             ageGroups: {
-        //               create: dest.age.map((a: HeroAgeGroup) => ({
-        //                 start: a.start,
-        //                 end: a.end,
-        //                 price: parseFloat(a.price.replace(',', '.')),
-        //                 priceIof: parseFloat(a.price_iof),
-        //               })),
-        //             },
-        //           })),
-        //         },
-        //       },
-        //     })
-        //     console.log(`[DB] Plano ${plan.name} criado.`)
-        //   } else {
-        //     // 👉 Plano já existe — vamos comparar as faixas etárias
-        //     let needsUpdate = false
-
-        //     for (const dest of plan.destinies) {
-        //       const existingDest = existingPlan.destinies.find((d) => d.slug === dest.destiny.slug)
-        //       if (!existingDest) {
-        //         needsUpdate = true
-        //         break
-        //       }
-
-        //       const newAges = dest.age.map((a: any) => ({
-        //         start: a.start,
-        //         end: a.end,
-        //         price: parseFloat(a.price.replace(',', '.')),
-        //         priceIof: parseFloat(a.price_iof),
-        //       }))
-
-        //       const oldAges = existingDest.ageGroups.map((ag) => ({
-        //         start: ag.start,
-        //         end: ag.end,
-        //         price: parseFloat(ag.price.toString()),
-        //         priceIof: parseFloat(ag.priceIof?.toString() || '0'),
-        //       }))
-
-        //       const diff = JSON.stringify(newAges) !== JSON.stringify(oldAges)
-        //       if (diff) {
-        //         needsUpdate = true
-        //         // atualiza os valores dessa faixa
-        //         await prisma.insurerPlanAgeGroup.deleteMany({
-        //           where: { insurerPlanDestinyId: existingDest.id },
-        //         })
-        //         await prisma.insurerPlanAgeGroup.createMany({
-        //           data: newAges.map((a) => ({
-        //             insurerPlanDestinyId: existingDest.id,
-        //             start: a.start,
-        //             end: a.end,
-        //             price: a.price,
-        //             priceIof: a.priceIof,
-        //           })),
-        //         })
-        //         console.log(`[DB] Atualizado valores de idade para destino ${existingDest.slug}`)
-        //       }
-        //     }
-
-        //     if (!needsUpdate) {
-        //       console.log(`[DB] Plano ${plan.name} sem alterações, ignorado.`)
-        //     }
-        //   }
-        // }
+     
   for (const plan of plansArray as InsurerPlan[]) {
     const existingPlan = await prisma.insurerPlan.findFirst({
       where: { externalId: plan.id, securityIntegrationId: credentials.id },
       include: {
-        destinies: { include: { ageGroups: true } },
+        //destinies: { include: { ageGroups: true } },
         coverages: { include: { coverage: true } },
       },
     })
@@ -216,23 +128,23 @@ export class MTAConnector extends InsuranceConnectorBase {
           name: plan.name,
           multitrip: Boolean(plan.multitrip),
           securityIntegrationId: credentials.id,
-          destinies: {
-            create: plan.destinies.map((dest: InsurerDestiny) => ({
-              name: dest.destiny.name,
-              slug: dest.destiny.slug,
-              displayOrder: dest.destiny.display_order,
-              destinyCode: dest.destiny.destiny_code,
-              crmBonusValue: dest.destiny.crm_bonus_value,
-              ageGroups: {
-                create: dest.age.map((a: InsurerAgeGroup) => ({
-                  start: a.start,
-                  end: a.end,
-                  price: parseFloat(a.price.replace(',', '.')),
-                  priceIof: parseFloat(a.price_iof),
-                })),
-              },
-            })),
-          },
+          // destinies: {
+          //   create: plan.destinies.map((dest: InsurerDestiny) => ({
+          //     name: dest.destiny.name,
+          //     slug: dest.destiny.slug,
+          //     displayOrder: dest.destiny.display_order,
+          //     destinyCode: dest.destiny.destiny_code,
+          //     crmBonusValue: dest.destiny.crm_bonus_value,
+          //     ageGroups: {
+          //       create: dest.age.map((a: InsurerAgeGroup) => ({
+          //         start: a.start,
+          //         end: a.end,
+          //         price: parseFloat(a.price.replace(',', '.')),
+          //         priceIof: parseFloat(a.price_iof),
+          //       })),
+          //     },
+          //   })),
+          // },
         },
       })
       console.log(`[DB] Plano ${plan.name} criado.`)
@@ -275,45 +187,45 @@ export class MTAConnector extends InsuranceConnectorBase {
       let needsUpdate = false
 
       // verifica atualizações nas faixas etárias
-      for (const dest of plan.destinies) {
-        const existingDest = existingPlan.destinies.find((d) => d.slug === dest.destiny.slug)
-        if (!existingDest) {
-          needsUpdate = true
-          break
-        }
+      // for (const dest of plan.destinies) {
+      //   const existingDest = existingPlan.destinies.find((d) => d.slug === dest.destiny.slug)
+      //   if (!existingDest) {
+      //     needsUpdate = true
+      //     break
+      //   }
 
-        const newAges = dest.age.map((a: any) => ({
-          start: a.start,
-          end: a.end,
-          price: parseFloat(a.price.replace(',', '.')),
-          priceIof: parseFloat(a.price_iof),
-        }))
+      //   const newAges = dest.age.map((a: any) => ({
+      //     start: a.start,
+      //     end: a.end,
+      //     price: parseFloat(a.price.replace(',', '.')),
+      //     priceIof: parseFloat(a.price_iof),
+      //   }))
 
-        const oldAges = existingDest.ageGroups.map((ag) => ({
-          start: ag.start,
-          end: ag.end,
-          price: parseFloat(ag.price.toString()),
-          priceIof: parseFloat(ag.priceIof?.toString() || '0'),
-        }))
+      //   const oldAges = existingDest.ageGroups.map((ag) => ({
+      //     start: ag.start,
+      //     end: ag.end,
+      //     price: parseFloat(ag.price.toString()),
+      //     priceIof: parseFloat(ag.priceIof?.toString() || '0'),
+      //   }))
 
-        const diff = JSON.stringify(newAges) !== JSON.stringify(oldAges)
-        if (diff) {
-          needsUpdate = true
-          await prisma.insurerPlanAgeGroup.deleteMany({
-            where: { insurerPlanDestinyId: existingDest.id },
-          })
-          await prisma.insurerPlanAgeGroup.createMany({
-            data: newAges.map((a) => ({
-              insurerPlanDestinyId: existingDest.id,
-              start: a.start,
-              end: a.end,
-              price: a.price,
-              priceIof: a.priceIof,
-            })),
-          })
-          console.log(`[DB] Atualizado valores de idade para destino ${existingDest.slug}`)
-        }
-      }
+      //   const diff = JSON.stringify(newAges) !== JSON.stringify(oldAges)
+      //   if (diff) {
+      //     needsUpdate = true
+      //     await prisma.insurerPlanAgeGroup.deleteMany({
+      //       where: { insurerPlanDestinyId: existingDest.id },
+      //     })
+      //     await prisma.insurerPlanAgeGroup.createMany({
+      //       data: newAges.map((a) => ({
+      //         insurerPlanDestinyId: existingDest.id,
+      //         start: a.start,
+      //         end: a.end,
+      //         price: a.price,
+      //         priceIof: a.priceIof,
+      //       })),
+      //     })
+      //     console.log(`[DB] Atualizado valores de idade para destino ${existingDest.slug}`)
+      //   }
+      // }
 
       // 🔹 Atualiza ou insere coberturas (se vierem)
       if (plan.coverages && plan.coverages.length > 0) {
@@ -519,68 +431,162 @@ export class MTAConnector extends InsuranceConnectorBase {
     })
   }
 
-  async getCotation(params?: QuoteRequestDto, id?: string) {
-    console.log('[MTAConnector] getCotation() called with params:', params)
-    return this.withErrorHandling(async () => {
-      const credentials = await prisma.securityIntegration.findFirst({
-        where: { id: id },
-      })
-      //console.log('[MTAConnector] getCotation credentials:', credentials);
-      if (!credentials) {
-        console.log('[MTAConnector] MTA credentials not found')
-        throw new Error('MTA credentials not found')
-      }
 
-      // Usa a baseUrl completa diretamente
-      const fullBaseUrl = credentials.baseUrl
-      if (!fullBaseUrl) {
-        throw new Error('baseUrl is not defined in credentials')
-      }
 
-      this.initializeAxios()
+async getCotation(params: QuoteRequestDto, id?: string): Promise<any> {
+  console.log("ID", id)
+  return this.withErrorHandling(async () => {
+    const credentials = await prisma.securityIntegration.findFirst({ where: { id } });
+    if (!credentials) throw new Error('MTA credentials not found');
 
-      // Verifica se existe accessToken válido, senão autentica
-      if (!credentials.accessToken) {
-        console.log('[MTAConnector] No accessToken, authenticating...')
-        credentials.accessToken = await this.authenticate(id)
-      }
+    const fullBaseUrl = credentials.baseUrl;
+    if (!fullBaseUrl) throw new Error('baseUrl is not defined in credentials');
 
-      this.logger.debug('Requesting quotes from MTA API...')
-      const fullPlansUrl = `${fullBaseUrl}cotation`
-      //console.log('[MTAConnector] fullPlansUrl:', fullPlansUrl);
+    this.initializeAxios();
 
-      try {
-        if (credentials.accessToken) {
-          const { data } = await this.axiosInstance.post(fullPlansUrl, params, {
-            headers: {
-              Authorization: `Bearer ${credentials.accessToken}`,
-              'Content-Type': 'application/json',
+    if (!credentials.accessToken) {
+      this.logger.log('[MTAConnector] No accessToken, authenticating...');
+      credentials.accessToken = await this.authenticate(id);
+    }
+
+    const fullPlansUrl = `${fullBaseUrl}cotation`;
+
+    const { data } = await this.axiosInstance.post(fullPlansUrl, params, {
+      headers: {
+        Authorization: `Bearer ${credentials.accessToken}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    // 🔧 Tipagem explícita
+    const plansArray = Object.values(data.data).filter(
+      (i) => typeof i === 'object'
+    ) as any[];
+
+    const processedData = { plans: plansArray, metadata: data.metadata || {} };
+
+    // 🔧 Aguarda a normalização
+    const normalizedPlans = await this.normalizePlans(processedData, id || '');
+
+    // 🔧 Garante coverages (sem erro de tipo)
+    normalizedPlans.forEach((p, idx) => {
+      (p as any).coverages = plansArray[idx]?.coverages ?? [];
+    });
+
+    return normalizedPlans;
+  });
+}
+
+
+async syncAllCoverages(id: string) {
+ const destinations = [
+    { id: 1, slug: 'brasil', name: 'Brasil', code: 'BRA' },
+    { id: 2, slug: 'america-latina-inclui-mexico', name: 'América Latina (inclui México)', code: 'GPR' },
+    { id: 4, slug: 'estados-unidos-e-canada', name: 'Estados Unidos e Canadá', code: 'USA' },
+    { id: 3, slug: 'europa', name: 'Europa', code: 'EUR' },
+    { id: 9, slug: 'demais-destinos', name: 'Ásia, África e Oceania', code: 'GPR' },
+    { id: 8, slug: '2-ou-mais-destinos', name: 'Múltiplos destinos', code: 'GPR' },
+    { id: 11, slug: '2-ou-mais-destinos-exceto-estados-unidos', name: 'Múltiplos destinos (exceto EUA)', code: 'GPR' },
+  ];
+
+  const quoteParamsBase: any = {
+  dateFormat: 'Y-m-d',              // formato que a MTA quer
+  multitrip: false,                 // campo obrigatório
+  priceDetails: true,
+  passengers: [
+    {
+      type: 'age',
+      age: '21',
+    },
+  ],
+};
+
+  for (const dest of destinations) {
+    try {
+      this.logger.log(`[SYNC] Cotando destino: ${dest.slug}`);
+      const quoteParams = {
+        ...quoteParamsBase,
+        destinyGroup: dest.id.toString(), // ← campo correto
+        departure: format(new Date(), 'yyyy-MM-dd'),
+        arrival: format(addDays(new Date(), 1), 'yyyy-MM-dd'),
+      };
+      const plans = await this.getCotation({ ...quoteParams}, id);
+
+      for (const plan of plans) {
+        // 1. Garante o plano
+       const dbPlan = await prisma.insurerPlan.upsert({
+          where: { slug: plan.slug }, // slug é único
+          update: {
+            name: plan.name,
+            is: plan.is,
+            isShow: plan.isShow,
+            //ref: plan.ref,
+            updatedAt: new Date(),
+          },
+          create: {
+            externalId: plan.id,
+            additionalId: plan.additionalId ?? 0,
+            //ref: plan.ref,
+            slug: plan.slug,
+            is: plan.is,
+            isShow: plan.isShow,
+            name: plan.name,
+            multitrip: plan.multitrip ?? false,
+            is_highlight: plan.is_highlight ?? false,
+            is_specialist_indication: plan.is_specialist_indication ?? false,
+            tag: plan.tag ?? null,
+            securityIntegrationId: id,
+          },
+        });
+
+
+        // 2. Itera coberturas
+        for (const pc of plan.coverages || []) {
+          const { coverage, is, coverage_type } = pc;
+
+          const dbCoverage = await prisma.coverage.upsert({
+            where: { slug: coverage.slug },
+            update: { title: coverage.title, name: coverage.name },
+            create: {
+              title: coverage.title,
+              name: coverage.name,
+              slug: coverage.slug,
+              highlight: coverage.highlight ?? '',
+              content: coverage.content ?? '',
+              displayOrder: coverage.display_order,
             },
-          })
-          //console.log('[MTAConnector] API response:', data);
+          });
 
-          // Transform the indexed object into an array
-          const plansArray = Object.values(data.data).filter((item) => typeof item === 'object')
-          console.log('[MTAConnector] Transformed plans array:', plansArray)
+          const existing = await prisma.planCoverage.findFirst({
+            where: { insurerPlanId: dbPlan.id, coverageId: dbCoverage.id },
+          });
 
-          // Process data directly without Zod validation
-          const processedData = { plans: plansArray, metadata: data.metadata || {} }
-          console.log('[MTAConnector] Processed data (without validation):', processedData)
-
-          // Normalize and apply markup
-          const normalizedPlans = this.normalizePlans(processedData, id || '')
-          console.log('[MTAConnector] Normalized plans:', normalizedPlans)
-
-          return normalizedPlans
-        } else {
-          throw new BadRequestError('No accessToken found')
+          if (!existing) {
+            await prisma.planCoverage.create({
+              data: {
+                insurerPlanId: dbPlan.id,
+                coverageId: dbCoverage.id,
+                value: is,
+                coverageType: coverage_type,
+              },
+            });
+          } else if (existing.value !== is || existing.coverageType !== coverage_type) {
+            await prisma.planCoverage.update({
+              where: { id: existing.id },
+              data: { value: is, coverageType: coverage_type },
+            });
+          }
         }
-      } catch (err) {
-        console.error('[MTAConnector] Error during getPlans:', err)
-        throw err
       }
-    })
+    } catch (error) {
+      this.logger.warn(`[SYNC] Falha ao sincronizar ${dest.slug}: ${error.message}`);
+    }
   }
+
+  this.logger.log('[SYNC] Sincronização de coberturas finalizada!');
+}
+
+
 
   private determineCoverageType(age: number): string {
     console.log('[MTAConnector] determineCoverageType called with age:', age)

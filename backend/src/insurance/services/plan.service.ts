@@ -41,7 +41,8 @@ export class PlanService {
 
           try {
             const externalStartTime = Date.now()
-            const insurerPlans = await this.fetchPlansWithRetry(connector, insurer.id)
+            const insurerPlans = await this.fetchPlansWithRetry(connector, insurer.id, insurer.insurerCode || '' )
+
             externalTime += Date.now() - externalStartTime
 
             this.logger.log(
@@ -152,21 +153,31 @@ export class PlanService {
   /**
    * Faz retry automático para buscar planos da seguradora
    */
-  private async fetchPlansWithRetry(connector: any, insurerId: string, attempt = 0) {
-    try {
-      await connector.getTodayCotation()
-      return await connector.getPlans(insurerId)
-    } catch (error) {
-      if (attempt >= this.maxRetries) throw error
+  private async fetchPlansWithRetry(connector: any, insurerId: string, insurerCode?: string, attempt:number = 0) {
+    
+    
+        try {
 
-      const delay = Math.min(1000 * Math.pow(2, attempt), 5000)
-      await new Promise((resolve) => setTimeout(resolve, delay))
+            // Se for MTA, roda o sincronizador de coberturas completo
+      
+          this.logger.log(`[PlanService] Sincronizando ${insurerCode} com múltiplos destinos...`)
+          await connector.syncAllCoverages(insurerId)
+          this.logger.log(`[PlanService] Sincronização ${insurerCode} concluída com sucesso!`)
+           
+          await connector.getTodayCotation()
+          return await connector.getPlans(insurerId)
+        } catch (error) {
+          if (attempt >= this.maxRetries) throw error
 
-      this.logger.warn(
-        `[PlanService] Retentando ${insurerId} (tentativa ${attempt + 1})`
-      )
-      return this.fetchPlansWithRetry(connector, insurerId, attempt + 1)
-    }
+          const delay = Math.min(1000 * Math.pow(2, attempt), 5000)
+          await new Promise((resolve) => setTimeout(resolve, delay))
+
+          // this.logger.warn(
+          //   `[PlanService] Retentando ${insurerId} (tentativa ${attempt + 1})`
+          // )
+          //return this.fetchPlansWithRetry(connector, insurerId, attempt + 1)
+        }
+    
   }
 
    async getPlanInfo(destination: string, departure: string, arrival: string, id: number) {

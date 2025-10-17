@@ -49,4 +49,9 @@ export class QuoteRequestDto {
   @ValidateNested({ each: true })
   @Type(() => PassengerDto)
   passengers: PassengerDto[]
+
+
+  @IsOptional()
+  @IsString()
+  couponCode?: string
 }
