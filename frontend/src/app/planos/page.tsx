@@ -1,5 +1,4 @@
 "use client";
-
 import { usePreRegisterForm } from "@/hooks/useRegisterStore";
 import { useEffect, useMemo, useState } from "react";
 
@@ -76,21 +75,21 @@ export default function PlanosPage() {
 	
 	const router = useRouter();
 	
-	const params = useSearchParams();
-	const urlDestination = params.get("destination");
-	const urlFrom = params.get("from");
-	const urlTo = params.get("to");
-	const urlCoupon = params.get("coupon");
+	//const params = useSearchParams();
+	// const urlDestination = params.get("destination");
+	// const urlFrom = params.get("from");
+	// const urlTo = params.get("to");
+	// const urlCoupon = params.get("coupon");
 	const { setCheckout } = useCheckout();
 		const [initialized, setInitialized] = useState(false);
 	const [form, setForm] = useState<PreRegisterForm>({
-			destination: urlDestination || formData?.destination || "3",
+			destination: formData?.destination || "3",
 			range: {
-				from: urlFrom ? new Date(urlFrom) : formData?.range?.from || new Date(),
-				to: urlTo ? new Date(urlTo) : formData?.range?.to || new Date(),
+				from: formData?.range?.from || new Date(),
+				to: formData?.range?.to || new Date(),
 			},
 			passengers: formData?.passengers || "1",
-			coupon: urlCoupon || formData?.coupon || "",
+			coupon: formData?.coupon || "",
 	});
 
 	const resolveSlug = (dest: string) => {
