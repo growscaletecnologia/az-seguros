@@ -3,11 +3,13 @@ import { ConfigService } from '@nestjs/config'
 import axios, { AxiosInstance, AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 
 interface ValePayConfig {
-  apiKey: string
-  apiSecret: string
   baseUrl: string
   timeout: number
-  accessToken: string | null
+  publicKey: string
+  privateKey: string
+  accessToken?: string
+  companyUuid: string
+  userUuid: string
 }
 
 @Injectable()
@@ -18,11 +20,14 @@ export class ValePayProvider {
 
   constructor(private readonly configService: ConfigService) {
     this.config = {
-      apiKey: this.configService.get('VALEPAY_API_KEY') || '',
-      apiSecret: this.configService.get('VALEPAY_API_SECRET') || '',
+      publicKey: this.configService.getOrThrow('VALEPAY_PUBLIC_KEY'),
+      privateKey: this.configService.getOrThrow('VALEPAY_PRIVATE_KEY'),
       baseUrl: this.configService.get('VALEPAY_BASE_URL') || 'https://api.valepay.com/v1',
       timeout: this.configService.get('VALEPAY_TIMEOUT') || 10000,
-      accessToken: null,
+      accessToken:
+        'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI0IiwianRpIjoiM2M1NzBmZWFkYjc5ZmNiOWFkZmE1YmU1NWY5MzBjNDc3MDMzMDBmZTNmYjEyN2NiNWQyZmFiMTRhYTkxMTBlMTdiYmYxYjdmMzVlZjYzNWYiLCJpYXQiOjE3NjA2NTY3MTIuOTQwMzczLCJuYmYiOjE3NjA2NTY3MTIuOTQwMzc3LCJleHAiOjE3NjA3NDMxMTIuOTE1MDEzLCJzdWIiOiIxODIiLCJzY29wZXMiOlsiY29tcGFueS1hcGkiXX0.Ww8_m8PsecT0-j7-eOBIBRHnpHiiqUGQol1STSME1ZhhlirD3Ozj9FOikzGHk0eqG4ap0PbJzNbgF1hpyGZ3-P0c7zRm5gl7UebUViJ2Jz0ZuaHej9nVdFhz3VwKdy-ufPnlgQi41AU6K7bDCqFrD9aEMmZR0dDw8ng0I92WDDrhRQbQrQolC5j7l74BhDMCe3IQBP254cKIDgST9H6lRV4a14bfLssgCBZaR6gK4ngm-rPlbolGHpdUovImK864ACVDmy_f9GEQp2sR-itzqLe0DibYRLuT5aBK5LqqcJfvkLgJteSBQJwhiPvxSbwVArQ6yqD3j9GM1WxqncokeM-U3zVlh5045VEMsaUUUtO2TC1tDEFZHQgbqC-pUaBEuyiWXVdKUk4ttktpG7TyEfLqlWPRT9pl2fVnAJfW_Rig5AGjfRAWu-EqaItKBfSf2WNezVSvUZ-QuDE_HxWPQAWklcHjUY0-ZUS3RBG6wffydJzTnq_39VwBqV5wFZJwXikfFDcKc-p-o2XHEJ5qrzVMcxF0cDQVEyYTZtTVNliQkfX7O5ukLS53SbSxw0iboWB3TmfZbU_L5tjUEO24gSxFkAxXnmkCmxeMuXpke9L1zWr3k1HM7ZHAwyVoMZGbrJx0ceFA3t4mzCiSLvvZ7kf4C1Xs_tix-SKLr_Ttuyw',
+      companyUuid: this.configService.getOrThrow('VALEPAY_COMPANY_UUID'),
+      userUuid: this.configService.getOrThrow('VALEPAY_USER_UUID'),
     }
     this.initializeAxios()
     this.logger = new Logger(ValePayProvider.name)
@@ -84,6 +89,7 @@ export class ValePayProvider {
   }
 
   private readonly responseInterceptorError = async (error: AxiosError) => {
+    this.logger.error(`Response Error Message: ${JSON.stringify(error.message)}`)
     this.logger.error(`Response Error: ${JSON.stringify(error)}`)
 
     if (error.response?.status === HttpStatus.UNAUTHORIZED) {
@@ -107,17 +113,22 @@ export class ValePayProvider {
       {},
       {
         headers: {
-          public: this.config.apiKey,
-          private: this.config.apiSecret,
+          public: this.config.publicKey,
+          private: this.config.privateKey,
         },
       },
     )
 
-    this.config.accessToken = response.data.access_token
+// TODO: Adicionar refresh automático do token com base na expiração: response.data.data.token.expires_in
+    this.config.accessToken = response.data.data.token.access_token
     this.logger.log('Authentication successful.')
   }
 
   public getAxiosInstance = (): AxiosInstance => {
     return this.axiosInstance
+  }
+
+  public getCompanyConfig = () => {
+    return { companyUuid: this.config.companyUuid, userUuid: this.config.userUuid }
   }
 }
