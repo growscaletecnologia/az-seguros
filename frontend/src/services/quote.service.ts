@@ -11,9 +11,18 @@ export interface QuoteRequestDto {
 	departureDate: string; // YYYY-MM-DD
 	returnDate: string; // YYYY-MM-DD
 	passengers: Passenger[]; // [{ age: 21 }, ...]
+	couponCode?: string;
 }
-
+export interface Coverage {
+  id: number;
+  title: string;
+  value: string;          // ex: "1000,00"
+  slug: string;           // identificador único (ex: "despesas-odontologicas")
+  type: 'USD' | 'BRL' | 'INCLUSO'; // tipo de valor
+  displayOrder: number;
+}
 export interface QuoteResponse {
+	id: number;
 	code: number;
 	name: string;
 	slug: string;
@@ -28,6 +37,9 @@ export interface QuoteResponse {
 	passengers: number;
 	ageGroups: QuoteAgeGroup[];
 	benefits: QuoteBenefit[];
+	coverages: Coverage[];
+  	coverageHighlight: Coverage[];
+	couponApplied?: boolean
 }
 
 export interface QuoteAgeGroup {
@@ -41,6 +53,7 @@ export interface QuoteAgeGroup {
 export interface QuoteBenefit {
 	id: number;
 	name: string;
+	code: number;
 }
 
 /** ====== Tipos internos (retorno cru da API) ======
@@ -70,6 +83,7 @@ export const QuoteService = {
 		const payload = {
 			dateFormat: "Y-m-d",
 			multitrip: false,
+			couponCode: data.couponCode ? data.couponCode : undefined,
 			departure: data.departureDate,
 			arrival: data.returnDate,
 			slug: data.slug,

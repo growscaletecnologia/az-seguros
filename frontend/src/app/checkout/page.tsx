@@ -20,6 +20,8 @@ import { toast } from "sonner";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { couponsService } from "@/services/api/coupons";
+import { PlanCoverageViewer } from "@/components/planos/PlanCoverageViewer";
+import { DESTINIES } from "@/types/destination";
 
 
 export default function CheckoutPage() {
@@ -54,6 +56,7 @@ export default function CheckoutPage() {
 	const [cepLoading, setCepLoading] = useState(false);
 	const [cepError, setCepError] = useState("");
 	const [cpfError, setCpfError] = useState("");
+	const [viewPlan , setViewPlan] = useState(false);
 	const [initialCouponVerified, setInitialCouponVerified] = useState(false);
 	const [seguradoErrors, setSeguradoErrors] = useState<
         { nascimento?: string; cpf?: string }[]
@@ -1001,7 +1004,8 @@ export default function CheckoutPage() {
 					{/* Card do plano */}
 					<div className="bg-white rounded-md border shadow-sm p-5 text-sm">
 						<p className="text-gray-700 font-medium mb-1">
-							{form.destination.charAt(0).toUpperCase() + form.destination.slice(1)}
+							
+							Viajando para {form.destination ? DESTINIES.filter((d)=>d.id === Number(form.destination))[0].name : ""}
 						</p>
 						<p className="text-gray-500 mb-2">
 							{formatDate(form.departure)} - {formatDate(form.arrival)}
@@ -1023,9 +1027,11 @@ export default function CheckoutPage() {
 							Faixa etária: {plan.ageGroups[0].start} a {plan?.ageGroups.at(-1)?.end} anos
 						</p>
 						
-						<a href="#" className="text-green-700 font-medium block mb-1 hover:underline">
+						<button 
+							onClick={() => setViewPlan(!viewPlan)}
+							className="text-green-700 font-medium block mb-1 hover:underline">
 							Cobertura completa
-						</a>
+						</button>
 						<a
 							href={plan?.provider_terms_url || ""}
 							target="_blank"
@@ -1051,6 +1057,15 @@ export default function CheckoutPage() {
 					</p>
 				</div>
 			</div>
+											{viewPlan && (
+												<PlanCoverageViewer
+													planId={plan.code || 0}
+													destination={form.destination ?? ""}
+													departure={form.departure}
+													arrival={form.arrival}
+													onClose={() => setViewPlan(false	)}				
+											/>
+											)}
 		</div>
 	);
 }

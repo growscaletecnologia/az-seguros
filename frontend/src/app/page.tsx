@@ -12,17 +12,11 @@ import { buildImageUrl } from "@/utils/imageUtils";
 import {
 	ArrowRight,
 	CheckCircle,
-	Clock,
-	DollarSign,
 	Globe,
 	Heart,
-	Info,
 	MapPin,
 	Plane,
-	Shield,
-	Star,
 	User,
-	Users,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -169,38 +163,95 @@ export default function HomePage() {
 		loadPosts();
 	}, []);
 
+	// function handleSubmit(event: React.FormEvent) {
+	// 	event.preventDefault();
+
+	// 	const requiredFields: (keyof PreRegisterForm)[] = [
+	// 		"name",
+	// 		"email",
+	// 		"phone",
+	// 		"range",
+	// 		"destination",
+	// 		"term",
+	// 	];
+
+	// 	const newErrors: Partial<Record<keyof PreRegisterForm, boolean>> = {};
+	// 	requiredFields.forEach((field) => {
+	// 		if (!formData?.[field] || (field === "range" && !formData?.range?.from)) {
+	// 		newErrors[field] = true;
+	// 		}
+	// 	});
+
+	// 	if (Object.keys(newErrors).length > 0) {
+	// 		setErrors(newErrors);
+	// 		return;
+	// 	}
+
+	// 	const finalForm = {
+	// 		...formData,
+	// 		coupon: coupomChecked && featuredCoupon?.code ? featuredCoupon.code : null,
+	// 	};
+
+		
+	// 	setForm(finalForm);
+	// 	router.push("/planos");
+	// }
+
+
 	function handleSubmit(event: React.FormEvent) {
-		event.preventDefault();
+  event.preventDefault();
 
-		const requiredFields: (keyof PreRegisterForm)[] = [
-			"name",
-			"email",
-			"phone",
-			"range",
-			"destination",
-			"term",
-		];
+  const requiredFields: (keyof PreRegisterForm)[] = [
+    "name",
+    "email",
+    "phone",
+    "range",
+    "destination",
+    "term",
+  ];
 
-		const newErrors: Partial<Record<keyof PreRegisterForm, boolean>> = {};
-		requiredFields.forEach((field) => {
-			if (!formData?.[field] || (field === "range" && !formData?.range?.from)) {
-			newErrors[field] = true;
-			}
-		});
+  const newErrors: Partial<Record<keyof PreRegisterForm, boolean>> = {};
+  requiredFields.forEach((field) => {
+    if (!formData?.[field] || (field === "range" && !formData?.range?.from)) {
+      newErrors[field] = true;
+    }
+  });
 
-		if (Object.keys(newErrors).length > 0) {
-			setErrors(newErrors);
-			return;
-		}
+  if (Object.keys(newErrors).length > 0) {
+    setErrors(newErrors);
+    return;
+  }
 
-		const finalForm = {
-			...formData,
-			coupon: coupomChecked && featuredCoupon?.code ? featuredCoupon.code : null,
-		};
+  // ✅ Se tiver cupom, inclui no objeto final
+  const finalForm = {
+    ...formData,
+    coupon: coupomChecked && featuredCoupon?.code ? featuredCoupon.code : null,
+  };
 
-		setForm(finalForm);
-		router.push("/planos");
-	}
+  setForm(finalForm);
+
+  // ✅ Gera parâmetros legíveis pra URL
+  const departure = finalForm.range?.from
+    ? new Date(finalForm.range.from).toISOString().split("T")[0]
+    : "";
+  const arrival = finalForm.range?.to
+    ? new Date(finalForm.range.to).toISOString().split("T")[0]
+    : "";
+
+  const query = new URLSearchParams({
+    destination: finalForm.destination?.toString() ?? "",
+    from: departure,
+    to: arrival,
+  });
+
+  if (finalForm.coupon) {
+    query.append("coupon", finalForm.coupon);
+  }
+
+  // ✅ Redireciona já com os dados salvos na URL
+  router.push(`/planos?${query.toString()}`);
+}
+
 
 	return (
 		<div className="bg-white">

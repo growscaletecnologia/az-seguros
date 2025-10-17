@@ -78,9 +78,9 @@ export interface PreRegisterForm {
   name?: string;
   email?: string;
   phone?: string;
-  destination: string;
+  destination?: string;
   range?: { from: Date; to: Date };
-  passengers: string | number;
+  passengers: string;
   step?: number;
   coupon?: string;
   term?: boolean;

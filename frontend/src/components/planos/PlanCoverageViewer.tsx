@@ -3,58 +3,80 @@
 import { useEffect, useState, useRef } from "react";
 import { PlanService } from "@/services/plan.service";
 
-import { Info, Minus, Plus, X, MapPin, Calendar } from "lucide-react";
+import { Info, Minus, Plus, X, MapPin, Calendar, ChevronUp, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { PlanInfo } from "@/types/types";
+import { formatPrice } from "@/lib/utils";
+import { DESTINIES } from "@/types/destination";
 
 interface PlanCoverageViewerProps {
   planId: number;
   destination: string;
   departure: string;
   arrival: string;
-  onClose: () => void;
-  onBuy:()=> void;
+  onClose?: () => void;
+  onBuy?:()=> void;
 }
 
-/** Linha de cobertura (acordeão) */
+
 function AccordionRow({
-  titulo,
-  valor,
-  extra,
+    titulo,
+    valor,
+    extra,
+    isFirstInCategory // Novo prop para borda superior
 }: {
-  titulo: string;
-  valor?: string;
-  extra?: string | null;
+    titulo: string;
+    valor?: string;
+    extra?: string | null;
+    isFirstInCategory: boolean;
 }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="border-b last:border-b-0">
-      <button
-        onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center justify-between px-4 py-3 bg-gray-100 hover:bg-gray-200 transition"
-      >
-        <div className="flex items-center gap-3">
-          <span className="p-1 rounded-md bg-white shadow-sm">
-            {open ? (
-              <Minus className="h-4 w-4 text-gray-600" />
-            ) : (
-              <Plus className="h-4 w-4 text-gray-600" />
+    // 💡 A imagem sugere que as linhas não são sempre expansíveis, mas vamos manter a funcionalidade do Acordeão.
+    // O valor do benefício (USD 60.000) fica à direita.
+    const [open, setOpen] = useState(false);
+
+    return (
+        <div 
+            className={`border-b border-gray-200 last:border-b-0 ${
+                isFirstInCategory ? 'border-t-0' : 'border-t'
+            } bg-white`}
+        >
+            <button
+                onClick={() => setOpen((v) => !v)}
+                // Estilo ajustado: fundo branco, sem hover visível, padding sutil
+                className="w-full flex items-center justify-between px-0 py-3 transition" 
+                aria-expanded={open}
+            >
+                {/* Título (Esquerda) */}
+                <div className="flex items-center gap-3">
+                    {/* Checkmark ou Icone de Expansão na esquerda (opcional, dependendo do design final) */}
+                    {/* Mantendo o título simples como na imagem */}
+                    <span className="text-sm font-normal text-gray-800">{titulo}</span>
+                </div>
+                
+                {/* Valor e Toggle (Direita) */}
+                <div className="flex items-center gap-3 text-right">
+                    {valor && <span className="text-sm font-semibold text-gray-800">{valor}</span>}
+                    
+                    {/* Ícone de Expansão na Direita, discreto */}
+                    <span className="ml-2 p-0.5">
+                        {open ? (
+                            <ChevronUp className="h-4 w-4 text-gray-500" />
+                        ) : (
+                            <ChevronDown className="h-4 w-4 text-gray-500" />
+                        )}
+                    </span>
+                </div>
+            </button>
+            
+            {/* Conteúdo Extra (Descrição Longa) */}
+            {open && extra && (
+                <div className="pb-3 pt-1 bg-white text-xs text-gray-600 flex items-start gap-2">
+                    <Info className="h-4 w-4 mt-0.5 text-gray-500 shrink-0" />
+                    <p>{extra}</p>
+                </div>
             )}
-          </span>
-          <span className="text-sm font-medium text-gray-800">{titulo}</span>
         </div>
-        <div className="flex items-center gap-3">
-          {valor && <span className="text-sm text-gray-800">{valor}</span>}
-        </div>
-      </button>
-      {open && extra && (
-        <div className="px-4 py-3 bg-white text-sm text-gray-700 flex items-start gap-2">
-          <Info className="h-4 w-4 mt-0.5 text-gray-500 shrink-0" />
-          <p>{extra}</p>
-        </div>
-      )}
-    </div>
-  );
+    );
 }
 
 /** Modal principal */
@@ -74,7 +96,8 @@ export function PlanCoverageViewer({
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        onClose();
+      
+          onClose?.();
       }
     };
     document.addEventListener("keydown", handleKeyDown);
@@ -84,7 +107,8 @@ export function PlanCoverageViewer({
   // Fechar clicando fora do modal
   const handleClickOutside = (e: MouseEvent) => {
     if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
-      onClose();
+    
+        onClose?.();
     }
   };
 
@@ -98,8 +122,9 @@ export function PlanCoverageViewer({
     async function loadInfo() {
       try {
         setLoading(true);
+        console.log("planId", planId, destination)
         const data = await PlanService.getInfo({
-          destination,
+          destination: DESTINIES.filter((d)=>d.id === Number(destination))[0].slug,
           departure,
           arrival,
           id: planId,
@@ -125,7 +150,7 @@ export function PlanCoverageViewer({
     );
 
   if (!planInfo) return null;
-
+  console.log("planInfo", planInfo)
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-start justify-center p-4 overflow-y-auto">
       <div
@@ -161,42 +186,38 @@ export function PlanCoverageViewer({
 
           <div className="text-right">
             <p className="text-xs text-gray-600">
-              {destination} — {planInfo.days} dias
+              {DESTINIES.filter((d)=>d.id === Number(destination))[0].name} — {planInfo.days} dias
             </p>
             <p className="text-3xl font-extrabold text-green-700">
-              {planInfo.totalPrice.toLocaleString("pt-BR", {
-                style: "currency",
-                currency: planInfo.currency,
-              })}
+              {formatPrice(planInfo?.totalPrice || 0)}
             </p>
             <p className="text-sm text-gray-700">
-              {planInfo.totalPriceWithPixDiscount.toLocaleString("pt-BR", {
-                style: "currency",
-                currency: planInfo.currency,
-              })}{" "}
+              {formatPrice(planInfo?.totalPriceWithPixDiscount || 0)}{" "}
               no Pix (5% off)
             </p>
             <button
                 className="mt-3 inline-flex items-center hover:cursor-pointer justify-center px-5 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition"
-                onClick={onBuy}
+                onClick={() => onBuy?.()}
                 >
             Comprar
             </button>
           </div>
 
-          <button
-            onClick={onClose}
-            className="absolute top-0 right- p-2 rounded-lg hover:bg-gray-100"
-          >
-            <X className="h-6 w-6 text-gray-700" />
-          </button>
+          
+            <button
+              onClick={() => onClose?.()}
+              className="absolute top-0 right-1 p-2 rounded-lg cursor-pointer"
+            >
+              <X className="size-5 text-red-700" />
+            </button>
+
         </div>
 
         {/* Info geral */}
         <div className="px-6 py-4 border-b bg-gray-50 flex flex-wrap gap-4 items-center text-sm text-gray-700">
           <div className="flex items-center gap-2">
             <MapPin className="h-4 w-4" />
-            <span>{destination}</span>
+            <span>{DESTINIES.filter((d)=>d.id === Number(destination))[0].name}</span>
           </div>
           <div className="flex items-center gap-2">
             <Calendar className="h-4 w-4" />
@@ -212,12 +233,13 @@ export function PlanCoverageViewer({
             Coberturas Médicas
           </h3>
           <div className="overflow-hidden rounded-lg border">
-            {planInfo.benefits.map((b) => (
+            {planInfo.benefits.map((b, index) => (
               <AccordionRow
                 key={b.id}
                 titulo={b.name}
                 valor={b.category_name}
                 extra={b.long_description}
+                isFirstInCategory = {index === 0}
               />
             ))}
           </div>
@@ -226,3 +248,4 @@ export function PlanCoverageViewer({
     </div>
   );
 }
+

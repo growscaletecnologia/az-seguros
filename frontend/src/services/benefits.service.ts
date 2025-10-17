@@ -7,6 +7,7 @@ export interface Benefit {
     id: string;
     name: string;
     slug: string;
+    code:number;
     description: string;
     categoryId: string; // ID da Categoria à qual o benefício pertence
     createdAt: string;

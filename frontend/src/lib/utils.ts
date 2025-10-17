@@ -16,3 +16,7 @@ export function formatDate(dateString: string) {
 	const date = new Date(dateString);
 	return format(date, "dd/MM/yyyy", { locale: ptBR });
 }
+
+
+export const formatPrice = (price: number) =>
+			price.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
