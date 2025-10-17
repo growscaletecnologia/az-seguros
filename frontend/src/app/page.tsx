@@ -6,23 +6,17 @@ import EmailField from "@/components/Inputs/EmailInput";
 import PhoneField from "@/components/Inputs/PhoneInput";
 import { WhyChooseSection } from "@/components/sections/WhyChooseSection";
 import { couponsService } from "@/services/api/coupons";
-import { postsService, Post } from "@/services/posts.service";
-import { buildImageUrl } from "@/utils/imageUtils";
+import { type Post, postsService } from "@/services/posts.service";
 import type { PreRegisterForm } from "@/types/types";
+import { buildImageUrl } from "@/utils/imageUtils";
 import {
 	ArrowRight,
 	CheckCircle,
-	Clock,
-	DollarSign,
 	Globe,
 	Heart,
-	Info,
 	MapPin,
 	Plane,
-	Shield,
-	Star,
 	User,
-	Users,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -33,14 +27,14 @@ import { useState } from "react";
 
 import DestinationSelect from "@/components/Inputs/DestinationSelect";
 
+import PassengersSelect from "@/components/Inputs/PassengersSelect";
+import { AvaliacoesCarousel } from "@/components/avaliations/AvaliacoesCarousel";
 import {
 	HoverCard,
 	HoverCardContent,
 	HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { usePreRegisterForm } from "@/hooks/useRegisterStore";
-import { AvaliacoesCarousel } from "@/components/avaliations/AvaliacoesCarousel";
-import PassengersSelect from "@/components/Inputs/PassengersSelect,";
 
 /**
  * Função para realizar rolagem suave até uma posição específica na página
@@ -48,43 +42,50 @@ import PassengersSelect from "@/components/Inputs/PassengersSelect,";
  * @param duration Duração da animação em milissegundos
  */
 function smoothScrollTo(position: number, duration: number) {
-  const startPosition = window.scrollY;
-  const distance = position - startPosition;
-  let startTime: number | null = null;
+	const startPosition = window.scrollY;
+	const distance = position - startPosition;
+	let startTime: number | null = null;
 
-  function animation(currentTime: number) {
-    if (startTime === null) startTime = currentTime;
-    const timeElapsed = currentTime - startTime;
-    const run = easeInOutQuad(timeElapsed, startPosition, distance, duration);
-    window.scrollTo(0, run);
-    if (timeElapsed < duration) requestAnimationFrame(animation);
-  }
+	function animation(currentTime: number) {
+		if (startTime === null) startTime = currentTime;
+		const timeElapsed = currentTime - startTime;
+		const run = easeInOutQuad(timeElapsed, startPosition, distance, duration);
+		window.scrollTo(0, run);
+		if (timeElapsed < duration) requestAnimationFrame(animation);
+	}
 
-  // Função de easing para suavizar o movimento
-  function easeInOutQuad(t: number, b: number, c: number, d: number) {
-    t /= d / 2;
-    if (t < 1) return c / 2 * t * t + b;
-    t--;
-    return -c / 2 * (t * (t - 2) - 1) + b;
-  }
+	// Função de easing para suavizar o movimento
+	function easeInOutQuad(t: number, b: number, c: number, d: number) {
+		t /= d / 2;
+		if (t < 1) return (c / 2) * t * t + b;
+		t--;
+		return (-c / 2) * (t * (t - 2) - 1) + b;
+	}
 
-  requestAnimationFrame(animation);
+	requestAnimationFrame(animation);
 }
 
 export default function HomePage() {
-	const { formData: dados, setForm } = usePreRegisterForm();
-	const [formData, setFormData] = useState<PreRegisterForm>({
+	const { formData, setForm, setField, reset } = usePreRegisterForm();
+
+	useEffect(() => {
+	if (!formData) {
+		setForm({
+		destination: "europa",
+		range: {
+			from: new Date(),
+			to: new Date(),
+		},
+		passengers: "1",
 		name: "",
 		email: "",
 		phone: "",
-		range: undefined,
-		passengers: "1",
-		destination: "BA",
 		step: 1,
 		coupon: "",
 		term: false,
-	});
-
+		});
+	}
+	}, [formData, setForm]);
 	const router = useRouter();
 	const [coupomChecked, setCoupomChecked] = useState(false);
 	const [errors, setErrors] = useState<
@@ -162,36 +163,96 @@ export default function HomePage() {
 		loadPosts();
 	}, []);
 
+	// function handleSubmit(event: React.FormEvent) {
+	// 	event.preventDefault();
+
+	// 	const requiredFields: (keyof PreRegisterForm)[] = [
+	// 		"name",
+	// 		"email",
+	// 		"phone",
+	// 		"range",
+	// 		"destination",
+	// 		"term",
+	// 	];
+
+	// 	const newErrors: Partial<Record<keyof PreRegisterForm, boolean>> = {};
+	// 	requiredFields.forEach((field) => {
+	// 		if (!formData?.[field] || (field === "range" && !formData?.range?.from)) {
+	// 		newErrors[field] = true;
+	// 		}
+	// 	});
+
+	// 	if (Object.keys(newErrors).length > 0) {
+	// 		setErrors(newErrors);
+	// 		return;
+	// 	}
+
+	// 	const finalForm = {
+	// 		...formData,
+	// 		coupon: coupomChecked && featuredCoupon?.code ? featuredCoupon.code : null,
+	// 	};
+
+		
+	// 	setForm(finalForm);
+	// 	router.push("/planos");
+	// }
+
+
 	function handleSubmit(event: React.FormEvent) {
-		event.preventDefault();
+  event.preventDefault();
 
-		const requiredFields: (keyof PreRegisterForm)[] = [
-			"name",
-			"email",
-			"phone",
-			"range",
-			"destination",
-			"term",
-		];
-		const newErrors: Partial<Record<keyof PreRegisterForm, boolean>> = {};
+  const requiredFields: (keyof PreRegisterForm)[] = [
+    "name",
+    "email",
+    "phone",
+    "range",
+    "destination",
+    "term",
+  ];
 
-		requiredFields.forEach((field) => {
-			if (!formData[field] || (field === "range" && !formData.range?.from)) {
-				newErrors[field] = true;
-			}
-		});
+  const newErrors: Partial<Record<keyof PreRegisterForm, boolean>> = {};
+  requiredFields.forEach((field) => {
+    if (!formData?.[field] || (field === "range" && !formData?.range?.from)) {
+      newErrors[field] = true;
+    }
+  });
 
-		if (Object.keys(newErrors).length > 0) {
-			setErrors(newErrors);
-			return;
-		}
+  if (Object.keys(newErrors).length > 0) {
+    setErrors(newErrors);
+    return;
+  }
 
-		const finalForm = { ...formData, coupon: coupomChecked ? "SEGURO25" : "" };
+  // ✅ Se tiver cupom, inclui no objeto final
+  const finalForm = {
+    ...formData,
+    coupon: coupomChecked && featuredCoupon?.code ? featuredCoupon.code : null,
+  };
 
-		setForm(finalForm);
-		router.push("/planos");
-		console.log("Form submitted:", finalForm);
-	}
+  setForm(finalForm);
+
+  // ✅ Gera parâmetros legíveis pra URL
+  const departure = finalForm.range?.from
+    ? new Date(finalForm.range.from).toISOString().split("T")[0]
+    : "";
+  const arrival = finalForm.range?.to
+    ? new Date(finalForm.range.to).toISOString().split("T")[0]
+    : "";
+
+  const query = new URLSearchParams({
+    destination: finalForm.destination?.toString() ?? "",
+    from: departure,
+    to: arrival,
+  });
+
+  if (finalForm.coupon) {
+    query.append("coupon", finalForm.coupon);
+  }
+
+  // ✅ Redireciona já com os dados salvos na URL
+  router.push(`/planos?${query.toString()}`);
+}
+
+
 	return (
 		<div className="bg-white">
 			{/* Hero Section */}
@@ -217,7 +278,9 @@ export default function HomePage() {
 						<div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
 							<div className="flex items-center space-x-2">
 								<CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0" />
-								<span className="text-sm sm:text-base">Melhor Preço Garantido</span>
+								<span className="text-sm sm:text-base">
+									Melhor Preço Garantido
+								</span>
 							</div>
 							<div className="flex items-center space-x-2">
 								<CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0" />
@@ -236,7 +299,7 @@ export default function HomePage() {
 											checked={coupomChecked}
 											onChange={() => {
 												setCoupomChecked(!coupomChecked);
-												setFormData((prev) => ({ ...prev, coupon: "" }));
+												setField("coupon", featuredCoupon.code);
 											}}
 										/>
 										<span className="text-base sm:text-lg font-bold">
@@ -252,10 +315,7 @@ export default function HomePage() {
 											checked={coupomChecked}
 											onChange={() => {
 												setCoupomChecked(!coupomChecked);
-												setFormData((prev) => ({
-													...prev,
-													coupon: featuredCoupon.code,
-												}));
+												setField("coupon", featuredCoupon.code);
 											}}
 										/>
 										<span className="text-sm">Aplicar cupom</span>
@@ -285,10 +345,8 @@ export default function HomePage() {
 									</h3>
 									<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
 										<DestinationSelect
-											data={formData.destination}
-											setData={(value) =>
-												setFormData((prev) => ({ ...prev, destination: value }))
-											}
+											data={formData?.destination || ""}
+											setData={(value) => setField("destination", value)}
 										/>
 										{errors.destination && (
 											<p className="text-red-500 text-xs sm:text-sm">
@@ -297,12 +355,10 @@ export default function HomePage() {
 										)}
 										<div className="col-span-1 md:col-span-2 lg:col-span-2">
 											<DateRangePicker
-												onChange={(value) => {
-													setFormData((prev) => ({ ...prev, range: value }));
-												}}
+												onChange={(value) => setField("range", value)}
 												minDate={new Date()}
 												months={1}
-												range={formData.range}
+												range={formData?.range}
 											/>
 											{errors.range && (
 												<p className="text-red-500 text-xs sm:text-sm">
@@ -320,20 +376,17 @@ export default function HomePage() {
 												type="text"
 												placeholder="Nome completo"
 												className="w-full bg-transparent border-0 placeholder-white/70 text-white focus:ring-0 focus:outline-none text-sm sm:text-base"
-												value={formData.name}
+												value={formData?.name || ""}
 												onChange={(e) =>
-													setFormData((prev) => ({
-														...prev,
-														name: e.target.value,
-													}))
+													setField("name", e.target.value)
 												}
 											/>
 										</div>
 										<div>
 											<EmailField
-												email={formData.email}
+												email={formData?.email || ""}
 												setEmail={(value) =>
-													setFormData((prev) => ({ ...prev, email: value }))
+													setField("email", value)
 												}
 											/>
 											{errors.email && (
@@ -344,9 +397,9 @@ export default function HomePage() {
 										</div>
 										<div>
 											<PhoneField
-												phone={formData.phone}
+												phone={formData?.phone || ""}
 												setPhone={(value) =>
-													setFormData((prev) => ({ ...prev, phone: value }))
+													setField("phone", value)
 												}
 											/>
 											{errors.phone && (
@@ -359,9 +412,9 @@ export default function HomePage() {
 
 									<div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4 mt-3 sm:mt-4">
 										<PassengersSelect
-											data={formData.passengers}
+											data={formData?.passengers || ""}
 											setData={(value) =>
-												setFormData((prev) => ({ ...prev, passengers: value }))
+												setField("passengers", value)
 											}
 										/>
 
@@ -380,9 +433,9 @@ export default function HomePage() {
 											type="checkbox"
 											id="cupom"
 											className="w-5 h-5 rounded-2xl mt-1"
-											checked={formData.term}
+											checked={formData?.term}
 											onChange={() => {
-												setFormData((prev) => ({ ...prev, term: !prev.term }));
+												setField("term", !formData?.term)
 											}}
 										/>
 
@@ -428,7 +481,8 @@ export default function HomePage() {
 							Últimas do Blog
 						</h2>
 						<p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
-							Confira as últimas notícias, dicas e informações sobre seguros de viagem
+							Confira as últimas notícias, dicas e informações sobre seguros de
+							viagem
 						</p>
 					</div>
 
@@ -445,28 +499,31 @@ export default function HomePage() {
 									if (post.coverImage) {
 										return buildImageUrl(post.coverImage);
 									}
-									
+
 									// Se não, procura pela imagem principal nos media
-									const mainImage = post.media?.find(media => media.isMain);
+									const mainImage = post.media?.find((media) => media.isMain);
 									if (mainImage?.url) {
 										return buildImageUrl(mainImage.url);
 									}
-									
+
 									// Se não encontrar nenhuma, usa a primeira imagem disponível
 									const firstImage = post.media?.[0];
 									if (firstImage?.url) {
 										return buildImageUrl(firstImage.url);
 									}
-									
+
 									// Fallback para placeholder
 									return buildImageUrl(null);
 								};
 
 								const mainImageUrl = getMainImageUrl(post);
-								const categories = post.categories.map(pc => pc.category);
+								const categories = post.categories.map((pc) => pc.category);
 
 								return (
-									<div key={post.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+									<div
+										key={post.id}
+										className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition"
+									>
 										<Link href={`/blog/${post.slug}`}>
 											<div className="aspect-video relative overflow-hidden">
 												<img
@@ -509,8 +566,8 @@ export default function HomePage() {
 										Seguro Viagem Marítimo
 									</h3>
 									<p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4">
-										Proteção contra imprevistos em alto mar, incluindo assistência
-										a bordo e emergências durante cruzeiros.
+										Proteção contra imprevistos em alto mar, incluindo
+										assistência a bordo e emergências durante cruzeiros.
 									</p>
 									<Link
 										href="/planos"
@@ -534,8 +591,9 @@ export default function HomePage() {
 										Seguro Viagem Intercâmbio
 									</h3>
 									<p className="text-gray-600 mb-4">
-										Estude em outro país com tranquilidade. Cobertura para saúde,
-										acidentes e suporte durante todo o programa de intercâmbio.
+										Estude em outro país com tranquilidade. Cobertura para
+										saúde, acidentes e suporte durante todo o programa de
+										intercâmbio.
 									</p>
 									<Link
 										href="/planos"
@@ -584,8 +642,8 @@ export default function HomePage() {
 										Seguro Viagem Mochilão
 									</h3>
 									<p className="text-gray-600 mb-4">
-										Explore o mundo com tranquilidade. Assistência para múltiplos
-										países e coberturas pensadas para mochileiros.
+										Explore o mundo com tranquilidade. Assistência para
+										múltiplos países e coberturas pensadas para mochileiros.
 									</p>
 									<Link
 										href="/planos"
@@ -703,7 +761,12 @@ export default function HomePage() {
 
 					{/* Carrossel de avaliações */}
 					<div className="mb-8">
-						<AvaliacoesCarousel limit={9} showOnlyActive={true} autoplay={true} delayMs={5000} />
+						<AvaliacoesCarousel
+							limit={9}
+							showOnlyActive={true}
+							autoplay={true}
+							delayMs={5000}
+						/>
 					</div>
 				</div>
 			</section>

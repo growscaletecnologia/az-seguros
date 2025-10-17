@@ -1,5 +1,6 @@
 "use client";
 
+import JoditEditorComponent from "@/components/Inputs/JoditEditor";
 import { TinyMCEEditor } from "@/components/Inputs/TinyMCEEditor";
 import { AddCategoryModal } from "@/components/modals/AddCategoryModal";
 import { AddTagModal } from "@/components/modals/AddTagModal";
@@ -17,12 +18,16 @@ import {
 	type UpdatePostDTO,
 	postsService,
 } from "@/services/posts.service";
-import { useRouter } from "next/navigation";
+import {
+	buildImageUrl,
+	convertToWebP,
+	generateImagePreview,
+	validateImageFile,
+} from "@/utils/imageUtils";
 import { Upload } from "lucide-react";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import JoditEditorComponent from "@/components/Inputs/JoditEditor";
 import { toast } from "sonner";
-import { validateImageFile, convertToWebP, generateImagePreview, buildImageUrl } from "@/utils/imageUtils";
 
 /**
  * Página de edição de posts existentes
@@ -40,11 +45,11 @@ export default function EditarBlogPostPage({
 	const [selectedTags, setSelectedTags] = useState<string[]>([]);
 	const [showCategoryModal, setShowCategoryModal] = useState(false);
 	const [showTagModal, setShowTagModal] = useState(false);
-	
+
 	// Estados para upload de imagem de capa
 	const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
 	const [coverImagePreview, setCoverImagePreview] = useState<string>("");
-	
+
 	// Desembrulha os parâmetros usando React.use()
 	const { id: postId } = React.use(params);
 
@@ -64,16 +69,20 @@ export default function EditarBlogPostPage({
 				setTags(tagsData?.tags || []);
 
 				// Configura as categorias e tags selecionadas
-				const postCategories = postData.categories?.map((cat: any) => cat.id) || [];
+				const postCategories =
+					postData.categories?.map((cat: any) => cat.id) || [];
 				const postTags = postData.tags?.map((tag: any) => tag.id) || [];
-				
+
 				// Se não há categorias selecionadas, usar a primeira categoria disponível
-				if (postCategories.length === 0 && categoriesData?.categories?.length > 0) {
+				if (
+					postCategories.length === 0 &&
+					categoriesData?.categories?.length > 0
+				) {
 					setSelectedCategories([categoriesData.categories[0].id]);
 				} else {
 					setSelectedCategories(postCategories);
 				}
-				
+
 				setSelectedTags(postTags);
 			} catch (error) {
 				console.error("Erro ao carregar dados:", error);
@@ -96,7 +105,9 @@ export default function EditarBlogPostPage({
 	/**
 	 * Manipula a seleção de arquivo de imagem de capa com conversão automática para WebP
 	 */
-	const handleCoverImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleCoverImageChange = async (
+		e: React.ChangeEvent<HTMLInputElement>,
+	) => {
 		const file = e.target.files?.[0];
 		if (!file) return;
 
@@ -113,12 +124,12 @@ export default function EditarBlogPostPage({
 
 			// Converter para WebP se não for SVG
 			let processedFile = file;
-			if (file.type !== 'image/svg+xml') {
+			if (file.type !== "image/svg+xml") {
 				processedFile = await convertToWebP(file, 0.85, 1200, 800);
 			}
 
 			setCoverImageFile(processedFile);
-			
+
 			// Gerar preview
 			const preview = await generateImagePreview(processedFile);
 			setCoverImagePreview(preview);
@@ -137,9 +148,11 @@ export default function EditarBlogPostPage({
 		setCoverImageFile(null);
 		setCoverImagePreview("");
 		// Limpar o input file
-		const fileInput = document.getElementById('coverImageFile') as HTMLInputElement;
+		const fileInput = document.getElementById(
+			"coverImageFile",
+		) as HTMLInputElement;
 		if (fileInput) {
-			fileInput.value = '';
+			fileInput.value = "";
 		}
 	};
 
@@ -179,7 +192,9 @@ export default function EditarBlogPostPage({
 
 		// Se há categorias selecionadas, usar a primeira categoria
 		if (selectedCategories.length > 0) {
-			const firstCategory = categories.find(cat => cat.id === selectedCategories[0]);
+			const firstCategory = categories.find(
+				(cat) => cat.id === selectedCategories[0],
+			);
 			if (firstCategory) {
 				// Normalizar o slug da categoria (remover acentos e espaços)
 				const categorySlug = firstCategory.slug
@@ -188,7 +203,7 @@ export default function EditarBlogPostPage({
 					.replace(/[\u0300-\u036f]/g, "")
 					.replace(/[^\w\s]/g, "")
 					.replace(/\s+/g, "-");
-				
+
 				handleChange("fullUrl", `/blog/${categorySlug}/${currentSlug}`);
 			} else {
 				handleChange("fullUrl", `/blog/${currentSlug}`);
@@ -245,7 +260,7 @@ export default function EditarBlogPostPage({
 			setSaving(true);
 			await postsService.uploadCoverImage(post.id, coverImageFile);
 			toast.success("Imagem de capa atualizada com sucesso!");
-			
+
 			// Recarregar os dados do post para mostrar a nova imagem
 			const updatedPost = await postsService.getPostById(post.id);
 			setPost(updatedPost);
@@ -289,12 +304,16 @@ export default function EditarBlogPostPage({
 				content: post.content,
 				resume: post.resume,
 				status: status || post.status,
-				categoryIds: selectedCategories.length > 0 
-					? selectedCategories.filter(id => id !== null && id !== undefined) 
-					: (categories.length > 0 ? [categories[0].id] : []),
-				tagIds: selectedTags.length > 0 
-					? selectedTags.filter(id => id !== null && id !== undefined) 
-					: [],
+				categoryIds:
+					selectedCategories.length > 0
+						? selectedCategories.filter((id) => id !== null && id !== undefined)
+						: categories.length > 0
+							? [categories[0].id]
+							: [],
+				tagIds:
+					selectedTags.length > 0
+						? selectedTags.filter((id) => id !== null && id !== undefined)
+						: [],
 				//metadata: post.metadata,
 			};
 
@@ -318,11 +337,15 @@ export default function EditarBlogPostPage({
 			console.error("Erro ao atualizar post:", error);
 			// Tratamento específico para diferentes tipos de erro
 			if (error?.response?.status === 409) {
-				toast.error("Este slug já está sendo usado por outro post. Escolha um slug diferente.");
+				toast.error(
+					"Este slug já está sendo usado por outro post. Escolha um slug diferente.",
+				);
 			} else if (error?.response?.status === 422) {
 				toast.error("Dados inválidos. Verifique os campos obrigatórios.");
 			} else {
-				toast.error("Erro ao atualizar post. Verifique os dados e tente novamente.");
+				toast.error(
+					"Erro ao atualizar post. Verifique os dados e tente novamente.",
+				);
 			}
 		} finally {
 			setSaving(false);
@@ -425,11 +448,15 @@ export default function EditarBlogPostPage({
 										className="cursor-pointer"
 									/>
 									<p className="text-sm text-gray-500">
-										Formatos aceitos: JPG, PNG, GIF, WebP, SVG. Tamanho máximo: 5MB
+										Formatos aceitos: JPG, PNG, GIF, WebP, SVG. Tamanho máximo:
+										5MB
 										<br />
-										<span className="text-blue-600">As imagens serão automaticamente convertidas para WebP para melhor performance.</span>
+										<span className="text-blue-600">
+											As imagens serão automaticamente convertidas para WebP
+											para melhor performance.
+										</span>
 									</p>
-									
+
 									{/* Preview da nova imagem selecionada */}
 									{coverImagePreview && (
 										<div className="space-y-2">
@@ -474,16 +501,16 @@ export default function EditarBlogPostPage({
 									)}
 
 									{/* Mostrar imagem atual se não há nova selecionada */}
-					{!coverImagePreview && post.coverImage && (
-						<div className="relative inline-block">
-							<img
-								src={buildImageUrl(post.coverImage)}
-								alt="Imagem de capa atual"
-								className="w-32 h-32 object-cover rounded-md border"
-							/>
-							<p className="text-sm text-gray-500 mt-1">Imagem atual</p>
-						</div>
-					)}
+									{!coverImagePreview && post.coverImage && (
+										<div className="relative inline-block">
+											<img
+												src={buildImageUrl(post.coverImage)}
+												alt="Imagem de capa atual"
+												className="w-32 h-32 object-cover rounded-md border"
+											/>
+											<p className="text-sm text-gray-500 mt-1">Imagem atual</p>
+										</div>
+									)}
 								</div>
 							</div>
 						</div>
@@ -501,10 +528,10 @@ export default function EditarBlogPostPage({
 							height={500}
 							label="Conteúdo do Post"
 						/> */}
-							<JoditEditorComponent
-								onChange={(value) => handleChange("content", value)}
-								value={post.content || ""}
-							></JoditEditorComponent>
+						<JoditEditorComponent
+							onChange={(value) => handleChange("content", value)}
+							value={post.content || ""}
+						></JoditEditorComponent>
 					</CardContent>
 				</Card>
 
@@ -629,7 +656,7 @@ export default function EditarBlogPostPage({
 											Sem categoria
 										</Label>
 									</div>
-									
+
 									{/* Lista de categorias disponíveis */}
 									{categories.map((category) => (
 										<div
@@ -651,7 +678,10 @@ export default function EditarBlogPostPage({
 															.replace(/[\u0300-\u036f]/g, "")
 															.replace(/[^\w\s]/g, "")
 															.replace(/\s+/g, "-");
-														handleChange("fullUrl", `/blog/${categorySlug}/${post.slug}`);
+														handleChange(
+															"fullUrl",
+															`/blog/${categorySlug}/${post.slug}`,
+														);
 													}
 												}}
 												className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500"

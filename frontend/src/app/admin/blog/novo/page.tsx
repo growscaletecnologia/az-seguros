@@ -23,15 +23,19 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import {
-	type CreatePostDTO,
 	type Category,
+	type CreatePostDTO,
 	type Tag,
 	postsService,
 } from "@/services/posts.service";
+import {
+	convertToWebP,
+	generateImagePreview,
+	validateImageFile,
+} from "@/utils/imageUtils";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { validateImageFile, convertToWebP, generateImagePreview } from "@/utils/imageUtils";
 
 /**
  * Página de criação de novos posts
@@ -43,7 +47,7 @@ export default function NovoBlogPostPage() {
 	const [tags, setTags] = useState<Tag[]>([]);
 	const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 	const [selectedTags, setSelectedTags] = useState<string[]>([]);
-	
+
 	// Estados para controlar os modais
 	const [showCategoryModal, setShowCategoryModal] = useState(false);
 	const [showTagModal, setShowTagModal] = useState(false);
@@ -76,7 +80,7 @@ export default function NovoBlogPostPage() {
 				]);
 				setCategories(categoriesData?.categories || []);
 				setTags(tagsData?.tags || []);
-				
+
 				// Seleciona automaticamente a primeira categoria disponível (Blog)
 				if (categoriesData?.categories?.length > 0) {
 					setSelectedCategories([categoriesData.categories[0].id]);
@@ -111,14 +115,14 @@ export default function NovoBlogPostPage() {
 
 	// Callback quando uma nova categoria é adicionada
 	const handleCategoryAdded = (newCategory: Category) => {
-		setCategories(prev => [...prev, newCategory]);
-		setSelectedCategories(prev => [...prev, newCategory.id]);
+		setCategories((prev) => [...prev, newCategory]);
+		setSelectedCategories((prev) => [...prev, newCategory.id]);
 	};
 
 	// Callback quando uma nova tag é adicionada
 	const handleTagAdded = (newTag: Tag) => {
-		setTags(prev => [...prev, newTag]);
-		setSelectedTags(prev => [...prev, newTag.id]);
+		setTags((prev) => [...prev, newTag]);
+		setSelectedTags((prev) => [...prev, newTag.id]);
 	};
 
 	// Atualiza o estado do post
@@ -161,7 +165,9 @@ export default function NovoBlogPostPage() {
 
 		// Se há categorias selecionadas, usar a primeira categoria
 		if (selectedCategories.length > 0) {
-			const firstCategory = categories.find(cat => cat.id === selectedCategories[0]);
+			const firstCategory = categories.find(
+				(cat) => cat.id === selectedCategories[0],
+			);
 			if (firstCategory) {
 				// Normalizar o slug da categoria (remover acentos e espaços)
 				const categorySlug = firstCategory.slug
@@ -170,7 +176,7 @@ export default function NovoBlogPostPage() {
 					.replace(/[\u0300-\u036f]/g, "")
 					.replace(/[^\w\s]/g, "")
 					.replace(/\s+/g, "-");
-				
+
 				handleChange("fullUrl", `/blog/${categorySlug}/${currentSlug}`);
 			} else {
 				handleChange("fullUrl", `/blog/${currentSlug}`);
@@ -183,7 +189,9 @@ export default function NovoBlogPostPage() {
 	/**
 	 * Manipula a seleção de arquivo de imagem de capa com conversão automática para WebP
 	 */
-	const handleCoverImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleCoverImageChange = async (
+		e: React.ChangeEvent<HTMLInputElement>,
+	) => {
 		const file = e.target.files?.[0];
 		if (!file) return;
 
@@ -200,12 +208,12 @@ export default function NovoBlogPostPage() {
 
 			// Converter para WebP se não for SVG
 			let processedFile = file;
-			if (file.type !== 'image/svg+xml') {
+			if (file.type !== "image/svg+xml") {
 				processedFile = await convertToWebP(file, 0.85, 1200, 800);
 			}
 
 			setCoverImageFile(processedFile);
-			
+
 			// Gerar preview
 			const preview = await generateImagePreview(processedFile);
 			setCoverImagePreview(preview);
@@ -224,9 +232,11 @@ export default function NovoBlogPostPage() {
 		setCoverImageFile(null);
 		setCoverImagePreview("");
 		// Limpar o input file
-		const fileInput = document.getElementById('coverImageFile') as HTMLInputElement;
+		const fileInput = document.getElementById(
+			"coverImageFile",
+		) as HTMLInputElement;
 		if (fileInput) {
-			fileInput.value = '';
+			fileInput.value = "";
 		}
 	};
 
@@ -238,19 +248,28 @@ export default function NovoBlogPostPage() {
 			// Atualiza o status antes de salvar
 			const postToSave: CreatePostDTO = {
 				...post,
-				content:  post.content || "",
+				content: post.content || "",
 				status,
-				categoryIds: selectedCategories.length > 0 ? selectedCategories : 
-					(categories.length > 0 ? [categories[0].id] : []),
+				categoryIds:
+					selectedCategories.length > 0
+						? selectedCategories
+						: categories.length > 0
+							? [categories[0].id]
+							: [],
 				tagIds: selectedTags || [],
 				// Garante que os campos de texto não sejam nulos
 				resume: post.resume || "",
 				// Metadados SEO não são mais obrigatórios
-				metadata: post.metadata?.title || post.metadata?.description || post.metadata?.keywords ? {
-					title: post.metadata?.title || "",
-					description: post.metadata?.description || "",
-					keywords: post.metadata?.keywords || "",
-				} : undefined,
+				metadata:
+					post.metadata?.title ||
+					post.metadata?.description ||
+					post.metadata?.keywords
+						? {
+								title: post.metadata?.title || "",
+								description: post.metadata?.description || "",
+								keywords: post.metadata?.keywords || "",
+							}
+						: undefined,
 			};
 
 			// Criar o post primeiro
@@ -263,7 +282,9 @@ export default function NovoBlogPostPage() {
 					toast.success("Post e imagem salvos com sucesso!");
 				} catch (uploadError) {
 					console.error("Erro ao fazer upload da imagem:", uploadError);
-					toast.warning("Post salvo, mas houve erro no upload da imagem. Você pode tentar novamente na edição.");
+					toast.warning(
+						"Post salvo, mas houve erro no upload da imagem. Você pode tentar novamente na edição.",
+					);
 				}
 			} else {
 				toast.success("Post salvo com sucesso!");
@@ -283,7 +304,7 @@ export default function NovoBlogPostPage() {
 			setLoading(false);
 		}
 	};
- console.log("categories", categories)
+	console.log("categories", categories);
 	return (
 		<div className="container mx-auto py-6">
 			<div className="flex justify-between items-center mb-6">
@@ -363,7 +384,7 @@ export default function NovoBlogPostPage() {
 											onChange={handleCoverImageChange}
 											className="cursor-pointer"
 										/>
-										
+
 										{/* Preview da imagem */}
 										{coverImagePreview && (
 											<div className="relative">
@@ -379,19 +400,33 @@ export default function NovoBlogPostPage() {
 													className="absolute top-2 right-2"
 													onClick={removeCoverImage}
 												>
-													<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-														<path d="M18 6 6 18"/>
-														<path d="m6 6 12 12"/>
+													<svg
+														xmlns="http://www.w3.org/2000/svg"
+														width="16"
+														height="16"
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														strokeWidth="2"
+														strokeLinecap="round"
+														strokeLinejoin="round"
+													>
+														<path d="M18 6 6 18" />
+														<path d="m6 6 12 12" />
 													</svg>
 												</Button>
 											</div>
 										)}
-										
+
 										{/* Informações sobre o arquivo */}
 										<p className="text-sm text-gray-500">
-											Formatos aceitos: JPG, PNG, GIF, WebP, SVG. Tamanho máximo: 5MB
+											Formatos aceitos: JPG, PNG, GIF, WebP, SVG. Tamanho
+											máximo: 5MB
 											<br />
-											<span className="text-blue-600">As imagens serão automaticamente convertidas para WebP para melhor performance.</span>
+											<span className="text-blue-600">
+												As imagens serão automaticamente convertidas para WebP
+												para melhor performance.
+											</span>
 										</p>
 									</div>
 								</div>
@@ -451,7 +486,7 @@ export default function NovoBlogPostPage() {
 												Sem categoria
 											</Label>
 										</div>
-										
+
 										{/* Lista de categorias disponíveis */}
 										{categories?.map((category) => (
 											<div
@@ -473,7 +508,10 @@ export default function NovoBlogPostPage() {
 																.replace(/[\u0300-\u036f]/g, "")
 																.replace(/[^\w\s]/g, "")
 																.replace(/\s+/g, "-");
-															handleChange("fullUrl", `/blog/${categorySlug}/${post.slug}`);
+															handleChange(
+																"fullUrl",
+																`/blog/${categorySlug}/${post.slug}`,
+															);
 														}
 													}}
 													className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500"
@@ -578,7 +616,18 @@ export default function NovoBlogPostPage() {
 						<CardContent className="space-y-4">
 							<div className="flex items-center space-x-2">
 								<div className="w-6 h-6 flex items-center justify-center">
-									<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-clock">
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										width="20"
+										height="20"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										strokeWidth="2"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										className="lucide lucide-clock"
+									>
 										<circle cx="12" cy="12" r="10" />
 										<polyline points="12 6 12 12 16 14" />
 									</svg>
@@ -587,7 +636,18 @@ export default function NovoBlogPostPage() {
 							</div>
 							<div className="flex items-center space-x-2">
 								<div className="w-6 h-6 flex items-center justify-center">
-									<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-user">
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										width="20"
+										height="20"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										strokeWidth="2"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										className="lucide lucide-user"
+									>
 										<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
 										<circle cx="12" cy="7" r="4" />
 									</svg>
@@ -596,7 +656,18 @@ export default function NovoBlogPostPage() {
 							</div>
 							<div className="flex items-center space-x-2">
 								<div className="w-6 h-6 flex items-center justify-center">
-									<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-activity">
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										width="20"
+										height="20"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										strokeWidth="2"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										className="lucide lucide-activity"
+									>
 										<path d="M22 12h-4l-3 9L9 3l-3 9H2" />
 									</svg>
 								</div>
@@ -625,7 +696,18 @@ export default function NovoBlogPostPage() {
 						<CardHeader className="flex flex-row items-center justify-between">
 							<CardTitle className=" flex items-center">
 								Categorias
-								<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-tag ml-2">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="20"
+									height="20"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									strokeWidth="2"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									className="lucide lucide-tag ml-2"
+								>
 									<path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z" />
 									<path d="M7 7h.01" />
 								</svg>
@@ -634,22 +716,37 @@ export default function NovoBlogPostPage() {
 						<CardContent className="space-y-2">
 							{selectedCategories.length > 0 ? (
 								categories
-									.filter(cat => selectedCategories.includes(cat.id))
+									.filter((cat) => selectedCategories.includes(cat.id))
 									.map((category) => (
-										<div key={category.id} className="flex items-center space-x-2 bg-sky-200 p-2 rounded">
-											
+										<div
+											key={category.id}
+											className="flex items-center space-x-2 bg-sky-200 p-2 rounded"
+										>
 											<span>{category.name}</span>
 										</div>
 									))
 							) : (
-								<div className="text-gray-400">Nenhuma categoria selecionada</div>
+								<div className="text-gray-400">
+									Nenhuma categoria selecionada
+								</div>
 							)}
 							<Button
 								variant="outline"
 								className="w-full mt-2 border-white  hover:bg-blue-300"
 								onClick={() => setShowCategoryModal(true)}
 							>
-								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-plus mr-2">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="16"
+									height="16"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									strokeWidth="2"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									className="lucide lucide-plus mr-2"
+								>
 									<path d="M5 12h14" />
 									<path d="M12 5v14" />
 								</svg>
@@ -663,7 +760,18 @@ export default function NovoBlogPostPage() {
 						<CardHeader className="flex flex-row items-center justify-between">
 							<CardTitle className=" flex items-center">
 								Tags
-								<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-hash ml-2">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="20"
+									height="20"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									strokeWidth="2"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									className="lucide lucide-hash ml-2"
+								>
 									<line x1="4" x2="20" y1="9" y2="9" />
 									<line x1="4" x2="20" y1="15" y2="15" />
 									<line x1="10" x2="8" y1="3" y2="21" />
@@ -674,9 +782,12 @@ export default function NovoBlogPostPage() {
 						<CardContent className="space-y-2">
 							{selectedTags.length > 0 ? (
 								tags
-									.filter(tag => selectedTags.includes(tag.id))
+									.filter((tag) => selectedTags.includes(tag.id))
 									.map((tag) => (
-										<div key={tag.id} className="flex items-center space-x-2 bg-sky-200 p-2 rounded">
+										<div
+											key={tag.id}
+											className="flex items-center space-x-2 bg-sky-200 p-2 rounded"
+										>
 											<span>{tag.name}</span>
 										</div>
 									))
@@ -688,7 +799,18 @@ export default function NovoBlogPostPage() {
 								className="w-full mt-2 border-white  hover:bg-blue-300"
 								onClick={() => setShowTagModal(true)}
 							>
-								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-plus mr-2">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="16"
+									height="16"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									strokeWidth="2"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									className="lucide lucide-plus mr-2"
+								>
 									<path d="M5 12h14" />
 									<path d="M12 5v14" />
 								</svg>

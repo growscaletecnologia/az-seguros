@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 // import { SelectSlug } from "@/components/admin/selectSlug";
 import JoditEditorComponent from "@/components/Inputs/JoditEditor";
 import { Button } from "@/components/ui/button";
@@ -19,6 +18,7 @@ import { pagesService } from "@/services/pages.service";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Pin, TagIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
+import React from "react";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -59,7 +59,9 @@ const pageSchema = z.object({
 
 type PageFormValues = z.infer<typeof pageSchema>;
 
-export default function PageForm({ params }: { params: Promise<{ id: string }> }) {
+export default function PageForm({
+	params,
+}: { params: Promise<{ id: string }> }) {
 	const router = useRouter();
 	const { id } = React.use(params);
 	const isNew = id === "new";

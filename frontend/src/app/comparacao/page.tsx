@@ -127,9 +127,13 @@ const ComparacaoPage = () => {
 													<p className="text-xs text-gray-600">10x sem juros</p>
 													<div
 														className="relative bg-no-repeat bg-cover 	h-[18px] mt-2 bg-center w-28"
-														style={{ backgroundImage: `url(/images/icons/pixDiscount.svg)` }}
+														style={{
+															backgroundImage: `url(/images/icons/pixDiscount.svg)`,
+														}}
 													>
-															<span className="text-xs font-medium text-white relative left-6 bottom-1">5% off no PIX</span>
+														<span className="text-xs font-medium text-white relative left-6 bottom-1">
+															5% off no PIX
+														</span>
 													</div>
 												</div>
 												<button className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">

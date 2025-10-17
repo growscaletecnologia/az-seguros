@@ -53,12 +53,12 @@ export class AuthService {
 
 			if (!response.ok) {
 				const error = await response.json();
-				
+
 				// Para erros 403 (conta bloqueada/suspensa), usar a mensagem detalhada
 				if (response.status === 403 && error.details) {
 					throw new Error(error.details);
 				}
-				
+
 				// Para outros erros, usar a mensagem padrão
 				throw new Error(error.message || "Falha na autenticação");
 			}
@@ -83,11 +83,13 @@ export class AuthService {
 		if (typeof window !== "undefined") {
 			localStorage.setItem(this.TOKEN_KEY, data.accessToken);
 			localStorage.setItem(this.USER_KEY, JSON.stringify(data.user));
-			
+
 			// Dispara evento customizado para notificar componentes sobre mudança de autenticação
-			window.dispatchEvent(new CustomEvent('authStateChanged', {
-				detail: { isAuthenticated: true, user: data.user }
-			}));
+			window.dispatchEvent(
+				new CustomEvent("authStateChanged", {
+					detail: { isAuthenticated: true, user: data.user },
+				}),
+			);
 		}
 	}
 
@@ -129,11 +131,13 @@ export class AuthService {
 		if (typeof window !== "undefined") {
 			localStorage.removeItem(this.TOKEN_KEY);
 			localStorage.removeItem(this.USER_KEY);
-			
+
 			// Dispara evento customizado para notificar componentes sobre mudança de autenticação
-			window.dispatchEvent(new CustomEvent('authStateChanged', {
-				detail: { isAuthenticated: false, user: null }
-			}));
+			window.dispatchEvent(
+				new CustomEvent("authStateChanged", {
+					detail: { isAuthenticated: false, user: null },
+				}),
+			);
 		}
 	}
 }

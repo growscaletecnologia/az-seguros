@@ -8,6 +8,8 @@ import { ValidationPipe } from '@nestjs/common'
 import helmet from 'helmet'
 import { NestExpressApplication } from '@nestjs/platform-express'
 import { join } from 'path'
+import { writeFileSync } from 'fs';
+import * as YAML from 'yaml';
 
 process.env.TZ = process.env.TZ || 'America/Sao_Paulo' // Define o fuso horário padrão
 
@@ -40,6 +42,7 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config)
   SwaggerModule.setup('api', app, document)
+  writeFileSync('./doc.yaml', YAML.stringify(document));
   app.setGlobalPrefix('api')
   const ENV_ORIGINS = normalizeOrigins(process.env.FRONT_ORIGIN)
   const DEFAULT_ORIGINS = normalizeOrigins([

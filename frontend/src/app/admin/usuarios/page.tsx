@@ -1,6 +1,6 @@
 "use client";
-import { InviteUserForm } from "@/components/rbac/invite-user-form";
 import { CreateUserForm } from "@/components/rbac/create-user-form";
+import { InviteUserForm } from "@/components/rbac/invite-user-form";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -16,6 +16,7 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
+import AuthService from "@/lib/services/auth-service";
 import { userRbacService } from "@/services/api/rbac";
 import {
 	CreateUserDto,
@@ -23,7 +24,6 @@ import {
 	type User,
 	usersService,
 } from "@/services/api/users";
-import AuthService from "@/lib/services/auth-service";
 import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
 
@@ -91,12 +91,16 @@ const UsuariosPage = () => {
 			setLoading(true);
 			const data = await usersService.getAll();
 			const usuariosMapeados = data.map(mapApiUserToUsuario);
-			console.log("usuarios Mapeados",usuariosMapeados);
-			const usuariosSemCustomer = usuariosMapeados.filter(u => u.role !== 'customer');
+			console.log("usuarios Mapeados", usuariosMapeados);
+			const usuariosSemCustomer = usuariosMapeados.filter(
+				(u) => u.role !== "customer",
+			);
 			setUsuarios(usuariosSemCustomer);
 		} catch (error) {
-				console.error("Erro ao carregar usuários:", error);
-			toast.error(`Erro ao carregar usuários: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
+			console.error("Erro ao carregar usuários:", error);
+			toast.error(
+				`Erro ao carregar usuários: ${error instanceof Error ? error.message : "Erro desconhecido"}`,
+			);
 		} finally {
 			setLoading(false);
 		}
@@ -117,11 +121,11 @@ const UsuariosPage = () => {
 	 */
 	const mapRoleToBackend = (role: string): string => {
 		const roleMapping: Record<string, string> = {
-			'admin': 'ADMIN',
-			'gerente': 'MANAGER',
-			'cliente': 'CUSTOMER'
+			admin: "ADMIN",
+			gerente: "MANAGER",
+			cliente: "CUSTOMER",
 		};
-		return roleMapping[role.toLowerCase()] || 'CUSTOMER';
+		return roleMapping[role.toLowerCase()] || "CUSTOMER";
 	};
 
 	/**
@@ -129,11 +133,11 @@ const UsuariosPage = () => {
 	 */
 	const mapRoleToDisplay = (role: string): string => {
 		const roleMapping: Record<string, string> = {
-			'ADMIN': 'admin',
-			'MANAGER': 'gerente',
-			'CUSTOMER': 'cliente'
+			ADMIN: "admin",
+			MANAGER: "gerente",
+			CUSTOMER: "cliente",
 		};
-		return roleMapping[role.toUpperCase()] || 'cliente';
+		return roleMapping[role.toUpperCase()] || "cliente";
 	};
 
 	const atualizarUsuario = async () => {
@@ -156,7 +160,9 @@ const UsuariosPage = () => {
 			setEditandoUsuario(null);
 		} catch (error) {
 			console.error("Erro ao atualizar usuário:", error);
-			toast.error(`Erro ao atualizar usuário: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
+			toast.error(
+				`Erro ao atualizar usuário: ${error instanceof Error ? error.message : "Erro desconhecido"}`,
+			);
 		}
 	};
 
@@ -167,7 +173,9 @@ const UsuariosPage = () => {
 			carregarUsuarios();
 		} catch (error) {
 			console.error("Erro ao excluir usuário:", error);
-			toast.error(`Erro ao excluir usuário: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
+			toast.error(
+				`Erro ao excluir usuário: ${error instanceof Error ? error.message : "Erro desconhecido"}`,
+			);
 		}
 	};
 
@@ -199,7 +207,10 @@ const UsuariosPage = () => {
 			const updateUserDto: UpdateUserDto = {
 				name: usuario.nome,
 				email: usuario.email,
-				role: mapRoleToBackend(usuario.role) as "ADMIN" | "MANAGER" | "CUSTOMER",
+				role: mapRoleToBackend(usuario.role) as
+					| "ADMIN"
+					| "MANAGER"
+					| "CUSTOMER",
 				status: usuario.ativo ? "INACTIVE" : "ACTIVE",
 			};
 
@@ -210,7 +221,9 @@ const UsuariosPage = () => {
 			carregarUsuarios();
 		} catch (error) {
 			console.error("Erro ao alterar status do usuário:", error);
-			toast.error(`Erro ao alterar status do usuário: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
+			toast.error(
+				`Erro ao alterar status do usuário: ${error instanceof Error ? error.message : "Erro desconhecido"}`,
+			);
 		}
 	};
 
@@ -262,7 +275,7 @@ const UsuariosPage = () => {
 							</Card>
 						</DialogContent>
 					</Dialog>
-					
+
 					<Dialog>
 						<DialogTrigger asChild>
 							<Button>Adicionar Usuário</Button>
@@ -450,16 +463,21 @@ const UsuariosPage = () => {
 											</button>
 											<button
 												onClick={() => toggleUsuario(usuario.id)}
-												disabled={AuthService.getUser()?.id === usuario.id && usuario.ativo}
+												disabled={
+													AuthService.getUser()?.id === usuario.id &&
+													usuario.ativo
+												}
 												className={`px-3 py-1 text-xs rounded ${
-													AuthService.getUser()?.id === usuario.id && usuario.ativo
+													AuthService.getUser()?.id === usuario.id &&
+													usuario.ativo
 														? "bg-gray-400 cursor-not-allowed"
 														: usuario.ativo
 															? "bg-orange-500 hover:bg-orange-600"
 															: "bg-green-500 hover:bg-green-600"
 												} text-white`}
 												title={
-													AuthService.getUser()?.id === usuario.id && usuario.ativo
+													AuthService.getUser()?.id === usuario.id &&
+													usuario.ativo
 														? "Você não pode desativar sua própria conta"
 														: undefined
 												}

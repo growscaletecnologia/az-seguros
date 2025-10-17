@@ -1,10 +1,10 @@
 // app/termos/page.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import UnavailableContent from "@/components/UnavailableContent";
 import { SystemPagesService } from "@/services/systemPages";
 import DOMPurify from "dompurify";
-import UnavailableContent from "@/components/UnavailableContent";
+import { useEffect, useState } from "react";
 
 /**
  * Componente para renderizar conteúdo HTML de forma segura
@@ -30,10 +30,10 @@ export default function TermosPage() {
 			try {
 				setLoading(true);
 				const termsPage = await SystemPagesService.getByType("TERMS");
-				
+
 				if (termsPage) {
 					setContent(termsPage.content);
-					
+
 					// Se tiver título, atualizamos o título da página
 					if (termsPage.title) {
 						setPageTitle(termsPage.title);
@@ -41,7 +41,9 @@ export default function TermosPage() {
 				}
 			} catch (error) {
 				console.error("Erro ao buscar conteúdo dos Termos:", error);
-				setContent("<p>Não foi possível carregar os termos e condições. Por favor, tente novamente mais tarde.</p>");
+				setContent(
+					"<p>Não foi possível carregar os termos e condições. Por favor, tente novamente mais tarde.</p>",
+				);
 			} finally {
 				setLoading(false);
 			}
@@ -56,13 +58,11 @@ export default function TermosPage() {
 				<div className="text-center py-8">Carregando...</div>
 			) : content ? (
 				<div className="prose prose-blue max-w-none">
-					<h1 className="text-3xl font-bold text-center mb-8">
-						{pageTitle}
-					</h1>
+					<h1 className="text-3xl font-bold text-center mb-8">{pageTitle}</h1>
 					<SafeHTML html={content} />
 				</div>
 			) : (
-				<UnavailableContent 
+				<UnavailableContent
 					title="Termos Indisponíveis"
 					message="Os termos e condições não estão disponíveis no momento. Por favor, tente novamente mais tarde."
 				/>

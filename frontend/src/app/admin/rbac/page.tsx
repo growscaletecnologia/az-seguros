@@ -25,7 +25,7 @@ export default function RbacAdminPage() {
 			<div>
 				<h1 className="text-3xl font-bold">Controle de Acesso</h1>
 				<p className="text-muted-foreground">
-					Gerencie os tipos  de acesso para o sistema
+					Gerencie os tipos de acesso para o sistema
 				</p>
 			</div>
 

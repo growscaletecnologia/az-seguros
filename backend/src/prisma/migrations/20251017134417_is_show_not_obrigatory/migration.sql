@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "InsurerPlan" ALTER COLUMN "is" DROP NOT NULL,
+ALTER COLUMN "isShow" DROP NOT NULL;

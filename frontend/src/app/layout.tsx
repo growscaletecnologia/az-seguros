@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import ClientGtmScripts from "@/components/ClientGtmScripts";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import ChatWidget from "@/components/chatbot/Chat";
 import { Toaster } from "sonner";
-import ClientGtmScripts from "@/components/ClientGtmScripts";
-
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,8 +28,9 @@ export default function RootLayout({
 			<body className={inter.className}>
 				<Header />
 				<main className="min-h-screen pt-16">{children}</main>
+				<ChatWidget />
 				<Footer />
-				<Toaster position="top-right" richColors />
+				<Toaster position="top-center" richColors />
 			</body>
 		</html>
 	);

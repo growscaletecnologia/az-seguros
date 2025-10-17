@@ -569,9 +569,9 @@ model SecurityIntegration {
   tokenExpiresAt  DateTime?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-
+  insurerProviderId String? // 👈 nova FK
   InsuranceCache  InsuranceCache[]
-  InsurerProvider InsurerProvider?
+  insurerProvider   InsurerProvider? @relation(fields: [insurerProviderId], references: [id])
 
   plans           InsurerPlan[]
 }
@@ -599,7 +599,7 @@ model InsurerProvider {
   logo        String?   @default("")
   terms_url   String?  @default("")
   insurerId   String   @unique
-  insurer     SecurityIntegration  @relation(fields: [insurerId], references: [id])
+  securityIntegrations SecurityIntegration[]
 
   @@index([insurerId])
 }
@@ -609,10 +609,10 @@ model InsurerPlan {
   id             Int       @id @default(autoincrement())
   externalId     Int?
   additionalId   Int?      @default(0)
-  ref            String
+  ref            String?
   slug           String    @unique
-  is             String
-  isShow         String
+  is             String?
+  isShow         String?
   name           String
   multitrip      Boolean   @default(false)
   is_highlight   Boolean   @default(false)
@@ -627,6 +627,8 @@ model InsurerPlan {
   destinies      InsurerPlanDestiny[]
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
+
+  planBenefits   InsurerPlanBenefit[]
 
   @@index([securityIntegrationId])
 }
@@ -686,6 +688,18 @@ model PlanBenefit {
   longDescription String?  @db.Text
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+
+    plans           InsurerPlanBenefit[]
+}
+
+model InsurerPlanBenefit {
+  insurerPlanId  Int
+  planBenefitId  Int
+
+  insurerPlan    InsurerPlan @relation(fields: [insurerPlanId], references: [id], onDelete: Cascade)
+  planBenefit    PlanBenefit @relation(fields: [planBenefitId], references: [id], onDelete: Cascade)
+
+  @@id([insurerPlanId, planBenefitId]) // chave composta, evita duplicidade e não precisa id autoincrement
 }
 
 model Coverage {

@@ -1,37 +1,39 @@
 "use client";
 
-import React from "react";
 import { type Post, postsService } from "@/services/posts.service";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import React from "react";
 import { useEffect, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Calendar, User, CheckCircle } from "lucide-react";
 import { buildImageUrl } from "@/utils/imageUtils";
+import { ArrowLeft, Calendar, CheckCircle, User } from "lucide-react";
 
 // Imports para o formulário de cotação
 import { DateRangePicker } from "@/components/Inputs/CustomCalendar";
-import EmailField from "@/components/Inputs/EmailInput";
-import PhoneField from "@/components/Inputs/PhoneInput";
 import DestinationSelect from "@/components/Inputs/DestinationSelect";
-import PassengersSelect from "@/components/Inputs/PassengersSelect,";
+import EmailField from "@/components/Inputs/EmailInput";
+import PassengersSelect from "@/components/Inputs/PassengersSelect";
+import PhoneField from "@/components/Inputs/PhoneInput";
 import {
 	HoverCard,
 	HoverCardContent,
 	HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { usePreRegisterForm } from "@/hooks/useRegisterStore";
-import type { PreRegisterForm } from "@/types/types";
 import { couponsService } from "@/services/api/coupons";
+import type { PreRegisterForm } from "@/types/types";
 
 /**
  * Página pública de visualização de post individual por slug
  */
-export default function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
+export default function BlogPostPage({
+	params,
+}: { params: Promise<{ slug: string }> }) {
 	const router = useRouter();
 	const { slug } = React.use(params);
 	const [post, setPost] = useState<Post | null>(null);
@@ -148,9 +150,9 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
 			return;
 		}
 
-		const finalForm = { 
-			...formData, 
-			coupon: coupomChecked && featuredCoupon ? featuredCoupon.code : "" 
+		const finalForm = {
+			...formData,
+			coupon: coupomChecked && featuredCoupon ? featuredCoupon.code : "",
 		};
 
 		setForm(finalForm);
@@ -158,27 +160,25 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
 		console.log("Form submitted:", finalForm);
 	}
 
-
-
 	// Função para obter a URL da imagem principal do post
 	const getMainImageUrl = (post: Post) => {
 		// Prioriza coverImage se disponível
 		if (post.coverImage) {
 			return buildImageUrl(post.coverImage);
 		}
-		
+
 		// Caso contrário, procura por media marcada como principal
 		const mainImage = post.media?.find((media) => media.isMain);
 		if (mainImage?.url) {
 			return buildImageUrl(mainImage.url);
 		}
-		
+
 		// Se não encontrar nenhuma, usa a primeira imagem disponível
 		const firstImage = post.media?.[0];
 		if (firstImage?.url) {
 			return buildImageUrl(firstImage.url);
 		}
-		
+
 		// Fallback para placeholder
 		return buildImageUrl(null);
 	};
@@ -289,7 +289,7 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
 							<h3 className="text-xl font-bold mb-4 text-center">
 								Faça sua cotação de seguro viagem e garanta o melhor preço
 							</h3>
-							
+
 							{/* Seção do cupom */}
 							{featuredCoupon && (
 								<div className="mb-4">
@@ -310,8 +310,8 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
 													Cupom "{featuredCoupon.code}" aplicado!
 												</span>
 												<span className="text-xs text-green-200">
-													{featuredCoupon.discountType === "PERCENTAGE" 
-														? `${featuredCoupon.discount}% OFF` 
+													{featuredCoupon.discountType === "PERCENTAGE"
+														? `${featuredCoupon.discount}% OFF`
 														: `R$ ${featuredCoupon.discount} OFF`}
 												</span>
 											</div>
@@ -325,9 +325,9 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
 												checked={coupomChecked}
 												onChange={() => {
 													setCoupomChecked(!coupomChecked);
-													setFormData((prev) => ({ 
-														...prev, 
-														coupon: coupomChecked ? "" : featuredCoupon.code 
+													setFormData((prev) => ({
+														...prev,
+														coupon: coupomChecked ? "" : featuredCoupon.code,
 													}));
 												}}
 											/>
@@ -336,8 +336,8 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
 													Aplicar cupom "{featuredCoupon.code}"
 												</span>
 												<span className="text-xs text-yellow-200">
-													{featuredCoupon.discountType === "PERCENTAGE" 
-														? `${featuredCoupon.discount}% OFF` 
+													{featuredCoupon.discountType === "PERCENTAGE"
+														? `${featuredCoupon.discount}% OFF`
 														: `R$ ${featuredCoupon.discount} OFF`}
 												</span>
 											</div>
@@ -464,8 +464,8 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
 												Este campo é obrigatório para confirmar que a viagem
 												ainda não foi iniciada.
 												<b>
-													Atenção: não é permitido renovar caso o passageiro
-													já esteja em viagem.
+													Atenção: não é permitido renovar caso o passageiro já
+													esteja em viagem.
 												</b>
 											</div>
 										</HoverCardContent>

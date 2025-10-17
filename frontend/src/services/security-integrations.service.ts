@@ -1,16 +1,17 @@
-import { api } from '@/lib/api';
-import { SecurityIntegration } from '@/types/types';
+import { api } from "@/lib/api";
+import type { SecurityIntegration } from "@/types/types";
 
-
-const BASE_URL = '/security-integrations';
+const BASE_URL = "/security-integrations";
 
 /**
  * Busca todas as integrações de segurança
  * @returns Lista de integrações de segurança
  */
-export async function getAllSecurityIntegrations(): Promise<SecurityIntegration[]> {
-  const response = await api.get<SecurityIntegration[]>(BASE_URL)
-  return response.data
+export async function getAllSecurityIntegrations(): Promise<
+	SecurityIntegration[]
+> {
+	const response = await api.get<SecurityIntegration[]>(BASE_URL);
+	return response.data;
 }
 
 /**
@@ -18,9 +19,11 @@ export async function getAllSecurityIntegrations(): Promise<SecurityIntegration[
  * @param id ID da integração
  * @returns Dados da integração de segurança
  */
-export async function getSecurityIntegrationById(id: string): Promise<SecurityIntegration> {
-  const response = await api.get<SecurityIntegration>(`${BASE_URL}/${id}`)
-  return response.data
+export async function getSecurityIntegrationById(
+	id: string,
+): Promise<SecurityIntegration> {
+	const response = await api.get<SecurityIntegration>(`${BASE_URL}/${id}`);
+	return response.data;
 }
 
 /**
@@ -28,9 +31,11 @@ export async function getSecurityIntegrationById(id: string): Promise<SecurityIn
  * @param data Dados da nova integração
  * @returns Integração criada
  */
-export async function createSecurityIntegration(data: SecurityIntegration): Promise<SecurityIntegration> {
-  const response = await api.post<SecurityIntegration>(BASE_URL, data)
-  return response.data
+export async function createSecurityIntegration(
+	data: SecurityIntegration,
+): Promise<SecurityIntegration> {
+	const response = await api.post<SecurityIntegration>(BASE_URL, data);
+	return response.data;
 }
 
 /**
@@ -39,9 +44,15 @@ export async function createSecurityIntegration(data: SecurityIntegration): Prom
  * @param data Dados a serem atualizados
  * @returns Integração atualizada
  */
-export async function updateSecurityIntegration(id: string, data: Partial<SecurityIntegration>): Promise<SecurityIntegration> {
-  const response = await api.patch<SecurityIntegration>(`${BASE_URL}/${id}`, data)
-  return response.data
+export async function updateSecurityIntegration(
+	id: string,
+	data: Partial<SecurityIntegration>,
+): Promise<SecurityIntegration> {
+	const response = await api.patch<SecurityIntegration>(
+		`${BASE_URL}/${id}`,
+		data,
+	);
+	return response.data;
 }
 
 /**
@@ -50,5 +61,5 @@ export async function updateSecurityIntegration(id: string, data: Partial<Securi
  * @returns Resultado da operação
  */
 export async function deleteSecurityIntegration(id: string): Promise<void> {
-  await api.delete(`${BASE_URL}/${id}`);
+	await api.delete(`${BASE_URL}/${id}`);
 }

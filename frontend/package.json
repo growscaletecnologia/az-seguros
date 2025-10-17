@@ -10,7 +10,7 @@
 		"dev": "next dev",
 		"build": "next build",
 		"start": "next start",
-		"format": "npx @biomejs/biome format --write ./app && npx @biomejs/biome check ./app --fix",
+		"format": "npx @biomejs/biome format --write ./src && npx @biomejs/biome check ./src --fix",
 		"check": "npx @biomejs/biome check --fix",
 		"postinstall": "node ./postinstall.js"
 	},
@@ -62,6 +62,8 @@
 		"next": "15.5.2",
 		"next-themes": "^0.4.6",
 		"react": "19.1.0",
+		"react-chat-elements": "^12.0.18",
+		"react-chatbot-kit": "^2.2.2",
 		"react-datepicker": "^8.7.0",
 		"react-day-picker": "^9.11.0",
 		"react-dom": "19.1.0",

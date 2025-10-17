@@ -75,23 +75,67 @@ export class CouponsService {
    * @param code Código do cupom
    * @returns O cupom encontrado
    */
-  async findByCode(code: string) {
-    const coupon = await this.prisma.coupom.findFirst({
-      where: {
-        code,
-        deleted: false,
-        status: CoupomStatus.ACTIVE,
-        expiresAt: { gt: new Date() },
-      },
-    })
+  // No seu serviço, onde o método findByCode está
+ async findByCode(code: string) {
+    // 1. Busca o cupom APENAS pelo código para verificar sua existência inicial.
+    const couponWithUsage = await this.prisma.coupom.findFirst({
+        where: {
+            code,
+            deleted: false, // Mantemos o soft delete fora
+        },
+        include: {
+            // Inclui a contagem de usos
+            _count: {
+                select: {
+                    usages: true,
+                },
+            },
+        },
+    });
 
-    if (!coupon) {
-      throw new NotFoundException(`Cupom com código ${code} não encontrado ou expirado`)
+    // ===============================================
+    // VALIDAÇÃO 1: Cupom Não Encontrado (Código Incorreto)
+    // ===============================================
+    if (!couponWithUsage) {
+        throw new NotFoundException(`Cupom com código "${code}" não existe.`);
     }
 
-    return coupon
-  }
+    const { _count, ...coupon } = couponWithUsage; // Separa a contagem
 
+    // ===============================================
+    // VALIDAÇÃO 2: Status (Inativo/Suspenso)
+    // ===============================================
+    if (coupon.status !== CoupomStatus.ACTIVE) {
+        // Retornar 400 Bad Request ou uma exceção personalizada de status
+        throw new BadRequestException(`Cupom "${code}" está inativo.`);
+    }
+
+    // ===============================================
+    // VALIDAÇÃO 3: Data de Expiração
+    // ===============================================
+    const now = new Date();
+    if (coupon.expiresAt < now) {
+        // Retornar 400 Bad Request ou uma exceção personalizada de expiração
+        throw new BadRequestException(`Cupom "${code}" expirou em ${coupon.expiresAt.toISOString().split('T')[0]}.`);
+    }
+
+    // ===============================================
+    // VALIDAÇÃO 4: Limite de Uso
+    // ===============================================
+    const usages = _count.usages;
+    const usageLimit = coupon.usageLimit;
+    
+    if (usageLimit !== null && usages >= usageLimit) {
+        // Retornar 400 Bad Request ou uma exceção personalizada de limite
+        throw new BadRequestException(`Cupom "${code}" atingiu seu limite máximo de usos (${usageLimit}).`);
+    }
+    
+    // Retorna o cupom válido (e pode incluir o uso restante para o frontend, se desejar)
+    return {
+        ...coupon,
+        usagesLeft: usageLimit !== null ? usageLimit - usages : null,
+    }; 
+} 
   /**
    * Atualiza um cupom existente
    * @param id ID do cupom

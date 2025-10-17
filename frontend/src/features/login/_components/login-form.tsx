@@ -66,9 +66,12 @@ export function LoginForm({
 			toast.success("Login realizado com sucesso!");
 		} catch (error) {
 			console.error("Erro no login:", error);
-			
+
 			// Exibe a mensagem específica do erro (incluindo detalhes para contas bloqueadas)
-			const errorMessage = error instanceof Error ? error.message : "Credenciais inválidas ou erro no servidor";
+			const errorMessage =
+				error instanceof Error
+					? error.message
+					: "Credenciais inválidas ou erro no servidor";
 			toast.error(errorMessage);
 		} finally {
 			setIsLoading(false);
