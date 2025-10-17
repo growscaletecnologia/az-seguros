@@ -2,67 +2,65 @@ import { Injectable } from '@nestjs/common'
 import { ValePayProvider } from '../provider/valePay.provider'
 import { AxiosInstance } from 'axios'
 import {
-  GeneratePixQrCodeRequestRawType,
   GeneratePixQrCodeRequestType,
-  GeneratePixQrCodeResponseRawType,
   GeneratePixQrCodeResponseType,
+  TokenizeCardRequestType,
+  TransactionsCustomerRequestType,
+  TransactionsPaymentRequestType,
+  TransactionsStartRequestType,
+  ValePayCompanyConfig,
 } from '../types/valePay.types'
+import {
+  mapPixQrCodeRequestToRaw,
+  mapPixQrCodeResponseToDomain,
+  mapTokenizeCardRequestToRaw,
+  mapTransactionsPaymentRequestToRaw,
+  mapTransactionsStartRequestToRaw,
+} from '../mappers/valePay.mappers'
 
 @Injectable()
 export class ValePayService {
   private http: AxiosInstance
+  private companyConfig: ValePayCompanyConfig
 
   constructor(valePayProvider: ValePayProvider) {
     this.http = valePayProvider.getAxiosInstance()
+    this.companyConfig = valePayProvider.getCompanyConfig()
   }
 
   async genPixQrCode(data: GeneratePixQrCodeRequestType): Promise<GeneratePixQrCodeResponseType> {
-    const body = this.mapPixQrCodeRequestToRaw(data)
+    const body = mapPixQrCodeRequestToRaw({ ...data, ...this.companyConfig })
 
-    try {
-      const response = await this.http.post<GeneratePixQrCodeResponseRawType>(
-        '/v1/api/pix/dynamic-qrcode',
-        body,
-      )
-      return this.mapPixQrCodeResponseToDomain(response.data)
-    } catch (error) {
-      throw error
-    }
+    const response = await this.http.post('/v1/api/pix/dynamic-qrcode', body)
+    return mapPixQrCodeResponseToDomain(response.data)
   }
 
-  private mapPixQrCodeRequestToRaw({
-    companyUuid,
-    expirationDate,
-    userUuid,
-    webhookUrl,
-    ...singleWorded
-  }: GeneratePixQrCodeRequestType): GeneratePixQrCodeRequestRawType {
-    return {
-      company_uuid: companyUuid,
-      user_uuid: userUuid,
-      expiration_date: expirationDate,
-      webhook_url: webhookUrl,
-      ...singleWorded,
-    }
+  async transactionStart(data: TransactionsStartRequestType): Promise<unknown> {
+    const body = mapTransactionsStartRequestToRaw({
+      ...data,
+      companyUuid: this.companyConfig.companyUuid,
+    })
+
+    const response = await this.http.post('/v1/api/transactions/start', body)
+    return response.data
   }
 
-  private mapPixQrCodeResponseToDomain({
-    formatted_amount,
-    liquid_amount,
-    max_tax,
-    percentage_tax,
-    total_tax,
-    transaction_uuid,
-    ...singleWorded
-  }: GeneratePixQrCodeResponseRawType): GeneratePixQrCodeResponseType {
-    return {
-      transactionUuid: transaction_uuid,
-      formattedAmount: formatted_amount,
-      liquidAmount: liquid_amount,
-      percentageTax: percentage_tax,
-      totalTax: total_tax,
-      maxTax: max_tax,
-      ...singleWorded,
-    }
+  async transactionCustomer(data: TransactionsCustomerRequestType): Promise<unknown> {
+    const response = await this.http.post('/v1/api/transactions/customer', data)
+    return response.data
+  }
+
+  async tokenizeCard(data: TokenizeCardRequestType): Promise<unknown> {
+    const body = mapTokenizeCardRequestToRaw(data)
+
+    const response = await this.http.post('/v1/api/cards/tokenize', body)
+    return response.data
+  }
+
+  async transactionPayment(data: TransactionsPaymentRequestType): Promise<unknown> {
+    const body = mapTransactionsPaymentRequestToRaw(data)
+
+    const response = await this.http.post('/v1/api/transactions/payment', body)
+    return response.data
   }
 }
