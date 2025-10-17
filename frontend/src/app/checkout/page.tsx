@@ -27,7 +27,6 @@ import { DESTINIES } from "@/types/destination";
 export default function CheckoutPage() {
 	const router = useRouter();
 	const { plan, form } = useCheckout();
-	console.log("FORM", form)
 
 	const [segurados, setSegurados] = useState([
 		{ nome: "", nascimento: "", cpf: "", age: 0, type: "age" },
