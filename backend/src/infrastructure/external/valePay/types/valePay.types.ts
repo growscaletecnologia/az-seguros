@@ -41,6 +41,7 @@ export type GeneratePixQrCodeResponseRawType = GeneratePixQrCodeResponseCommon &
   percentage_tax: number
   total_tax: number
   max_tax: boolean
+  code_sale: string
 }
 
 export type GeneratePixQrCodeRequestType = GeneratePixQrCodeRequestCommon & {
@@ -55,7 +56,9 @@ export type GeneratePixQrCodeResponseType = GeneratePixQrCodeResponseCommon & {
   percentageTax: number
   totalTax: number
   maxTax: boolean
+  codeSale: string
 }
+
 // -- ValePay Generate Pix QR Code -- END --
 
 // -- ValePay Start Transaction -- START --
@@ -82,6 +85,27 @@ export type TransactionsStartRequestRawType = TransactionsStartRequestCommon & {
   webhook_url: string
   company_uuid: string
 }
+
+export type TransactionStartRawResponse = {
+  uuid: string
+  total: number
+  installments: number
+  acquirer_guid: string
+  amount_installments: number
+  code_sale: string
+  amount_return: number
+}
+
+export type TransactionStartResponse = {
+  uuid: string
+  total: number
+  installments: number
+  acquirerGuid: string
+  amountInstallments: number
+  codeSale: string
+  amountReturn: number
+}
+
 // -- ValePay Start Transaction -- END --
 
 // -- ValePay Transaction Customer -- START --
@@ -121,6 +145,23 @@ export type TransactionsCustomerRequestRawType = {
   }
 }
 
+export type TransactionCustomerResponseRaw = {
+  uuid: string
+  total: number
+  installments: number
+  amount_installments: number
+  customer_uuid: string
+}
+
+export type TransactionCustomerResponse = {
+  uuid: string
+  total: number
+  installments: number
+  amountInstallments: number
+  customerUuid: string
+}
+
+
 // -- ValePay Transaction Customer -- END --
 
 // -- ValePay TokenizeCard -- START --
@@ -133,6 +174,11 @@ export type TokenizeCardRequestType = {
 export type TokenizeCardRequestRawType = {
   cardNumber: string
   transaction_uuid: string
+}
+
+export type TokenizeCardResponseType = {
+  token: string
+  paymentMethodID: string
 }
 
 // -- ValePay TokenizeCard -- END --
@@ -162,6 +208,41 @@ export type TransactionsPaymentRequestRawType = {
     ip_address: string
     soft_description: string
   }
+}
+
+type TransactionPaymentResponseCommon = {
+  uuid: string
+  installments: number
+  authorization: string
+  product: {
+    name: string
+  }
+  status: {
+    id: number
+    status: string
+  }
+}
+
+export type TransactionPaymentResponseRawType = TransactionPaymentResponseCommon & {
+  code_sale: string
+  total_amount: number
+  amount_instalment: number
+  amount_return: number
+  payment_date: Date | string
+  antecipation_date: Date | string
+  sof_description: string
+  aquirer_message: string
+}
+
+export type TransactionPaymentResponseType = TransactionPaymentResponseCommon & {
+  codeSale: string
+  totalAmount: number
+  amountInstalment: number
+  amountReturn: number
+  paymentDate: Date | string
+  antecipationDate: Date | string
+  sofDescription: string
+  aquirerMessage: string
 }
 
 // -- ValePay Transaction Payment -- END --
