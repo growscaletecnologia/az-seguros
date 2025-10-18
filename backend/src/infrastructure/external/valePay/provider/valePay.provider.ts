@@ -96,7 +96,7 @@ export class ValePayProvider {
       this.authenticate()
 
       if (error.config) {
-        delete error.config.headers?.Authorization
+        error.config.headers.Authorization = this.buildHeaders().Authorization
 
         return await this.axiosInstance.request(error.config)
       }
