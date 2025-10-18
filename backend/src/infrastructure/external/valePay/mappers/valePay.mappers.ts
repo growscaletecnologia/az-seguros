@@ -12,6 +12,12 @@ import {
   TransactionsPaymentRequestRawType,
   TransactionsPaymentRequestType,
   ValePayCompanyConfig,
+  TransactionStartRawResponse,
+  TransactionStartResponse,
+  TransactionCustomerResponse,
+  TransactionCustomerResponseRaw,
+  TransactionPaymentResponseRawType,
+  TransactionPaymentResponseType,
 } from '../types/valePay.types'
 
 export function mapPixQrCodeRequestToRaw({
@@ -37,6 +43,7 @@ export function mapPixQrCodeResponseToDomain({
   percentage_tax,
   total_tax,
   transaction_uuid,
+  code_sale,
   ...common
 }: GeneratePixQrCodeResponseRawType): GeneratePixQrCodeResponseType {
   return {
@@ -46,6 +53,7 @@ export function mapPixQrCodeResponseToDomain({
     percentageTax: percentage_tax,
     totalTax: total_tax,
     maxTax: max_tax,
+    codeSale: code_sale,
     ...common,
   }
 }
@@ -105,5 +113,57 @@ export function mapTransactionsPaymentRequestToRaw({
       soft_description: softDescription,
       ...common,
     },
+  }
+}
+
+export function mapTransactionStartResponseToDomain({
+  acquirer_guid,
+  amount_installments,
+  code_sale,
+  amount_return,
+  ...common
+}: TransactionStartRawResponse): TransactionStartResponse {
+  return {
+    acquirerGuid: acquirer_guid,
+    amountInstallments: amount_installments,
+    codeSale: code_sale,
+    amountReturn: amount_return,
+    ...common,
+  }
+}
+
+export function mapTransactionCustomerResponseToDomain({
+  amount_installments,
+  customer_uuid,
+  ...common
+}: TransactionCustomerResponseRaw): TransactionCustomerResponse {
+  return {
+    amountInstallments: amount_installments,
+    customerUuid: customer_uuid,
+    ...common,
+  }
+}
+
+export function mapTransactionPaymentResponseToDomain({
+  code_sale,
+  total_amount,
+  amount_instalment,
+  amount_return,
+  payment_date,
+  antecipation_date,
+  sof_description,
+  aquirer_message,
+  ...common
+}: TransactionPaymentResponseRawType): TransactionPaymentResponseType {
+  return {
+    codeSale: code_sale,
+    totalAmount: total_amount,
+    amountInstalment: amount_instalment,
+    amountReturn: amount_return,
+    paymentDate: payment_date,
+    antecipationDate: antecipation_date,
+    sofDescription: sof_description,
+    aquirerMessage: aquirer_message,
+    ...common,
   }
 }

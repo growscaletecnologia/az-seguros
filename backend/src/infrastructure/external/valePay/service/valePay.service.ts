@@ -14,8 +14,11 @@ import {
   mapPixQrCodeRequestToRaw,
   mapPixQrCodeResponseToDomain,
   mapTokenizeCardRequestToRaw,
+  mapTransactionCustomerResponseToDomain,
+  mapTransactionPaymentResponseToDomain,
   mapTransactionsPaymentRequestToRaw,
   mapTransactionsStartRequestToRaw,
+  mapTransactionStartResponseToDomain,
 } from '../mappers/valePay.mappers'
 
 @Injectable()
@@ -31,7 +34,7 @@ export class ValePayService {
   async genPixQrCode(data: GeneratePixQrCodeRequestType): Promise<GeneratePixQrCodeResponseType> {
     const body = mapPixQrCodeRequestToRaw({ ...data, ...this.companyConfig })
 
-    const response = await this.http.post('/v1/api/pix/dynamic-qrcode', body)
+    const response = await this.http.post('v1/api/pix/dynamic-qrcode', body)
     return mapPixQrCodeResponseToDomain(response.data)
   }
 
@@ -41,26 +44,26 @@ export class ValePayService {
       companyUuid: this.companyConfig.companyUuid,
     })
 
-    const response = await this.http.post('/v1/api/transactions/start', body)
-    return response.data
+    const response = await this.http.post('/v1/api/transaction/start', body)
+    return mapTransactionStartResponseToDomain(response.data)
   }
 
   async transactionCustomer(data: TransactionsCustomerRequestType): Promise<unknown> {
-    const response = await this.http.post('/v1/api/transactions/customer', data)
-    return response.data
+    const response = await this.http.post('/v1/api/transaction/customer', data)
+    return mapTransactionCustomerResponseToDomain(response.data)
   }
 
   async tokenizeCard(data: TokenizeCardRequestType): Promise<unknown> {
     const body = mapTokenizeCardRequestToRaw(data)
 
-    const response = await this.http.post('/v1/api/cards/tokenize', body)
+    const response = await this.http.post('/v1/api/transaction/tokenize/card', body)
     return response.data
   }
 
   async transactionPayment(data: TransactionsPaymentRequestType): Promise<unknown> {
     const body = mapTransactionsPaymentRequestToRaw(data)
 
-    const response = await this.http.post('/v1/api/transactions/payment', body)
-    return response.data
+    const response = await this.http.post('/v1/api/transaction/payment', body)
+    return mapTransactionPaymentResponseToDomain(response.data)
   }
 }
